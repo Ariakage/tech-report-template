@@ -1,0 +1,37 @@
+%% =============================================================================
+%% sections/01_introduction.tex
+%% =============================================================================
+\section{Introduction}
+\label{sec:intro}
+
+Modern clinical surveillance systems ingest continuous bedside telemetry alongside intermittent laboratory assays, medication administration logs, and triage notes~\cite{johnson2023mimic, rajpurkar2022ai}. Despite rapid progress in clinical foundation models~\cite{moor2023foundation}, deploying predictive risk models in real-time hospital workflows remains constrained by three tightly coupled operational challenges:
+
+\begin{itemize}
+  \item \textbf{Asynchronous missingness.} Wearable and bedside sensors experience irregular sampling rates, motion artifacts, and transient lead disconnections that violate synchronized sequence assumptions~\cite{shukla2021multi}.
+  \item \textbf{Confidence miscalibration.} High-capacity multimodal Transformers frequently assign overconfident risk scores during distribution shifts, undermining clinician trust and triggering alarm fatigue~\cite{guo2017calibration, ovadia2019can}.
+  \item \textbf{Latency and interpretability budgets.} Edge clinical workstations require sub-20\,ms inference per patient card while exposing modality-level attribution and calibrated uncertainty intervals.
+\end{itemize}
+
+To address these requirements simultaneously, we present \textbf{AuroraCard}, a modular physiological fusion architecture that treats each patient encounter as a structured, uncertainty-aware state representation. Rather than concatenating imputed dense tensors into a single quadratic attention stack, AuroraCard encodes each stream via a continuous-time decay kernel and fuses available modalities through an entropy-gated cross-modal router.
+
+\begin{hccard}[Core Contributions]
+  \begin{enumerate}
+    \item \textbf{Modality-aware continuous encoding:} We formulate a closed-form irregular-interval state update that eliminates naive forward-fill imputation artifacts.
+    \item \textbf{Conformal temperature routing:} A lightweight calibration layer adjusts predictive entropy dynamically based on real-time sensor completeness.
+    \item \textbf{Multi-center validation:} Across four public and federated cohorts, AuroraCard achieves state-of-the-art discrimination, calibration, and edge latency.
+  \end{enumerate}
+\end{hccard}
+
+Figure~\ref{fig:metrics} summarizes the headline operational gains achieved by AuroraCard across our primary multi-center test split, illustrating simultaneous improvements in discriminative accuracy, probability calibration, missing-modality robustness, and inference throughput.
+
+\begin{figure*}[t]
+  \begin{hcmetricgrid}[4]
+    \hcmetriccard{blue}{heart}{Macro AUROC}{96.4\%}{+3.8\% vs. Transformer} &
+    \hcmetriccard{pink}{shield}{Calibration ECE}{0.015}{$-$61.5\% error reduction} &
+    \hcmetriccard{blue}{bolt}{Window Latency}{14.2\,ms}{$-$44\% vs. Multimodal ViT} &
+    \hcmetriccard{pink}{check}{Dropout Robustness}{94.1\%}{At 40\% sensor drop}
+  \end{hcmetricgrid}
+  \caption{Headline clinical monitoring metrics for AuroraCard on the multi-center VitalBench-26 evaluation suite ($N = 46{,}050$ held-out stays). All improvements are statistically significant ($p < 0.001$, paired bootstrap).}
+  \Description{Four side-by-side health-card metric tiles showing Macro AUROC 96.4 percent, Calibration ECE 0.015, Window Latency 14.2 ms, and Dropout Robustness 94.1 percent.}
+  \label{fig:metrics}
+\end{figure*}

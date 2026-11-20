@@ -1,0 +1,88 @@
+%% =============================================================================
+%% sections/02_methodology.tex
+%% =============================================================================
+\section{Methodology}
+\label{sec:method}
+
+Let a longitudinal patient encounter over horizon $[0, T]$ consist of $M$ heterogeneous physiological modalities $\mathcal{X} = \{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(M)}\}$, where each stream $\mathcal{S}^{(m)} = \{(t_k^{(m)}, \mathbf{x}_k^{(m)}, \mathbf{m}_k^{(m)})\}_{k=1}^{L_m}$ contains irregular timestamps $t_k^{(m)}$, measurement vectors $\mathbf{x}_k^{(m)} \in \mathbb{R}^{d_m}$, and binary observation masks $\mathbf{m}_k^{(m)} \in \{0,1\}^{d_m}$.
+
+\subsection{Continuous-Time Vital Encoding}
+\label{sec:method:encoder}
+
+Following continuous-time neural dynamics~\cite{gu2022efficiently, kidger2020neural}, we evolve each modality latent state $\mathbf{h}_k^{(m)} \in \mathbb{R}^{d}$ between consecutive timestamps $\Delta t_k = t_k^{(m)} - t_{k-1}^{(m)}$ using an exponential decay gate parameterized by positive learnable rates $\boldsymbol{\gamma}_m = \operatorname{softplus}(\mathbf{w}_m)$:
+\begin{align}
+  \tilde{\mathbf{h}}_{k}^{(m)} &= \exp\!\big(-\boldsymbol{\gamma}_m \Delta t_k\big) \odot \mathbf{h}_{k-1}^{(m)}, \nonumber \\
+  \mathbf{h}_k^{(m)} &= \operatorname{GRUCell}\!\big(\mathbf{u}_k^{(m)}, \tilde{\mathbf{h}}_k^{(m)}\big),
+  \label{eq:ct-decay}
+\end{align}
+where $\mathbf{u}_k^{(m)} = \phi_m(\mathbf{x}_k^{(m)} \odot \mathbf{m}_k^{(m)}, \log(1 + \Delta t_k))$ projects observed channels and inter-arrival intervals into the shared latent space. When a channel remains unobserved for an extended interval, its latent influence decays smoothly toward the prior baseline without injecting artificial discontinuities.
+
+\begin{hcdefinition}{Modality Reliability Score}{rel}
+  Given the instantaneous observation density $\rho_m(t) \in [0, 1]$ over lookback window $[t - W, t]$ and encoder epistemic variance $\sigma_m^2(t)$, the \emph{reliability weight} of modality $m$ is defined as
+  \begin{equation}
+    \alpha_m(t) = \frac{\rho_m(t)\,\exp\!\big(-\beta \sigma_m^2(t)\big)}{\sum_{j=1}^{M} \rho_j(t)\,\exp\!\big(-\beta \sigma_j^2(t)\big) + \varepsilon},
+    \label{eq:reliability}
+  \end{equation}
+  with temperature sensitivity $\beta > 0$ and numerical stabilizer $\varepsilon = 10^{-6}$.
+\end{hcdefinition}
+
+\subsection{Entropy-Gated Fusion and Calibration}
+\label{sec:method:fusion}
+
+Rather than using static modality weights, AuroraCard aggregates the modality embeddings $\mathbf{z}^{(m)} = \mathbf{h}_{L_m}^{(m)}$ into a unified patient-card representation $\mathbf{z}_{\mathrm{card}} = \sum_{m=1}^{M} \alpha_m(T)\,\mathbf{W}_m \mathbf{z}^{(m)}$ and modulates the output logit temperature $\tau(\mathcal{X})$ using the effective Shannon entropy $H(\boldsymbol{\alpha}) = -\sum_{m} \alpha_m \log \alpha_m$:
+\begin{equation}
+  \hat{p}(y \mid \mathcal{X}) = \operatorname{softmax}\!\left(\frac{\mathbf{W}_{\mathrm{cls}}\,\mathbf{z}_{\mathrm{card}}}{\tau_0 + \lambda \, \big(1 - \bar{\rho}(\mathcal{X})\big) + \eta H(\boldsymbol{\alpha})}\right),
+  \label{eq:temp-routing}
+\end{equation}
+where $\bar{\rho}(\mathcal{X}) = \frac{1}{M}\sum_{m=1}^{M} \rho_m(T)$ measures aggregate sensor availability, and $(\tau_0, \lambda, \eta) \in \mathbb{R}_{>0}^3$ are fitted strictly on a held-out calibration split using proper scoring rules.
+
+\begin{hctheorem}{Finite-Sample Conformal Coverage}{coverage}
+  Let $\mathcal{D}_{\mathrm{cal}} = \{(\mathcal{X}_i, y_i)\}_{i=1}^{n}$ be exchangeable with a test encounter $(\mathcal{X}_{\mathrm{test}}, y_{\mathrm{test}})$ under arbitrary covariate-dependent sensor dropout $\mathcal{M}(\mathcal{X})$. Define nonconformity scores $s_i = 1 - \hat{p}(y_i \mid \mathcal{X}_i)$ from Eq.~\eqref{eq:temp-routing} and let $\hat{q}_{1-\delta}$ be the $\lceil (n+1)(1-\delta)\rceil / n$ empirical quantile of $\{s_i\}_{i=1}^{n}$. Then the prediction set $\mathcal{C}(\mathcal{X}_{\mathrm{test}}) = \{y : 1 - \hat{p}(y \mid \mathcal{X}_{\mathrm{test}}) \le \hat{q}_{1-\delta}\}$ satisfies
+  \[
+    1 - \delta \;\le\; \mathbb{P}\!\big(y_{\mathrm{test}} \in \mathcal{C}(\mathcal{X}_{\mathrm{test}})\big) \;\le\; 1 - \delta + \frac{1}{n + 1}.
+  \]
+\end{hctheorem}
+
+Algorithm~\ref{alg:calibration} details the online conformal calibration pass executed once per deployment site, while Listing~\ref{lst:router} shows the core PyTorch router with key reliability and temperature lines highlighted.
+
+\begin{hcalgorithm}[Online Conformal Calibration Pass]{label=alg:calibration}
+  \Require Calibration split $\mathcal{D}_{\mathrm{cal}}$, trained encoder $f_\theta$, miscoverage $\delta$
+  \Ensure Temperature tuple $(\tau_0, \lambda, \eta)$ and conformal quantile $\hat{q}_{1-\delta}$
+  \State Fit $(\tau_0, \lambda, \eta)$ on $\mathcal{D}_{\mathrm{cal}}$ via L-BFGS \Comment{frozen backbone}
+  \State Initialize nonconformity score buffer $\mathcal{S} \gets \emptyset$
+  \For{each encounter $(\mathcal{X}_i, y_i) \in \mathcal{D}_{\mathrm{cal}}$}
+    \State Compute reliability weights $\boldsymbol{\alpha}_i$ and density $\bar{\rho}_i$ via Eq.~\eqref{eq:reliability}
+    \State Evaluate calibrated probability $\hat{p}(y_i \mid \mathcal{X}_i)$ via Eq.~\eqref{eq:temp-routing}
+    \State Append score $s_i \gets 1 - \hat{p}(y_i \mid \mathcal{X}_i)$ to $\mathcal{S}$
+  \EndFor
+  \State $\hat{q}_{1-\delta} \gets \operatorname{Quantile}\!\big(\mathcal{S},\, \lceil (n+1)(1-\delta) \rceil / n\big)$
+  \State \Return $(\tau_0, \lambda, \eta),\, \hat{q}_{1-\delta}$
+\end{hcalgorithm}
+
+\begin{hccode}[AuroraCard Router (PyTorch)]{language=Python, hlblue={16,17}, hlpink={21,22,23}}{label=lst:router}
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class ConformalRouter(nn.Module):
+    """Entropy-gated calibration router."""
+    def __init__(self, dim: int, classes: int):
+        super().__init__()
+        self.head = nn.Linear(dim, classes)
+        self.tau0 = nn.Parameter(torch.tensor(1.05))
+        self.lam = nn.Parameter(torch.tensor(0.35))
+        self.eta = nn.Parameter(torch.tensor(0.18))
+
+    def forward(self, emb, rho, var, beta=2.0):
+        # Reliability weights alpha_m (Eq. 2)
+        w = rho * torch.exp(-beta * var)
+        alpha = w / (w.sum(dim=-1, keepdim=True) + 1e-6)
+        z_card = torch.einsum("bm,bmd->bd", alpha, emb)
+
+        # Adaptive temperature scaling (Eq. 3)
+        ent = -(alpha * alpha.clamp_min(1e-8).log()).sum(-1)
+        tau = self.tau0 + self.lam * (1 - rho.mean(-1))
+        tau = tau + self.eta * ent
+        logits = self.head(z_card) / tau.unsqueeze(-1)
+        return F.softmax(logits, dim=-1), alpha
+\end{hccode}

@@ -1,0 +1,35 @@
+%% =============================================================================
+%% figures/fig_dropout.tex — Standalone Native PGFPlots Figure
+%% =============================================================================
+\begin{figure}[t]
+  \centering
+  \begin{hcframecard}
+    \begin{tikzpicture}
+      \begin{axis}[
+        hcaxis,
+        xlabel={Missing Sensor Channels (\%)},
+        ylabel={Macro AUROC (\%)},
+        xmin=0, xmax=60,
+        ymin=67, ymax=99,
+        xtick={0,15,30,45,60},
+        ytick={70,75,80,85,90,95},
+        legend style={at={(0.03,0.04)}, anchor=south west}
+      ]
+        \addplot coordinates {(0,96.4) (15,95.9) (30,94.9) (45,93.5) (60,91.4)};
+        \addlegendentry{AuroraCard (Ours)}
+
+        \addplot coordinates {(0,92.6) (15,90.8) (30,88.1) (45,84.4) (60,79.2)};
+        \addlegendentry{Multimodal Transformer}
+
+        \addplot coordinates {(0,92.1) (15,90.9) (30,89.2) (45,86.7) (60,83.1)};
+        \addlegendentry{S4-Med}
+
+        \addplot coordinates {(0,89.7) (15,87.1) (30,83.6) (45,79.1) (60,74.2)};
+        \addlegendentry{GRU-D}
+      \end{axis}
+    \end{tikzpicture}
+  \end{hcframecard}
+  \caption{Graceful degradation under progressive channel dropout. AuroraCard maintains $>91\%$ AUROC even when 60\% of waveform streams are disconnected.}
+  \Description{Line chart comparing Macro AUROC from 0 to 60 percent missing channels for AuroraCard, Multimodal Transformer, S4-Med, and GRU-D.}
+  \label{fig:dropout}
+\end{figure}

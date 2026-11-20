@@ -1,0 +1,21 @@
+# Build outputs & LaTeX auxiliary artifacts
+build/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.listing
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.xdv
+*.run.xml
+*-blx.bib
+.DS_Store

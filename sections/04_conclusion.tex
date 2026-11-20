@@ -1,0 +1,31 @@
+%% =============================================================================
+%% sections/04_conclusion.tex
+%% =============================================================================
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+We introduced \textbf{AuroraCard}, a calibration-first multimodal fusion framework tailored to asynchronous physiological telemetry and longitudinal clinical surveillance. By combining continuous-time latent decay with reliability-weighted fusion and conformal temperature routing, AuroraCard delivers strong discriminative accuracy, verifiable finite-sample uncertainty guarantees, and sub-15\,ms edge inference latency.
+
+\begin{hccaveat}[Clinical Deployment Caveat]
+  While VitalBench-26 spans four geographically diverse medical centers, prospective bedside deployment still requires site-specific threshold governance, human-in-the-loop alert escalation policies, and continuous subgroup fairness auditing~\cite{rajpurkar2022ai}. All retrospective cohorts were de-identified under institutional ethics waivers.
+\end{hccaveat}
+
+\paragraph{Future Directions}
+Promising extensions include incorporating structured clinician progress notes via retrieval-augmented adapters, federated conformal calibration across privacy-preserving hospital consortia, and streaming hardware quantization for wearable triage monitors.
+
+\section*{Acknowledgments}
+We thank the clinical informatics teams across participating partner hospitals for de-identified cohort curation, and the anonymous reviewers for constructive feedback on the conformal coverage analysis.
+
+%% Automatically generated Author ORCID directory from \hcauthor declarations
+\makeorcidlist
+
+%% Reproducibility / Hardware Testbed Card (balances final column beside References)
+%% Tip: For Apple Silicon / systems benchmarks (e.g. aminfer), swap rows to:
+%%   SoC & Memory / OS & Kernel / Compiler & Backend (e.g. Zig & Metal) / Precision.
+\begin{hcenvcard}[Hardware \& Evaluation Environment]
+  \hcenvrow{Compute Node}{NVIDIA L40S (48\,GB) \textperiodcentered\ Edge: Apple M4}
+  \hcenvrow{Host OS}{Ubuntu 24.04 LTS \textperiodcentered\ macOS 15.x}
+  \hcenvrow{Toolchain}{PyTorch 2.6 / CUDA 12.6 \textperiodcentered\ Metal 3.2}
+  \hcenvrow{Precision}{BF16 train \textperiodcentered\ FP16/FP32 calibrated eval}
+  \hcenvrow{Reproducibility}{5 fixed seeds (42--46) \textperiodcentered\ Deterministic}
+\end{hcenvcard}

@@ -1,0 +1,84 @@
+%% =============================================================================
+%% sections/03_experiments.tex
+%% =============================================================================
+\section{Experimental Evaluation}
+\label{sec:experiments}
+
+\begin{table*}[t]
+  \centering
+  \caption{Multi-center benchmark results on VitalBench-26 ($N = 46{,}050$ held-out stays, mean $\pm$ std over 5 seeds). Lower is better for ECE ($\downarrow$) and Latency ($\downarrow$); higher is better for AUROC ($\uparrow$) and AUPRC ($\uparrow$). Best results are highlighted with delta badges relative to Multimodal Transformer.}
+  \label{tab:main-results}
+  \begin{hctable}
+    \begin{tabularx}{\textwidth}{@{}X c c c c c c@{}}
+      \hctoprule
+      \hctablehead
+      \hcth{Model Architecture} & \hcth{Params} & \hcth{Macro AUROC ($\uparrow$)} & \hcth{AUPRC ($\uparrow$)} & \hcth{ECE ($\downarrow$)} & \hcth{40\% Drop ($\uparrow$)} & \hcth{Latency ($\downarrow$)} \\
+      \hcmidrule
+      GRU-D~\cite{che2018recurrent} & 14.2\,M & 89.7 $\pm$ 0.3 & 54.1 $\pm$ 0.6 & 0.052 & 81.4 $\pm$ 0.5 & 19.6\,ms \\
+      \hcaltrow
+      mTAND~\cite{shukla2021multi} & 17.8\,M & 91.4 $\pm$ 0.2 & 58.3 $\pm$ 0.4 & 0.044 & 85.2 $\pm$ 0.4 & 22.8\,ms \\
+      S4-Med~\cite{gu2022efficiently} & 16.5\,M & 92.1 $\pm$ 0.2 & 60.5 $\pm$ 0.5 & 0.041 & 87.9 $\pm$ 0.4 & 16.4\,ms \\
+      \hcaltrow
+      Multimodal Transformer & 19.1\,M & 92.6 $\pm$ 0.2 & 61.9 $\pm$ 0.4 & 0.039 & 86.3 $\pm$ 0.5 & 25.4\,ms \\
+      \hcmidrule
+      \hcbestrow
+      \textbf{AuroraCard (Ours)} \hcpinkbadge{SOTA} & \textbf{17.4\,M} & \textbf{96.4}\gain{+3.8} & \textbf{69.8}\gain{+7.9} & \textbf{0.015}\drop{$-$61.5\%} & \textbf{94.1}\gain{+7.8} & \textbf{14.2\,ms}\speedup{1.8$\times$} \\
+      \hcbottomrule
+    \end{tabularx}
+  \end{hctable}
+\end{table*}
+
+We evaluate AuroraCard on \textbf{VitalBench-26}, a unified multi-center clinical benchmark spanning four hospitals (184{,}200 encounters total; 70\% train, 5\% calibration, 25\% held-out test). All baselines are trained under identical preprocessing, fixed random seeds, and matched parameter budgets ($\approx 18\text{M}$ parameters) on a single NVIDIA L40S GPU.
+
+\begin{hcnote}[Benchmark Protocol \& Measurement Note]
+  Latency is measured end-to-end with batch size~1 across 1{,}000 warm-started streaming windows (p50 wall-clock time, including irregular-timestamp decay projection and conformal calibration head).
+\end{hcnote}
+
+\subsection{Main Multi-Center Benchmark}
+\label{sec:exp:main}
+
+Table~\ref{tab:main-results} compares AuroraCard against recurrent imputation baselines (GRU-D~\cite{che2018recurrent}), irregular-time attention models (mTAND~\cite{shukla2021multi}), structured state-space encoders (S4-Med~\cite{gu2022efficiently}), and a late-fusion Multimodal Transformer. AuroraCard consistently attains the highest discrimination (\hlblue{96.4\%} Macro AUROC) while cutting Expected Calibration Error (ECE) by \hlpink{61.5\%} across both ICU mortality and acute decompensation endpoints. Notably, our continuous-time encoder runs \hlblue{1.8$\times$} faster than the Multimodal Transformer, comfortably meeting real-time bedside display refresh budgets.
+
+\subsection{Robustness Under Progressive Sensor Dropout}
+\label{sec:exp:dropout}
+
+Real-world clinical telemetry frequently experiences partial lead loss during patient transport or nursing interventions. To simulate realistic degradation, we randomly drop between 0\% and 60\% of continuous waveform channels at inference time without retraining. Figure~\ref{fig:dropout} plots Macro AUROC trajectories across escalating dropout severity. While standard cross-modal attention deteriorates rapidly beyond 30\% missingness, AuroraCard smoothly reweights surviving sensors via Eq.~\eqref{eq:reliability} and sustains $>91\%$ AUROC at 60\% disconnection.
+
+\input{figures/fig_dropout}
+
+\subsection{Component Ablation Analysis}
+\label{sec:exp:ablation}
+
+Table~\ref{tab:ablation} isolates the contribution of each architectural module. Removing continuous-time decay degrades missing-data discrimination by 2.9 points, while replacing conformal temperature routing with static temperature scaling nearly doubles calibration error on out-of-hospital shifts.
+
+\begin{table}[t]
+  \centering
+  \caption{Ablation study on VitalBench-26 isolating continuous decay, reliability gating, and adaptive temperature routing.}
+  \label{tab:ablation}
+  \begin{hctable}
+    \begin{tabularx}{\linewidth}{@{}X c c@{}}
+      \hctoprule
+      \hctablehead
+      \hcth{Configuration Variant} & \hcth{AUROC ($\uparrow$)} & \hcth{ECE ($\downarrow$)} \\
+      \hcmidrule
+      \hcbestrow
+      \textbf{AuroraCard (Full)} & \textbf{96.4} & \textbf{0.015} \\
+      w/o Continuous Decay (Eq.~\ref{eq:ct-decay}) & 93.5 & 0.024 \\
+      \hcaltrow
+      w/o Reliability Gating (Eq.~\ref{eq:reliability}) & 94.2 & 0.029 \\
+      w/o Adaptive Temperature (Eq.~\ref{eq:temp-routing}) & 96.3 & 0.031 \\
+      \hcaltrow
+      Static Mean-Imputed Baseline & 91.2 & 0.047 \\
+      \hcbottomrule
+    \end{tabularx}
+  \end{hctable}
+\end{table}
+
+\begin{hcpinkcard}[Key Ablation Insight]
+  Adaptive temperature routing leaves ranking performance virtually unchanged (96.3\% vs. 96.4\% AUROC) while reducing calibration error by \hlpink{51.6\%} (0.031 $\rightarrow$ 0.015). Decoupling uncertainty scaling from feature extraction thus eliminates the traditional accuracy--calibration trade-off.
+\end{hcpinkcard}
+
+\subsection{Cross-Hospital Conformal Coverage}
+\label{sec:exp:coverage}
+
+To verify Theorem~\ref{thm:coverage} empirically under site shift, we calibrate $\hat{q}_{1-\delta}$ at target miscoverage $\delta = 0.05$ on three source hospitals and evaluate coverage on the held-out fourth center~\cite{angelopoulos2023conformal, vovk2005algorithmic}. AuroraCard achieves \hlblue{95.3\%} empirical coverage with a mean prediction set size of 1.12 classes, compared to 88.4\% empirical coverage for uncalibrated softmax thresholding.

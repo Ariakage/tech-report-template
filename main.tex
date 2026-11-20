@@ -1,0 +1,93 @@
+%% =============================================================================
+%% main.tex — Content Entry Point (Completely Decoupled from style/healthcard.sty)
+%% Compile with standard pdfLaTeX (NO -shell-escape required):
+%%   latexmk -pdf main.tex      (outputs to build/main.pdf)
+%%   make                       (or make preview / make clean)
+%% =============================================================================
+\documentclass[sigconf, nonacm]{acmart}
+
+%% All visual styling, palette, cards, ORCID badges, and microtype live in style/.
+%% One-click theme & style options:
+%%   theme=pastel|ocean|sage|lavender|mono  (default: pastel = #5BCEFA/#F5A9B8/#FFFFFF)
+%%   orcid=brand|official                   (default: brand)
+%%   ribbon=gradient|stripe|none            (default: gradient)
+%%   accent=blue|pink                       (default: blue)
+%%   headerstyle=layered|clean              (default: layered)
+\usepackage[theme=pastel]{style/healthcard}
+
+%% Optional custom hex skinning (uncomment to override any 2 hex colors):
+%% \hcsettheme{primary=5BCEFA, accent=F5A9B8}
+
+%% -----------------------------------------------------------------------------
+%% Logo Slots (Page 1 Dual 18pt Logos + Inner-Page 10pt Monochrome Mini Logo)
+%% For custom image files in figures/, simply replace with:
+%%   \projectlogoimage[18pt]{aminfer_logo.pdf}
+%%   \orglogoimage[18pt]{srinternet_logo.pdf}
+%%   \headerlogoimage[10pt]{aminfer_mini.pdf}
+%% -----------------------------------------------------------------------------
+\input{figures/logos}
+\projectlogo{\demoprojectlogo}
+\orglogo{\demoorglogo}
+\headerlogo{\demoheaderlogo}
+
+%% -----------------------------------------------------------------------------
+%% Paper Metadata
+%% -----------------------------------------------------------------------------
+\reportlabel{Technical Report}
+\reportbadge{v1.0 \textperiodcentered\ Preprint}
+\reportdate{November 21, 2026}
+
+\title{AuroraCard: Calibrated Multimodal Vital-Sign Fusion for Longitudinal Clinical Decision Support}
+\subtitle{A Modular Architecture for Uncertainty-Aware Physiological Monitoring and Interpretable Risk Stratification}
+\hcshorttitle{AuroraCard: Calibrated Multimodal Vital-Sign Fusion}
+\hcshortauthors{Lin, Takahashi, Vance, and Zhou}
+
+%% Authors: \hcauthor[affiliation/note marks]{Full Name}{ORCID (or empty)}
+\hcauthor[1,*]{Aria Lin}{0000-0002-1825-0097}
+\hcauthor[1,2,*]{Sora Takahashi}{0000-0001-9432-6104}
+\hcauthor[2]{Elena Vance}{0000-0003-2719-8451}
+\hcauthor[1,\dag]{Mina Zhou}{0000-0002-6510-3392}
+
+%% Affiliations
+\hcaffiliation[1]{Pastel Systems Research Lab}
+\hcaffiliation[2]{Department of Biomedical Informatics, Pacific Institute of Technology}
+
+%% Author Notes & Correspondence
+\hcauthornote{\textsuperscript{*}Equal contribution}
+\hcauthornote{\textsuperscript{\dag}Corresponding author}
+\hccorrespondence{\hcemail{aria.lin@pastelsys.org}, \hcemail{mina.zhou@pastelsys.org}}
+
+%% Resource Metadata Pills (icons auto-matched by label)
+\hcmetadata[Code]{\hcghlink{Ariakage/tech-report-template}}
+\hcmetadata[Models]{\hchflink{pastel-lab/auroracard-v1}}
+\hcmetadata[Dataset]{\hchflink{datasets/pastel-lab/vitalbench-26}}
+\hcmetadata[Project]{\href{https://pastelsys.org/auroracard}{pastelsys.org/auroracard}}
+
+%% Keywords (automatically rendered as pastel pill tags inside the Header Card)
+\hckeywords{Clinical Decision Support, Multimodal Fusion, Uncertainty Calibration, Vital-Sign Modeling, Preprint Systems}
+
+%% -----------------------------------------------------------------------------
+%% Document Body
+%% -----------------------------------------------------------------------------
+\begin{document}
+
+%% Place abstract BEFORE \maketitle so it renders inside the Header Card
+\begin{abstract}
+\input{sections/00_abstract}
+\end{abstract}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_methodology}
+\input{sections/03_experiments}
+\input{sections/04_conclusion}
+
+%% Balance final page columns cleanly before References
+\hcbalance
+
+%% Bibliography (TeX Live built-in ACM-Reference-Format)
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{bib/references}
+
+\end{document}

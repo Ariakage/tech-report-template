@@ -1,0 +1,39 @@
+%% =============================================================================
+%% figures/logos.tex — Pure-TikZ Vector Demo Logos (100% pdfLaTeX / arXiv Safe)
+%% Replace in main.tex with \projectlogoimage[18pt]{...} / \orglogoimage[18pt]{...}
+%% whenever you have custom PDF/PNG brand marks in figures/.
+%% =============================================================================
+
+%% Project Logo (18pt height, adapts automatically to active theme colors)
+\newcommand{\demoprojectlogo}{%
+  \begin{tikzpicture}[baseline=0.3ex]
+    \fill[hcPrimarySoft, rounded corners=4pt] (0,0) rectangle (18pt,18pt);
+    \draw[hcPrimaryBorder, line width=0.55pt, rounded corners=4pt] (0,0) rectangle (18pt,18pt);
+    \draw[hcPrimaryDark, line width=1.0pt, line cap=round, line join=round]
+      (2.4pt,9pt) -- (5.5pt,9pt) -- (7.3pt,13.8pt) -- (10.1pt,4.2pt) -- (12.1pt,9pt) -- (15.4pt,9pt);
+    \fill[hcAccent] (15.4pt,9pt) circle (1.5pt);
+    \node[anchor=west, font=\sffamily\bfseries\fontsize{8.2}{9}\selectfont, text=hcPrimaryDark, inner sep=0pt]
+      at (22pt, 9pt) {AuroraCard};
+  \end{tikzpicture}%
+}
+
+%% Organization / Studio Logo (18pt height, adapts automatically to active theme)
+\newcommand{\demoorglogo}{%
+  \begin{tikzpicture}[baseline=0.3ex]
+    \fill[hcSurface, rounded corners=4pt] (0,0) rectangle (18pt,18pt);
+    \draw[hcAccentBorder, line width=0.6pt, rounded corners=4pt] (0,0) rectangle (18pt,18pt);
+    \fill[hcPrimary] (4.5pt,4.5pt) rectangle (9.5pt,13.5pt);
+    \fill[hcAccent] (8.8pt,6.8pt) rectangle (13.8pt,13.5pt);
+    \node[anchor=west, font=\sffamily\bfseries\fontsize{7.8}{9}\selectfont, text=hcMuted, inner sep=0pt]
+      at (22pt, 9pt) {Pastel Lab};
+  \end{tikzpicture}%
+}
+
+%% Inner-Page 10pt Monochrome Miniature Logo (Pages 2+ Top-Left Running Header)
+\newcommand{\demoheaderlogo}{%
+  \begin{tikzpicture}[baseline=0.15ex]
+    \draw[hcMuted, line width=0.65pt, rounded corners=2pt] (0,0) rectangle (10pt,10pt);
+    \draw[hcMuted, line width=0.75pt, line cap=round, line join=round]
+      (1.5pt,5pt) -- (3.3pt,5pt) -- (4.3pt,7.6pt) -- (5.8pt,2.4pt) -- (6.8pt,5pt) -- (8.5pt,5pt);
+  \end{tikzpicture}%
+}
