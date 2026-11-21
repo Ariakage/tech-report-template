@@ -1,31 +1,45 @@
 %% =============================================================================
-%% sections/04_conclusion.tex
+%% sections/04_conclusion.tex — Single-Source Multilingual Conclusion & Metadata
 %% =============================================================================
-\section{Conclusion and Future Work}
+\hcsecbi{结论与后续方向}{Conclusion and Future Work}
 \label{sec:conclusion}
 
-We introduced \textbf{AuroraCard}, a calibration-first multimodal fusion framework tailored to asynchronous physiological telemetry and longitudinal clinical surveillance. By combining continuous-time latent decay with reliability-weighted fusion and conformal temperature routing, AuroraCard delivers strong discriminative accuracy, verifiable finite-sample uncertainty guarantees, and sub-15\,ms edge inference latency.
+\hcbipair{%
+本文提出了面向异步生理遥测与纵向临床监测的校准优先融合框架 \textbf{AuroraCard}。通过联合连续时间隐状态衰减、可靠度加权融合与共形温度路由，系统兼具高判别精度、有限样本不确定性覆盖保证与低于 15\,ms 的边缘推理时延。%
+}{%
+We introduced \textbf{AuroraCard}, a calibration-first multimodal fusion framework tailored to asynchronous physiological telemetry and longitudinal clinical surveillance. Combining continuous-time latent decay with reliability-weighted fusion and conformal temperature routing yields strong discrimination, finite-sample coverage guarantees, and sub-15\,ms edge latency.%
+}
 
-\begin{hccaveat}[Clinical Deployment Caveat]
-  While VitalBench-26 spans four geographically diverse medical centers, prospective bedside deployment still requires site-specific threshold governance, human-in-the-loop alert escalation policies, and continuous subgroup fairness auditing~\cite{rajpurkar2022ai}. All retrospective cohorts were de-identified under institutional ethics waivers.
+\begin{hccaveat}[\hcbisep{临床部署边界提示}{Clinical Deployment Caveat}]
+  \hcbipair{%
+    尽管 VitalBench-26 覆盖四家地理分布各异的医疗中心，前瞻性床旁上线仍需开展院区阈值治理、人工复核分级报警与持续亚组公平性审计~\cite{rajpurkar2022ai}。全部回顾性队列均经机构伦理豁免并去标识化。%
+  }{%
+    While VitalBench-26 spans four medical centers, prospective bedside deployment still requires site-specific threshold governance, human-in-the-loop alert escalation policies, and continuous subgroup fairness auditing~\cite{rajpurkar2022ai}. All retrospective cohorts were de-identified under institutional ethics waivers.%
+  }
 \end{hccaveat}
 
-\paragraph{Future Directions}
-Promising extensions include incorporating structured clinician progress notes via retrieval-augmented adapters, federated conformal calibration across privacy-preserving hospital consortia, and streaming hardware quantization for wearable triage monitors.
+\hcparbi{后续研究方向}{Future Directions}
+\hcbipair{%
+后续工作包括通过检索增强适配器融合结构化病程文本、在隐私保护医疗联盟内开展联邦共形校准，以及针对可穿戴分诊设备的流式硬件量化。%
+}{%
+Promising extensions include adding structured clinician progress notes via retrieval-augmented adapters, federated conformal calibration across privacy-preserving hospital consortia, and streaming hardware quantization for wearable triage monitors.%
+}
 
-\section*{Acknowledgments}
-We thank the clinical informatics teams across participating partner hospitals for de-identified cohort curation, and the anonymous reviewers for constructive feedback on the conformal coverage analysis.
+\hcsecbistar{致谢}{Acknowledgments}
+\hcbipair{%
+感谢参与合作医院的临床信息学团队提供去标识化队列整理支持，并感谢匿名审稿人对共形覆盖分析提出的宝贵意见。%
+}{%
+We thank the clinical informatics teams across participating partner hospitals for de-identified cohort curation, and the anonymous reviewers for constructive feedback on the conformal coverage analysis.%
+}
 
 %% Automatically generated Author ORCID directory from \hcauthor declarations
 \makeorcidlist
 
 %% Reproducibility / Hardware Testbed Card (balances final column beside References)
-%% Tip: For Apple Silicon / systems benchmarks (e.g. aminfer), swap rows to:
-%%   SoC & Memory / OS & Kernel / Compiler & Backend (e.g. Zig & Metal) / Precision.
-\begin{hcenvcard}[Hardware \& Evaluation Environment]
-  \hcenvrow{Compute Node}{NVIDIA L40S (48\,GB) \textperiodcentered\ Edge: Apple M4}
-  \hcenvrow{Host OS}{Ubuntu 24.04 LTS \textperiodcentered\ macOS 15.x}
-  \hcenvrow{Toolchain}{PyTorch 2.6 / CUDA 12.6 \textperiodcentered\ Metal 3.2}
-  \hcenvrow{Precision}{BF16 train \textperiodcentered\ FP16/FP32 calibrated eval}
-  \hcenvrow{Reproducibility}{5 fixed seeds (42--46) \textperiodcentered\ Deterministic}
+\begin{hcenvcard}[\hcbisep{硬件与评估环境}{Hardware \& Evaluation Environment}]
+  \hcenvrow{\hcbi{计算节点}{Compute Node}}{NVIDIA L40S (48\,GB) \textperiodcentered\ Edge: Apple M4}
+  \hcenvrow{\hcbi{操作系统}{Host OS}}{Ubuntu 24.04 LTS \textperiodcentered\ macOS 15.x}
+  \hcenvrow{\hcbi{工具链}{Toolchain}}{PyTorch 2.6 / CUDA 12.6 \textperiodcentered\ Metal 3.2}
+  \hcenvrow{\hcbi{数值精度}{Precision}}{BF16 train \textperiodcentered\ FP16/FP32 eval}
+  \hcenvrow{\hcbi{可复现性}{Reproducibility}}{5 fixed seeds (42--46) \textperiodcentered\ Deterministic}
 \end{hcenvcard}

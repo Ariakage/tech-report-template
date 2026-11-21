@@ -1,51 +1,88 @@
 %% =============================================================================
-%% sections/02_methodology.tex
+%% sections/02_methodology.tex — Single-Source Multilingual Methodology
 %% =============================================================================
-\section{Methodology}
+\hcsecbi{方法学设计}{Methodology}
 \label{sec:method}
 
-Let a longitudinal patient encounter over horizon $[0, T]$ consist of $M$ heterogeneous physiological modalities $\mathcal{X} = \{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(M)}\}$, where each stream $\mathcal{S}^{(m)} = \{(t_k^{(m)}, \mathbf{x}_k^{(m)}, \mathbf{m}_k^{(m)})\}_{k=1}^{L_m}$ contains irregular timestamps $t_k^{(m)}$, measurement vectors $\mathbf{x}_k^{(m)} \in \mathbb{R}^{d_m}$, and binary observation masks $\mathbf{m}_k^{(m)} \in \{0,1\}^{d_m}$.
+\hcbipair{%
+设 $[0, T]$ 时间窗内的单次纵向就诊包含 $M$ 类异构生理模态 $\mathcal{X} = \{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(M)}\}$，每条序列 $\mathcal{S}^{(m)} = \{(t_k^{(m)}, \mathbf{x}_k^{(m)}, \mathbf{m}_k^{(m)})\}_{k=1}^{L_m}$ 由不规则时间戳 $t_k^{(m)}$、观测向量 $\mathbf{x}_k^{(m)} \in \mathbb{R}^{d_m}$ 与二值观测掩码 $\mathbf{m}_k^{(m)} \in \{0,1\}^{d_m}$ 组成。%
+}{%
+Let a longitudinal patient encounter over horizon $[0, T]$ consist of $M$ heterogeneous physiological modalities $\mathcal{X} = \{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(M)}\}$, where each stream $\mathcal{S}^{(m)} = \{(t_k^{(m)}, \mathbf{x}_k^{(m)}, \mathbf{m}_k^{(m)})\}_{k=1}^{L_m}$ contains irregular timestamps $t_k^{(m)}$, measurement vectors $\mathbf{x}_k^{(m)} \in \mathbb{R}^{d_m}$, and binary observation masks $\mathbf{m}_k^{(m)} \in \{0,1\}^{d_m}$.%
+}
 
-\subsection{Continuous-Time Vital Encoding}
+\hcsubsecbi{连续时间生理状态编码}{Continuous-Time Vital Encoding}
 \label{sec:method:encoder}
 
-Following continuous-time neural dynamics~\cite{gu2022efficiently, kidger2020neural}, we evolve each modality latent state $\mathbf{h}_k^{(m)} \in \mathbb{R}^{d}$ between consecutive timestamps $\Delta t_k = t_k^{(m)} - t_{k-1}^{(m)}$ using an exponential decay gate parameterized by positive learnable rates $\boldsymbol{\gamma}_m = \operatorname{softplus}(\mathbf{w}_m)$:
+\hcbipair{%
+借鉴连续时间神经动力学~\cite{gu2022efficiently, kidger2020neural}，在相邻观测间隔 $\Delta t_k = t_k^{(m)} - t_{k-1}^{(m)}$ 内，模型利用可学习正衰减率 $\boldsymbol{\gamma}_m = \operatorname{softplus}(\mathbf{w}_m)$ 演进隐状态 $\mathbf{h}_k^{(m)} \in \mathbb{R}^{d}$：%
+}{%
+Following continuous-time neural dynamics~\cite{gu2022efficiently, kidger2020neural}, we evolve each modality latent state $\mathbf{h}_k^{(m)} \in \mathbb{R}^{d}$ between consecutive timestamps $\Delta t_k = t_k^{(m)} - t_{k-1}^{(m)}$ using an exponential decay gate parameterized by positive learnable rates $\boldsymbol{\gamma}_m = \operatorname{softplus}(\mathbf{w}_m)$:%
+}
 \begin{align}
   \tilde{\mathbf{h}}_{k}^{(m)} &= \exp\!\big(-\boldsymbol{\gamma}_m \Delta t_k\big) \odot \mathbf{h}_{k-1}^{(m)}, \nonumber \\
   \mathbf{h}_k^{(m)} &= \operatorname{GRUCell}\!\big(\mathbf{u}_k^{(m)}, \tilde{\mathbf{h}}_k^{(m)}\big),
   \label{eq:ct-decay}
 \end{align}
-where $\mathbf{u}_k^{(m)} = \phi_m(\mathbf{x}_k^{(m)} \odot \mathbf{m}_k^{(m)}, \log(1 + \Delta t_k))$ projects observed channels and inter-arrival intervals into the shared latent space. When a channel remains unobserved for an extended interval, its latent influence decays smoothly toward the prior baseline without injecting artificial discontinuities.
+\hcbipair{%
+其中 $\mathbf{u}_k^{(m)} = \phi_m(\mathbf{x}_k^{(m)} \odot \mathbf{m}_k^{(m)}, \log(1 + \Delta t_k))$ 把已观测通道与时间间隔映射至共享隐空间。当某一通道长时间缺失时，其隐状态贡献平滑衰减回先验基线，不产生人为插值伪影。%
+}{%
+where $\mathbf{u}_k^{(m)} = \phi_m(\mathbf{x}_k^{(m)} \odot \mathbf{m}_k^{(m)}, \log(1 + \Delta t_k))$ projects observed channels and inter-arrival intervals into the shared latent space. When a channel stays unobserved over an extended gap, its latent influence decays smoothly toward the prior baseline without artificial discontinuities.%
+}
 
-\begin{hcdefinition}{Modality Reliability Score}{rel}
-  Given the instantaneous observation density $\rho_m(t) \in [0, 1]$ over lookback window $[t - W, t]$ and encoder epistemic variance $\sigma_m^2(t)$, the \emph{reliability weight} of modality $m$ is defined as
+\begin{hcdefinition}{\hcbisep{模态可靠度权重}{Modality Reliability Score}}{rel}
+  \hcbipair{%
+    给定回看窗口 $[t - W, t]$ 内的瞬时观测密度 $\rho_m(t) \in [0, 1]$ 及编码器认知方差 $\sigma_m^2(t)$，模态 $m$ 的可靠度权重定义为：
+  }{%
+    Given the instantaneous observation density $\rho_m(t) \in [0, 1]$ over lookback window $[t - W, t]$ and encoder epistemic variance $\sigma_m^2(t)$, the reliability weight of modality $m$ is defined as
+  }
+  \vspace{-3pt}
   \begin{equation}
     \alpha_m(t) = \frac{\rho_m(t)\,\exp\!\big(-\beta \sigma_m^2(t)\big)}{\sum_{j=1}^{M} \rho_j(t)\,\exp\!\big(-\beta \sigma_j^2(t)\big) + \varepsilon},
     \label{eq:reliability}
   \end{equation}
-  with temperature sensitivity $\beta > 0$ and numerical stabilizer $\varepsilon = 10^{-6}$.
+  \hcbipair{%
+    其中 $\beta > 0$ 为温度敏感系数，$\varepsilon = 10^{-6}$ 为数值稳定项。
+  }{%
+    with temperature sensitivity $\beta > 0$ and numerical stabilizer $\varepsilon = 10^{-6}$.
+  }
 \end{hcdefinition}
 
-\subsection{Entropy-Gated Fusion and Calibration}
+\hcsubsecbi{熵门控融合与共形校准}{Entropy-Gated Fusion and Calibration}
 \label{sec:method:fusion}
 
-Rather than using static modality weights, AuroraCard aggregates the modality embeddings $\mathbf{z}^{(m)} = \mathbf{h}_{L_m}^{(m)}$ into a unified patient-card representation $\mathbf{z}_{\mathrm{card}} = \sum_{m=1}^{M} \alpha_m(T)\,\mathbf{W}_m \mathbf{z}^{(m)}$ and modulates the output logit temperature $\tau(\mathcal{X})$ using the effective Shannon entropy $H(\boldsymbol{\alpha}) = -\sum_{m} \alpha_m \log \alpha_m$:
+\hcbipair{%
+AuroraCard 不使用静态固定权重，而是将模态表征 $\mathbf{z}^{(m)} = \mathbf{h}_{L_m}^{(m)}$ 聚合为统一卡片表征 $\mathbf{z}_{\mathrm{card}} = \sum_{m=1}^{M} \alpha_m(T)\,\mathbf{W}_m \mathbf{z}^{(m)}$，并借助香农熵 $H(\boldsymbol{\alpha}) = -\sum_m \alpha_m \log \alpha_m$ 动态调节输出温度 $\tau(\mathcal{X})$：%
+}{%
+Rather than using static modality weights, AuroraCard aggregates modality embeddings $\mathbf{z}^{(m)} = \mathbf{h}_{L_m}^{(m)}$ into a unified patient-card representation $\mathbf{z}_{\mathrm{card}} = \sum_{m=1}^{M} \alpha_m(T)\,\mathbf{W}_m \mathbf{z}^{(m)}$ and modulates logit temperature $\tau(\mathcal{X})$ using Shannon entropy $H(\boldsymbol{\alpha}) = -\sum_{m} \alpha_m \log \alpha_m$:%
+}
 \begin{equation}
   \hat{p}(y \mid \mathcal{X}) = \operatorname{softmax}\!\left(\frac{\mathbf{W}_{\mathrm{cls}}\,\mathbf{z}_{\mathrm{card}}}{\tau_0 + \lambda \, \big(1 - \bar{\rho}(\mathcal{X})\big) + \eta H(\boldsymbol{\alpha})}\right),
   \label{eq:temp-routing}
 \end{equation}
-where $\bar{\rho}(\mathcal{X}) = \frac{1}{M}\sum_{m=1}^{M} \rho_m(T)$ measures aggregate sensor availability, and $(\tau_0, \lambda, \eta) \in \mathbb{R}_{>0}^3$ are fitted strictly on a held-out calibration split using proper scoring rules.
+\hcbipair{%
+其中 $\bar{\rho}(\mathcal{X}) = \frac{1}{M}\sum_{m=1}^{M} \rho_m(T)$ 衡量整体传感器可用率，超参数 $(\tau_0, \lambda, \eta) \in \mathbb{R}_{>0}^3$ 仅在独立留出校准集上拟合。%
+}{%
+where $\bar{\rho}(\mathcal{X}) = \frac{1}{M}\sum_{m=1}^{M} \rho_m(T)$ measures aggregate sensor availability, and $(\tau_0, \lambda, \eta) \in \mathbb{R}_{>0}^3$ are fitted strictly on a held-out calibration split using proper scoring rules.%
+}
 
-\begin{hctheorem}{Finite-Sample Conformal Coverage}{coverage}
-  Let $\mathcal{D}_{\mathrm{cal}} = \{(\mathcal{X}_i, y_i)\}_{i=1}^{n}$ be exchangeable with a test encounter $(\mathcal{X}_{\mathrm{test}}, y_{\mathrm{test}})$ under arbitrary covariate-dependent sensor dropout $\mathcal{M}(\mathcal{X})$. Define nonconformity scores $s_i = 1 - \hat{p}(y_i \mid \mathcal{X}_i)$ from Eq.~\eqref{eq:temp-routing} and let $\hat{q}_{1-\delta}$ be the $\lceil (n+1)(1-\delta)\rceil / n$ empirical quantile of $\{s_i\}_{i=1}^{n}$. Then the prediction set $\mathcal{C}(\mathcal{X}_{\mathrm{test}}) = \{y : 1 - \hat{p}(y \mid \mathcal{X}_{\mathrm{test}}) \le \hat{q}_{1-\delta}\}$ satisfies
+\begin{hctheorem}{\hcbisep{有限样本共形覆盖保证}{Finite-Sample Conformal Coverage}}{coverage}
+  \hcbipair{%
+    设校准集 $\mathcal{D}_{\mathrm{cal}} = \{(\mathcal{X}_i, y_i)\}_{i=1}^{n}$ 与测试就诊样本 $(\mathcal{X}_{\mathrm{test}}, y_{\mathrm{test}})$ 在协变量依赖传感器缺失 $\mathcal{M}(\mathcal{X})$ 下满足可交换性。由式~\eqref{eq:temp-routing} 定义非一致性分数 $s_i = 1 - \hat{p}(y_i \mid \mathcal{X}_i)$，并记 $\hat{q}_{1-\delta}$ 为其 $\lceil (n+1)(1-\delta)\rceil / n$ 经验分位数，则预测集合 $\mathcal{C}(\mathcal{X}_{\mathrm{test}}) = \{y : 1 - \hat{p}(y \mid \mathcal{X}_{\mathrm{test}}) \le \hat{q}_{1-\delta}\}$ 满足：
+  }{%
+    Let $\mathcal{D}_{\mathrm{cal}} = \{(\mathcal{X}_i, y_i)\}_{i=1}^{n}$ be exchangeable with a test encounter $(\mathcal{X}_{\mathrm{test}}, y_{\mathrm{test}})$ under covariate-dependent sensor dropout $\mathcal{M}(\mathcal{X})$. Define nonconformity scores $s_i = 1 - \hat{p}(y_i \mid \mathcal{X}_i)$ from Eq.~\eqref{eq:temp-routing} and let $\hat{q}_{1-\delta}$ be the $\lceil (n+1)(1-\delta)\rceil / n$ empirical quantile of $\{s_i\}_{i=1}^{n}$. Then the prediction set $\mathcal{C}(\mathcal{X}_{\mathrm{test}}) = \{y : 1 - \hat{p}(y \mid \mathcal{X}_{\mathrm{test}}) \le \hat{q}_{1-\delta}\}$ satisfies
+  }
   \[
     1 - \delta \;\le\; \mathbb{P}\!\big(y_{\mathrm{test}} \in \mathcal{C}(\mathcal{X}_{\mathrm{test}})\big) \;\le\; 1 - \delta + \frac{1}{n + 1}.
   \]
 \end{hctheorem}
 
-Algorithm~\ref{alg:calibration} details the online conformal calibration pass executed once per deployment site, while Listing~\ref{lst:router} shows the core PyTorch router with key reliability and temperature lines highlighted.
+\hcbipair{%
+算法~\ref{alg:calibration} 给出在各部署院区执行一次的在线共形校准过程，代码清单~\ref{lst:router} 展示 PyTorch 路由核心实现并高亮可靠度计算与温度缩放关键行。%
+}{%
+Algorithm~\ref{alg:calibration} details the online conformal calibration pass executed once per deployment site, while Listing~\ref{lst:router} shows the core PyTorch router with key reliability and temperature lines highlighted.%
+}
 
-\begin{hcalgorithm}[Online Conformal Calibration Pass]{label=alg:calibration}
+\begin{hcalgorithm}[\hcbisep{在线共形校准流程}{Online Conformal Calibration Pass}]{unbreakable, label=alg:calibration}
   \Require Calibration split $\mathcal{D}_{\mathrm{cal}}$, trained encoder $f_\theta$, miscoverage $\delta$
   \Ensure Temperature tuple $(\tau_0, \lambda, \eta)$ and conformal quantile $\hat{q}_{1-\delta}$
   \State Fit $(\tau_0, \lambda, \eta)$ on $\mathcal{D}_{\mathrm{cal}}$ via L-BFGS \Comment{frozen backbone}
@@ -59,7 +96,7 @@ Algorithm~\ref{alg:calibration} details the online conformal calibration pass ex
   \State \Return $(\tau_0, \lambda, \eta),\, \hat{q}_{1-\delta}$
 \end{hcalgorithm}
 
-\begin{hccode}[AuroraCard Router (PyTorch)]{language=Python, hlblue={16,17}, hlpink={21,22,23}}{label=lst:router}
+\begin{hccode}[\hcbisep{AuroraCard 共形路由模块}{AuroraCard Router (PyTorch)}]{language=Python, hlblue={16,17}, hlpink={21,22,23}}{label=lst:router}
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

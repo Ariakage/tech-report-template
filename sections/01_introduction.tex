@@ -1,37 +1,53 @@
 %% =============================================================================
-%% sections/01_introduction.tex
+%% sections/01_introduction.tex — Single-Source Multilingual Introduction
 %% =============================================================================
-\section{Introduction}
+\hcsecbi{引言}{Introduction}
 \label{sec:intro}
 
-Modern clinical surveillance systems ingest continuous bedside telemetry alongside intermittent laboratory assays, medication administration logs, and triage notes~\cite{johnson2023mimic, rajpurkar2022ai}. Despite rapid progress in clinical foundation models~\cite{moor2023foundation}, deploying predictive risk models in real-time hospital workflows remains constrained by three tightly coupled operational challenges:
+\hcbipair{%
+现代临床监测系统持续接入床旁生理遥测、间歇检验结果、给药记录与分诊文本~\cite{johnson2023mimic, rajpurkar2022ai}。尽管临床基础模型进展迅速~\cite{moor2023foundation}，在实时院内流程中部署风险预测模型仍受制于三个相互关联的工程约束：%
+}{%
+Modern clinical surveillance systems ingest continuous bedside telemetry alongside intermittent laboratory assays, medication administration logs, and triage notes~\cite{johnson2023mimic, rajpurkar2022ai}. Despite rapid progress in clinical foundation models~\cite{moor2023foundation}, deploying predictive risk models in real-time hospital workflows remains constrained by three coupled operational challenges:%
+}
 
 \begin{itemize}
-  \item \textbf{Asynchronous missingness.} Wearable and bedside sensors experience irregular sampling rates, motion artifacts, and transient lead disconnections that violate synchronized sequence assumptions~\cite{shukla2021multi}.
-  \item \textbf{Confidence miscalibration.} High-capacity multimodal Transformers frequently assign overconfident risk scores during distribution shifts, undermining clinician trust and triggering alarm fatigue~\cite{guo2017calibration, ovadia2019can}.
-  \item \textbf{Latency and interpretability budgets.} Edge clinical workstations require sub-20\,ms inference per patient card while exposing modality-level attribution and calibrated uncertainty intervals.
+  \item \textbf{\hcbi{异步缺失与采样不均}{Asynchronous missingness}.} \hcifzh{可穿戴与床旁传感器的采样率不规则，运动伪影和短暂导联脱落会破坏同步序列假设~\cite{shukla2021multi}。}\hcifen{Wearable and bedside sensors experience irregular sampling rates, motion artifacts, and transient lead disconnections that violate synchronized sequence assumptions~\cite{shukla2021multi}.}\hcifbi{可穿戴与床旁传感器的采样率不规则，运动伪影和短暂导联脱落会破坏同步序列假设~\cite{shukla2021multi}。{\color{hcMuted}(Irregular sampling, motion artifacts, and lead disconnections break synchronized tensor assumptions.)}}
+  \item \textbf{\hcbi{置信度校准失真}{Confidence miscalibration}.} \hcifzh{高容量多模态 Transformer 在分布偏移下常输出过度自信的风险分数，削弱临床信任并引发报警疲劳~\cite{guo2017calibration, ovadia2019can}。}\hcifen{High-capacity multimodal Transformers frequently assign overconfident risk scores during distribution shifts, undermining clinician trust and triggering alarm fatigue~\cite{guo2017calibration, ovadia2019can}.}\hcifbi{高容量多模态 Transformer 在分布偏移下常输出过度自信的风险分数，削弱临床信任并引发报警疲劳~\cite{guo2017calibration, ovadia2019can}。{\color{hcMuted}(Overconfident scores under shift erode clinical trust and cause alarm fatigue.)}}
+  \item \textbf{\hcbi{低时延与可解释预算}{Latency and interpretability budgets}.} \hcifzh{边缘临床工作站要求单次病人卡推理低于 20\,ms，并输出模态级归因与已校准的不确定性区间。}\hcifen{Edge clinical workstations require sub-20\,ms inference per patient card while exposing modality-level attribution and calibrated uncertainty intervals.}\hcifbi{边缘临床工作站要求单次推理低于 20\,ms，同时提供模态归因与已校准不确定性区间。{\color{hcMuted}(Edge workstations require $<$20\,ms inference with modality attribution and calibrated intervals.)}}
 \end{itemize}
 
-To address these requirements simultaneously, we present \textbf{AuroraCard}, a modular physiological fusion architecture that treats each patient encounter as a structured, uncertainty-aware state representation. Rather than concatenating imputed dense tensors into a single quadratic attention stack, AuroraCard encodes each stream via a continuous-time decay kernel and fuses available modalities through an entropy-gated cross-modal router.
+\hcbipair{%
+为此，我们设计了 \textbf{AuroraCard} 模块化生理融合架构，把每次就诊记录视为带有不确定性感知的结构化状态表示。AuroraCard 不将前向填充的稠密张量直接送入二次方注意力堆栈，而是用连续时间衰减核编码各条生理流，再经熵门控跨模态路由汇总可用信息。%
+}{%
+To address these requirements together, we present \textbf{AuroraCard}, a modular physiological fusion architecture that treats each patient encounter as a structured, uncertainty-aware state representation. Rather than concatenating imputed dense tensors into a single quadratic attention stack, AuroraCard encodes each stream via a continuous-time decay kernel and fuses available modalities through an entropy-gated cross-modal router.%
+}
 
-\begin{hccard}[Core Contributions]
+\begin{hccard}[\hcbisep{核心贡献}{Core Contributions}]
   \begin{enumerate}
-    \item \textbf{Modality-aware continuous encoding:} We formulate a closed-form irregular-interval state update that eliminates naive forward-fill imputation artifacts.
-    \item \textbf{Conformal temperature routing:} A lightweight calibration layer adjusts predictive entropy dynamically based on real-time sensor completeness.
-    \item \textbf{Multi-center validation:} Across four public and federated cohorts, AuroraCard achieves state-of-the-art discrimination, calibration, and edge latency.
+    \item \textbf{\hcbi{模态感知连续编码}{Modality-aware continuous encoding}:} \hcifen{We formulate a closed-form irregular-interval state update that eliminates naive forward-fill imputation artifacts.}\hcifzh{构造解析形式的不规则间隔状态更新，避免朴素前向填充引入人工跳变。}\hcifbi{构造解析形式的不规则间隔状态更新，避免朴素前向填充引入人工跳变。{\color{hcMuted}(Closed-form irregular-interval update avoids naive forward-fill artifacts.)}}
+    \item \textbf{\hcbi{共形温度路由}{Conformal temperature routing}:} \hcifen{A lightweight calibration layer adjusts predictive entropy dynamically based on real-time sensor completeness.}\hcifzh{轻量校准层根据实时传感器完整度动态调节预测熵与输出温度。}\hcifbi{轻量校准层依据实时传感器完整度动态调节预测熵与输出温度。{\color{hcMuted}(Lightweight layer scales logit temperature from real-time sensor completeness.)}}
+    \item \textbf{\hcbi{多中心实证验证}{Multi-center validation}:} \hcifen{Across four public and federated cohorts, AuroraCard improves discrimination, calibration, and edge latency together.}\hcifzh{在四个公开与联合评估队列上兼顾高区分度、低校准误差与低边缘时延。}\hcifbi{在四个公开与联合评估队列上同步改善区分度、校准误差与边缘推理时延。{\color{hcMuted}(Strong discrimination, low ECE, and sub-15\,ms latency across four cohorts.)}}
   \end{enumerate}
 \end{hccard}
 
-Figure~\ref{fig:metrics} summarizes the headline operational gains achieved by AuroraCard across our primary multi-center test split, illustrating simultaneous improvements in discriminative accuracy, probability calibration, missing-modality robustness, and inference throughput.
+\hcbipair{%
+图~\ref{fig:metrics} 汇总了 AuroraCard 在主要多中心测试集上的核心运行指标，涵盖判别精度、概率校准、传感器缺失鲁棒性与窗口时延。%
+}{%
+Figure~\ref{fig:metrics} summarizes the headline operational gains achieved by AuroraCard across our primary multi-center test split, showing simultaneous improvements in discrimination accuracy, probability calibration, missing-modality robustness, and inference latency.%
+}
 
 \begin{figure*}[t]
   \begin{hcmetricgrid}[4]
     \hcmetriccard{blue}{heart}{Macro AUROC}{96.4\%}{+3.8\% vs. Transformer} &
-    \hcmetriccard{pink}{shield}{Calibration ECE}{0.015}{$-$61.5\% error reduction} &
-    \hcmetriccard{blue}{bolt}{Window Latency}{14.2\,ms}{$-$44\% vs. Multimodal ViT} &
-    \hcmetriccard{pink}{check}{Dropout Robustness}{94.1\%}{At 40\% sensor drop}
+    \hcmetriccard{pink}{shield}{\hcbi{校准 ECE}{Calibration ECE}}{0.015}{\hcbi{$-$61.5\% 误差}{$-$61.5\% ECE}} &
+    \hcmetriccard{blue}{bolt}{\hcbi{窗口时延}{Window Latency}}{14.2\,ms}{$-$44\% vs. ViT} &
+    \hcmetriccard{pink}{check}{\hcbi{缺失 AUROC}{Dropout AUROC}}{94.1\%}{\hcbi{40\% 脱落}{At 40\% drop}}
   \end{hcmetricgrid}
-  \caption{Headline clinical monitoring metrics for AuroraCard on the multi-center VitalBench-26 evaluation suite ($N = 46{,}050$ held-out stays). All improvements are statistically significant ($p < 0.001$, paired bootstrap).}
+  \hcbicaption{%
+    AuroraCard 在 VitalBench-26 多中心测试集（$N = 46{,}050$ 例留出住院记录）的核心监护指标。所有提升均具统计显著性（$p < 0.001$，配对 bootstrap）。%
+  }{%
+    Headline clinical monitoring metrics for AuroraCard on the multi-center VitalBench-26 evaluation suite ($N = 46{,}050$ held-out stays). All improvements are statistically significant ($p < 0.001$, paired bootstrap).%
+  }
   \Description{Four side-by-side health-card metric tiles showing Macro AUROC 96.4 percent, Calibration ECE 0.015, Window Latency 14.2 ms, and Dropout Robustness 94.1 percent.}
   \label{fig:metrics}
 \end{figure*}

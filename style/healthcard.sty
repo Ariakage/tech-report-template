@@ -1,22 +1,30 @@
 %% =============================================================================
-%% style/healthcard.sty — Pastel Health-Card / Header-Card Academic Paper Style
+%% style/healthcard.sty — AkaTechReport Health-Card / Header-Card Academic Style
 %% =============================================================================
-%% Default Theme : #5BCEFA (Sky Cyan), #F5A9B8 (Blossom Pink), #FFFFFF (White)
-%%                 + 4 built-in themes (ocean, sage, lavender, mono) & one-line
+%% Version       : v1.2 (English / Chinese / Bilingual Modes + Rich Metadata)
+%% Default Theme : akatechreport (#5BCEFA Sky Cyan, #F5A9B8 Blossom Pink, #FFFFFF)
+%%                 + 5 built-in themes (apple, ocean, sage, lavender, mono) & one-line
 %%                 custom hex theming via \hcsettheme{primary=..., accent=...}.
-%% Engine        : 100% pdfLaTeX / arXiv safe (Type 1 fonts + pure TikZ vector).
-%%                 Uses ONLY TeX Live built-in packages. ZERO -shell-escape.
+%% Languages     : lang=en        Pure English (default; 100% pdfLaTeX / arXiv
+%%                                Type 1 safe, zero CJK overhead).
+%%                 lang=zh        Pure Chinese (XeLaTeX/LuaLaTeX via TeX Live
+%%                                FandolSong/FandolHei/FandolKai, plus pdfLaTeX
+%%                                CJKutf8 fallback).
+%%                 lang=bilingual Chinese + English bilingual Header Card,
+%%                                paired prose helpers & localized UI chrome.
+%% Engine        : Uses ONLY TeX Live built-in packages. ZERO -shell-escape.
 %% Layout        : Native ACM acmart ([sigconf, nonacm] two-column or 1-column),
 %%                 plus standard article class fallback. All layout widths use
 %%                 relative units (\textwidth, \linewidth).
 %% =============================================================================
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{style/healthcard}[2026/11/21 v1.1 Pastel Health-Card Paper Template]
+\ProvidesPackage{style/healthcard}[2026/11/21 v1.2 AkaTechReport Multilingual Paper Template]
 
 %% -----------------------------------------------------------------------------
 %% 1. Package Options (via xkeyval, built into TeX Live & acmart)
 %% -----------------------------------------------------------------------------
+\RequirePackage{iftex}
 \RequirePackage{xkeyval}
 \RequirePackage{etoolbox}
 \RequirePackage{xstring}
@@ -27,12 +35,37 @@
 \newif\ifhc@ribbon@none \hc@ribbon@nonefalse
 \newif\ifhc@accent@flip \hc@accent@flipfalse
 \newif\ifhc@header@clean \hc@header@cleanfalse
+\newif\ifhc@theme@apple \hc@theme@applefalse
 \newif\ifhc@acmart \hc@acmartfalse
-\def\hc@themename{pastel}
+
+%% Language mode flags (default: pure English)
+\newif\ifhc@lang@en \hc@lang@entrue
+\newif\ifhc@lang@zh \hc@lang@zhfalse
+\newif\ifhc@lang@bi \hc@lang@bifalse
+\newif\ifhc@cjk \hc@cjkfalse
+\newif\ifhc@bi@enzh \hc@bi@enzhfalse
+
+\def\hc@themename{akatechreport}
+\def\hc@cjkfontset{fandol}
 
 \@ifclassloaded{acmart}{\hc@acmarttrue}{\hc@acmartfalse}
 
-\DeclareOptionX{theme}[pastel]{\def\hc@themename{#1}}
+\DeclareOptionX{theme}[akatechreport]{\def\hc@themename{#1}}
+\DeclareOptionX{lang}[en]{%
+  \hc@lang@enfalse\hc@lang@zhfalse\hc@lang@bifalse\hc@cjkfalse
+  \IfStrEqCase{#1}{%
+    {zh}{\hc@lang@zhtrue\hc@cjktrue}%
+    {cn}{\hc@lang@zhtrue\hc@cjktrue}%
+    {bilingual}{\hc@lang@bitrue\hc@cjktrue}%
+    {bi}{\hc@lang@bitrue\hc@cjktrue}%
+    {zh-en}{\hc@lang@bitrue\hc@cjktrue\hc@bi@enzhfalse}%
+    {en-zh}{\hc@lang@bitrue\hc@cjktrue\hc@bi@enzhtrue}%
+  }[\hc@lang@entrue]%
+}
+\DeclareOptionX{biorder}[zh-en]{%
+  \IfStrEq{#1}{en-zh}{\hc@bi@enzhtrue}{\hc@bi@enzhfalse}%
+}
+\DeclareOptionX{cjkfont}[fandol]{\def\hc@cjkfontset{#1}}
 \DeclareOptionX{orcid}[brand]{%
   \IfStrEq{#1}{official}{\hc@orcid@officialtrue}{\hc@orcid@officialfalse}%
 }
@@ -51,27 +84,44 @@
 \ProcessOptionsX\relax
 
 %% -----------------------------------------------------------------------------
-%% 2. Standard TeX Live Built-in Packages (Zero -shell-escape, Zero local TTF/OTF)
+%% 2. Standard TeX Live Packages & Engine-Aware CJK Typography (Zero -shell-escape)
 %% -----------------------------------------------------------------------------
 \ifhc@acmart
   %% acmart already loads: geometry, xcolor, hyperref, booktabs, caption,
-  %% fancyhdr, microtype, amsmath, amsthm, natbib, libertine, zi4, newtxmath,
+  %% fancyhdr, microtype, amsmath, amsthm, natbib, libertine, zi4, newtxmath
+  %% (or fontspec + unicode-math + OpenType libertine under XeTeX/LuaTeX),
   %% environ, graphicx, balance.
-  \microtypesetup{protrusion=true, expansion=true}
+  \ifXeTeX
+    \microtypesetup{protrusion=true}
+  \else
+    \microtypesetup{protrusion=true, expansion=true}
+  \fi
 \else
-  \RequirePackage[T1]{fontenc}
-  \RequirePackage[utf8]{inputenc}
-  \RequirePackage{amsmath, amsthm}
-  \RequirePackage[tt=false, type1=true]{libertine}
-  \RequirePackage[varqu]{zi4}
-  \RequirePackage[libertine]{newtxmath}
-  \RequirePackage[protrusion=true, expansion=true]{microtype}
+  \ifPDFTeX
+    \RequirePackage[T1]{fontenc}
+    \RequirePackage[utf8]{inputenc}
+    \RequirePackage{amsmath, amsthm}
+    \RequirePackage[tt=false, type1=true]{libertine}
+    \RequirePackage[varqu]{zi4}
+    \RequirePackage[libertine]{newtxmath}
+    \RequirePackage[protrusion=true, expansion=true]{microtype}
+  \else
+    \RequirePackage{amsmath, amsthm}
+    \RequirePackage{fontspec}
+    \RequirePackage[tt=false]{libertine}
+    \RequirePackage[varqu]{zi4}
+    \ifXeTeX
+      \RequirePackage[protrusion=true]{microtype}
+    \else
+      \RequirePackage[protrusion=true, expansion=true]{microtype}
+    \fi
+  \fi
   \RequirePackage[
     letterpaper,
     top=0.8in, bottom=0.88in,
     left=0.72in, right=0.72in,
     columnsep=0.28in,
-    headheight=17pt, headsep=12pt, footskip=24pt
+    headheight=20pt, headsep=12pt, footskip=24pt
   ]{geometry}
   \RequirePackage{xcolor}
   \RequirePackage{graphicx}
@@ -84,7 +134,92 @@
   \RequirePackage[bookmarksnumbered, unicode]{hyperref}
 \fi
 
+%% Engine-aware Chinese typography (loaded ONLY when lang=zh or lang=bilingual)
+\ifhc@cjk
+  \ifXeTeX
+    \RequirePackage[CJKchecksingle, AutoFakeSlant=0.16]{xeCJK}
+    \xeCJKsetup{%
+      PunctStyle=quanjiao,
+      AllowBreakBetweenPuncts=true,
+      CJKecglue={\hskip 0.22em plus 0.08em minus 0.05em}
+    }
+    \newcommand{\hc@setxecjk@fandol}{%
+      \setCJKmainfont[%
+        Scale=0.92,
+        BoldFont=FandolSong-Bold.otf,
+        ItalicFont=FandolKai-Regular.otf,
+        BoldItalicFont=FandolSong-Bold.otf
+      ]{FandolSong-Regular.otf}%
+      \setCJKsansfont[%
+        Scale=0.92,
+        BoldFont=FandolHei-Bold.otf,
+        ItalicFont=FandolHei-Regular.otf,
+        BoldItalicFont=FandolHei-Bold.otf
+      ]{FandolHei-Regular.otf}%
+      \setCJKmonofont[%
+        Scale=0.90,
+        BoldFont=FandolHei-Regular.otf
+      ]{FandolFang-Regular.otf}%
+    }
+    \IfStrEqCase{\hc@cjkfontset}{%
+      {none}{}%
+      {mac}{%
+        \setCJKmainfont[Scale=0.92, BoldFont=Songti SC Bold, ItalicFont=Kaiti SC Regular, BoldItalicFont=Kaiti SC Bold]{Songti SC Regular}%
+        \setCJKsansfont[Scale=0.92, BoldFont=PingFang SC Semibold]{PingFang SC Regular}%
+        \setCJKmonofont[Scale=0.90]{STFangsong}%
+      }%
+      {windows}{%
+        \setCJKmainfont[Scale=0.92, AutoFakeBold=2.2, ItalicFont=KaiTi]{SimSun}%
+        \setCJKsansfont[Scale=0.92, AutoFakeBold=2.0]{Microsoft YaHei}%
+        \setCJKmonofont[Scale=0.90]{FangSong}%
+      }%
+      {ubuntu}{%
+        \setCJKmainfont[Scale=0.92, BoldFont=Noto Serif CJK SC Bold]{Noto Serif CJK SC}%
+        \setCJKsansfont[Scale=0.92, BoldFont=Noto Sans CJK SC Bold]{Noto Sans CJK SC}%
+        \setCJKmonofont[Scale=0.90]{Noto Sans Mono CJK SC}%
+      }%
+    }[\hc@setxecjk@fandol]
+  \else\ifLuaTeX
+    \RequirePackage{luatexja-fontspec}
+    \newcommand{\hc@setluacjk@fandol}{%
+      \setmainjfont[Scale=0.92, BoldFont=FandolSong-Bold.otf, ItalicFont=FandolKai-Regular.otf]{FandolSong-Regular.otf}%
+      \setsansjfont[Scale=0.92, BoldFont=FandolHei-Bold.otf]{FandolHei-Regular.otf}%
+      \setmonojfont[Scale=0.90]{FandolFang-Regular.otf}%
+    }
+    \IfStrEqCase{\hc@cjkfontset}{%
+      {none}{}%
+      {mac}{%
+        \setmainjfont[Scale=0.92, BoldFont=Songti SC Bold, ItalicFont=Kaiti SC Regular]{Songti SC Regular}%
+        \setsansjfont[Scale=0.92, BoldFont=PingFang SC Semibold]{PingFang SC Regular}%
+        \setmonojfont[Scale=0.90]{STFangsong}%
+      }%
+    }[\hc@setluacjk@fandol]
+  \else
+    %% pdfLaTeX fallback via TeX Live built-in CJKutf8 + Arphic Type 1 gbsn
+    \RequirePackage{CJKutf8}
+    \AtEndPreamble{\hc@sync@pdfmetadata}
+    \AddToHook{begindocument/end}{\begin{CJK*}{UTF8}{gbsn}}
+    \AddToHook{enddocument}{\clearpage\end{CJK*}}
+  \fi\fi
+  %% Comfortable inter-line rhythm for article class (acmart forbids \linespread)
+  \ifhc@acmart\else
+    \ifhc@lang@zh
+      \linespread{1.15}
+    \else
+      \linespread{1.06}
+    \fi
+  \fi
+\fi
+
+%% Uppercase helper: uppercase Latin pills in pure EN, preserve clean casing in ZH/BI
+\ifhc@lang@en
+  \newcommand{\hc@maybecaps}[1]{\MakeUppercase{#1}}
+\else
+  \newcommand{\hc@maybecaps}[1]{#1}
+\fi
+
 %% Mainstream TeX Live packages for cards, tables, icons, code, algorithms & plots
+\RequirePackage{needspace}
 \RequirePackage{colortbl}
 \RequirePackage{array}
 \RequirePackage{tabularx}
@@ -105,12 +240,86 @@
 \graphicspath{{figures/}}
 
 %% Smooth narrow two-column line breaking alongside microtype
-\emergencystretch=1.25em
-\tolerance=1000
+\emergencystretch=1.35em
+\tolerance=1200
 \hbadness=1500
 
 %% -----------------------------------------------------------------------------
-%% 3. Semantic Color System & One-Click Theme Engine
+%% 3. Localized UI Labels & Defaults (Auto-Switched by lang=en|zh|bilingual)
+%% -----------------------------------------------------------------------------
+\ifhc@lang@zh
+  \def\hc@lbl@report{技术报告}
+  \def\hc@lbl@abstract{摘要}
+  \def\hc@lbl@abstractzh{摘要}
+  \def\hc@lbl@keywords{关键词}
+  \def\hc@lbl@keywordszh{关键词}
+  \def\hc@lbl@figure{图}
+  \def\hc@lbl@table{表}
+  \def\hc@lbl@listing{代码清单}
+  \def\hc@lbl@algorithm{算法}
+  \def\hc@lbl@alginput{输入：}
+  \def\hc@lbl@algoutput{输出：}
+  \def\hc@lbl@theorem{定理}
+  \def\hc@lbl@definition{定义}
+  \def\hc@lbl@proposition{命题}
+  \def\hc@lbl@thmterm{}
+  \def\hc@lbl@references{参考文献}
+  \def\hc@lbl@orcidlist{作者 ORCID 标识}
+  \def\hc@lbl@envcard{实验与运行环境}
+  \def\hc@lbl@card{核心要点}
+  \def\hc@lbl@pinkcard{关键发现}
+  \def\hc@lbl@note{实现说明}
+  \def\hc@lbl@caveat{局限与注意事项}
+\else\ifhc@lang@bi
+  \def\hc@lbl@report{技术报告 \textperiodcentered\ Technical Report}
+  \def\hc@lbl@abstract{ABSTRACT}
+  \def\hc@lbl@abstractzh{摘要}
+  \def\hc@lbl@keywords{KEYWORDS}
+  \def\hc@lbl@keywordszh{关键词}
+  \def\hc@lbl@figure{图 / Fig.}
+  \def\hc@lbl@table{表 / Table}
+  \def\hc@lbl@listing{代码清单 / Listing}
+  \def\hc@lbl@algorithm{算法 / Algorithm}
+  \def\hc@lbl@alginput{Input:}
+  \def\hc@lbl@algoutput{Output:}
+  \def\hc@lbl@theorem{定理 / Theorem}
+  \def\hc@lbl@definition{定义 / Definition}
+  \def\hc@lbl@proposition{命题 / Proposition}
+  \def\hc@lbl@thmterm{.}
+  \def\hc@lbl@references{参考文献 \textperiodcentered\ References}
+  \def\hc@lbl@orcidlist{作者 ORCID 标识 \textperiodcentered\ Author ORCID Identifiers}
+  \def\hc@lbl@envcard{实验与运行环境 \textperiodcentered\ Experimental Environment}
+  \def\hc@lbl@card{核心要点 \textperiodcentered\ Key Takeaway}
+  \def\hc@lbl@pinkcard{关键发现 \textperiodcentered\ Key Finding}
+  \def\hc@lbl@note{实现说明 \textperiodcentered\ Implementation Note}
+  \def\hc@lbl@caveat{局限与注意 \textperiodcentered\ Caveat \& Limitation}
+\else
+  \def\hc@lbl@report{Technical Report}
+  \def\hc@lbl@abstract{ABSTRACT}
+  \def\hc@lbl@abstractzh{摘要}
+  \def\hc@lbl@keywords{KEYWORDS}
+  \def\hc@lbl@keywordszh{关键词}
+  \def\hc@lbl@figure{Figure}
+  \def\hc@lbl@table{Table}
+  \def\hc@lbl@listing{Listing}
+  \def\hc@lbl@algorithm{Algorithm}
+  \def\hc@lbl@alginput{Input:}
+  \def\hc@lbl@algoutput{Output:}
+  \def\hc@lbl@theorem{Theorem}
+  \def\hc@lbl@definition{Definition}
+  \def\hc@lbl@proposition{Proposition}
+  \def\hc@lbl@thmterm{.}
+  \def\hc@lbl@references{References}
+  \def\hc@lbl@orcidlist{Author ORCID Identifiers}
+  \def\hc@lbl@envcard{Experimental Environment}
+  \def\hc@lbl@card{Key Takeaway}
+  \def\hc@lbl@pinkcard{Key Finding}
+  \def\hc@lbl@note{Implementation Note}
+  \def\hc@lbl@caveat{Caveat \& Limitation}
+\fi\fi
+
+%% -----------------------------------------------------------------------------
+%% 4. Semantic Color System & One-Click Theme Engine
 %% -----------------------------------------------------------------------------
 %% Constant surfaces, neutral inks, and Note/Caveat accents (B&W print-safe)
 \definecolor{hcWhite}{HTML}{FFFFFF}
@@ -134,7 +343,7 @@
 \definecolor{hcCaveatDark}{HTML}{66420C}
 \definecolor{hcCaveatDeep}{HTML}{8A5B14}
 
-%% Rebuild gradient shadings & ORCID color whenever a theme is applied
+%% Rebuild gradient shadings, semantic chrome roles & ORCID color whenever a theme is applied
 \newcommand{\hc@refresh@theme@assets}{%
   \ifhc@accent@flip
     \colorlet{hc@tmp}{hcPrimary}
@@ -178,30 +387,133 @@
   \colorlet{hcLinkBlue}{hcLinkColor}
   \colorlet{hcCiteBlue}{hcCiteColor}
   \colorlet{hcUrlPink}{hcUrlColor}
+  %% Semantic Chrome Roles (Apple HIG grouped hierarchy vs Pastel expressive cards)
+  \ifhc@theme@apple
+    \definecolor{hcInk}{HTML}{1D1D1F}%
+    \definecolor{hcMuted}{HTML}{48484D}%
+    \definecolor{hcCodeNum}{HTML}{515156}%
+    \definecolor{hcSysRed}{HTML}{E05A52}%
+    \definecolor{hcSysYellow}{HTML}{DF9E26}%
+    \definecolor{hcSysGreen}{HTML}{2DA94A}%
+    \colorlet{hcHeaderBg}{hcCanvas}%
+    \colorlet{hcHeaderBorder}{hcLine}%
+    \colorlet{hcAbstractBorder}{hcLine}%
+    \colorlet{hcAbstractBar}{hcPrimary}%
+    \colorlet{hcReportPillBg}{hcPrimarySoft}%
+    \colorlet{hcReportPillBorder}{hcPrimaryBorder}%
+    \colorlet{hcReportPillInk}{hcPrimaryDeep}%
+    \colorlet{hcBadgePillBg}{hcStripe}%
+    \colorlet{hcBadgePillBorder}{hcLine}%
+    \colorlet{hcBadgePillInk}{hcInk}%
+    \colorlet{hcSecNumBg}{hcPrimarySoft}%
+    \colorlet{hcSecNumBorder}{hcPrimaryBorder}%
+    \colorlet{hcSecNumInk}{hcPrimaryDeep}%
+    \colorlet{hcCardBg}{hcCanvas!70!hcSurface}%
+    \colorlet{hcCardBorder}{hcLine}%
+    \colorlet{hcPinkCardBg}{hcCanvas!70!hcSurface}%
+    \colorlet{hcPinkCardBorder}{hcLine}%
+    \colorlet{hcTableHeadBg}{hcCanvas}%
+    \colorlet{hcTableRule}{hcLine}%
+    \colorlet{hcTableHeavyRule}{hcInk}%
+    \colorlet{hcCodeBg}{hcSurface}%
+    \colorlet{hcCodeTitleBg}{hcCanvas}%
+    \colorlet{hcAlgTitleBg}{hcCanvas}%
+    \colorlet{hcPagePillBg}{hcCanvas}%
+    \colorlet{hcPagePillBorder}{hcLine}%
+    \colorlet{hcPagePillInk}{hcInk}%
+  \else
+    \definecolor{hcInk}{HTML}{1A2433}%
+    \definecolor{hcMuted}{HTML}{3F5062}%
+    \definecolor{hcCodeNum}{HTML}{445567}%
+    \colorlet{hcHeaderBg}{hcPrimaryBg!75!hcSurface}%
+    \colorlet{hcHeaderBorder}{hcPrimaryBorder}%
+    \colorlet{hcAbstractBorder}{hcLine}%
+    \colorlet{hcAbstractBar}{hcAccent}%
+    \colorlet{hcReportPillBg}{hcPrimarySoft}%
+    \colorlet{hcReportPillBorder}{hcPrimaryBorder}%
+    \colorlet{hcReportPillInk}{hcPrimaryDark}%
+    \colorlet{hcBadgePillBg}{hcAccentSoft}%
+    \colorlet{hcBadgePillBorder}{hcAccentBorder}%
+    \colorlet{hcBadgePillInk}{hcAccentDark}%
+    \colorlet{hcSecNumBg}{hcPrimarySoft}%
+    \colorlet{hcSecNumBorder}{hcPrimaryBorder}%
+    \colorlet{hcSecNumInk}{hcPrimaryDark}%
+    \colorlet{hcCardBg}{hcPrimaryBg!68!hcSurface}%
+    \colorlet{hcCardBorder}{hcPrimaryBorder}%
+    \colorlet{hcPinkCardBg}{hcAccentBg!78!hcSurface}%
+    \colorlet{hcPinkCardBorder}{hcAccentBorder}%
+    \colorlet{hcTableHeadBg}{hcPrimaryBg}%
+    \colorlet{hcTableRule}{hcPrimaryBorder}%
+    \colorlet{hcTableHeavyRule}{hcPrimaryDeep}%
+    \colorlet{hcCodeBg}{hcCanvas}%
+    \colorlet{hcCodeTitleBg}{hcPrimaryBg}%
+    \colorlet{hcAlgTitleBg}{hcPrimaryBg}%
+    \colorlet{hcPagePillBg}{hcPrimaryBg}%
+    \colorlet{hcPagePillBorder}{hcPrimaryBorder!85!hcSurface}%
+    \colorlet{hcPagePillInk}{hcPrimaryDark}%
+  \fi
   %% ORCID icon color
   \ifhc@orcid@official
     \colorlet{orcidlogocol}{hcOrcidGreen}
   \else
     \colorlet{orcidlogocol}{hcPrimaryDeep}
   \fi
-  %% Symmetric pastel gradient ribbon & running-header hairline rule
-  \pgfdeclarehorizontalshading{hcRibbonGrad}{10bp}{%
-    color(0bp)=(hcPrimary);
-    color(24bp)=(hcAccent);
-    color(50bp)=(hcSurface!85!hcPrimaryBg);
-    color(76bp)=(hcAccent);
-    color(100bp)=(hcPrimary)
-  }%
-  \pgfdeclarehorizontalshading{hcRuleGrad}{4bp}{%
-    color(0bp)=(hcPrimary!80!hcSurface);
-    color(50bp)=(hcAccent!85!hcSurface);
-    color(100bp)=(hcPrimary!80!hcSurface)
-  }%
+  %% Header ribbon & running-header hairline rule shadings
+  \ifhc@theme@apple
+    \pgfdeclarehorizontalshading{hcRibbonGrad}{10bp}{%
+      color(0bp)=(hcPrimary!85!hcSurface);
+      color(38bp)=(hcAccent!75!hcSurface);
+      color(100bp)=(hcLine!65!hcSurface)
+    }%
+    \pgfdeclarehorizontalshading{hcRuleGrad}{4bp}{%
+      color(0bp)=(hcLine);
+      color(50bp)=(hcLine);
+      color(100bp)=(hcLine)
+    }%
+  \else
+    \pgfdeclarehorizontalshading{hcRibbonGrad}{10bp}{%
+      color(0bp)=(hcPrimary);
+      color(24bp)=(hcAccent);
+      color(50bp)=(hcSurface!85!hcPrimaryBg);
+      color(76bp)=(hcAccent);
+      color(100bp)=(hcPrimary)
+    }%
+    \pgfdeclarehorizontalshading{hcRuleGrad}{4bp}{%
+      color(0bp)=(hcPrimary!80!hcSurface);
+      color(50bp)=(hcAccent!85!hcSurface);
+      color(100bp)=(hcPrimary!80!hcSurface)
+    }%
+  \fi
 }
 
 %% Built-in theme definitions
+\newcommand{\hc@apply@apple@palette}{%
+  \hc@theme@appletrue
+  \definecolor{hcPrimary}{HTML}{007AFF}%
+  \definecolor{hcAccent}{HTML}{5856D6}%
+  \definecolor{hcPrimaryBg}{HTML}{F2F7FF}%
+  \definecolor{hcPrimarySoft}{HTML}{E2EEFF}%
+  \definecolor{hcPrimaryBorder}{HTML}{B6D3FA}%
+  \definecolor{hcAccentBg}{HTML}{F4F3FD}%
+  \definecolor{hcAccentSoft}{HTML}{E7E5FB}%
+  \definecolor{hcAccentBorder}{HTML}{C5C3F4}%
+  \definecolor{hcCanvas}{HTML}{F5F5F7}%
+  \definecolor{hcStripe}{HTML}{F8F8FA}%
+  \definecolor{hcLine}{HTML}{D2D2D7}%
+  \definecolor{hcPrimaryDark}{HTML}{1D1D1F}%
+  \definecolor{hcPrimaryDeep}{HTML}{0051B3}%
+  \definecolor{hcAccentDark}{HTML}{2E2C7E}%
+  \definecolor{hcAccentDeep}{HTML}{4240AE}%
+  \definecolor{hcLinkColor}{HTML}{0055BA}%
+  \definecolor{hcCiteColor}{HTML}{005BBF}%
+  \definecolor{hcUrlColor}{HTML}{4340AC}%
+}
+
 \newcommand{\hc@apply@builtin@theme}[1]{%
+  \hc@theme@applefalse
   \IfStrEqCase{#1}{%
+    {apple}{\hc@apply@apple@palette}%
+    {cupertino}{\hc@apply@apple@palette}%
     {ocean}{%
       \definecolor{hcPrimary}{HTML}{38BDF8}%
       \definecolor{hcAccent}{HTML}{2DD4BF}%
@@ -283,7 +595,7 @@
       \definecolor{hcUrlColor}{HTML}{475569}%
     }%
   }[%
-    %% Default theme=pastel (#5BCEFA + #F5A9B8 + #FFFFFF, B&W print-safe)
+    %% Default theme=akatechreport (alias: pastel; #5BCEFA + #F5A9B8 + #FFFFFF, B&W print-safe)
     \definecolor{hcPrimary}{HTML}{5BCEFA}%
     \definecolor{hcAccent}{HTML}{F5A9B8}%
     \definecolor{hcPrimaryBg}{HTML}{EEF9FE}%
@@ -304,6 +616,7 @@
     \definecolor{hcUrlColor}{HTML}{7C3F51}%
   ]%
   \hc@refresh@theme@assets
+  \hc@apply@chrome@dims
 }
 
 %% Custom hex theme override: \hcsettheme{primary=5BCEFA, accent=F5A9B8}
@@ -311,7 +624,60 @@
 \define@key{hctheme}{accent}{\definecolor{hcAccent}{HTML}{#1}}
 \define@key{hctheme}{surface}{\definecolor{hcSurface}{HTML}{#1}}
 
+\newcommand{\hc@apply@chrome@dims}{%
+  \ifhc@theme@apple
+    \colorlet{hcSectionInk}{hcInk}%
+    \colorlet{hcSubsecNumInk}{hcPrimaryDeep}%
+    \colorlet{hcSubsubsecNumInk}{hcMuted}%
+    \colorlet{hcChromeBarTitleInk}{hcInk}%
+    \colorlet{hcTableHeadInk}{hcInk}%
+    \def\hc@abstract@barw{2.0pt}%
+    \def\hc@header@rulew{0.55pt}%
+    \def\hc@header@toppad{12pt}%
+    \def\hc@card@rulew{0.5pt}%
+    \def\hc@card@barw{2.0pt}%
+    \def\hc@thm@rulew{0.55pt}%
+    \def\hc@frame@rulew{0.55pt}%
+    \def\hc@table@midw{0.5pt}%
+    \def\hc@code@rulew{0.55pt}%
+    \def\hc@alg@rulew{0.55pt}%
+  \else
+    \colorlet{hcSectionInk}{hcPrimaryDark}%
+    \colorlet{hcSubsecNumInk}{hcAccentDeep}%
+    \colorlet{hcSubsubsecNumInk}{hcPrimaryDeep}%
+    \colorlet{hcChromeBarTitleInk}{hcPrimaryDark}%
+    \colorlet{hcTableHeadInk}{hcPrimaryDark}%
+    \def\hc@abstract@barw{2.8pt}%
+    \def\hc@header@rulew{0.75pt}%
+    \def\hc@header@toppad{13.5pt}%
+    \def\hc@card@rulew{0.6pt}%
+    \def\hc@card@barw{2.6pt}%
+    \def\hc@thm@rulew{0.6pt}%
+    \def\hc@frame@rulew{0.6pt}%
+    \def\hc@table@midw{0.6pt}%
+    \def\hc@code@rulew{0.6pt}%
+    \def\hc@alg@rulew{0.6pt}%
+  \fi
+}
+
+\newcommand{\hc@code@dots}{%
+  \ifhc@theme@apple
+    \tikz[baseline=-0.35ex]{%
+      \fill[hcSysRed] (0,0) circle (2.0pt);
+      \fill[hcSysYellow] (5.8pt,0) circle (2.0pt);
+      \fill[hcSysGreen] (11.6pt,0) circle (2.0pt);
+    }%
+  \else
+    \tikz[baseline=-0.35ex]{%
+      \fill[hcPrimary] (0,0) circle (2.0pt);
+      \fill[hcAccent] (5.8pt,0) circle (2.0pt);
+      \fill[hcSurface, draw=hcPrimaryBorder, line width=0.4pt] (11.6pt,0) circle (2.0pt);
+    }%
+  \fi
+}
+
 \newcommand{\hcsettheme}[1]{%
+  \hc@theme@applefalse
   \setkeys{hctheme}{#1}%
   \colorlet{hcPrimaryBg}{hcPrimary!11!hcSurface}%
   \colorlet{hcPrimarySoft}{hcPrimary!24!hcSurface}%
@@ -330,16 +696,20 @@
   \colorlet{hcCiteColor}{hcPrimary!56!hcInk}%
   \colorlet{hcUrlColor}{hcAccent!46!hcInk}%
   \hc@refresh@theme@assets
+  \hc@apply@chrome@dims
 }
 
 %% Initialize selected package theme
 \hc@apply@builtin@theme{\hc@themename}
 
 %% -----------------------------------------------------------------------------
-%% 4. Hyperref (No Ugly Red Boxes — Low-Saturation Theme Color Links) & Base Ink
+%% 5. Hyperref (No Ugly Red Boxes — Low-Saturation Theme Color Links) & Base Ink
 %% -----------------------------------------------------------------------------
 \ifhc@acmart
   \@ACM@screentrue
+  \@ifpackageloaded{hyperxmp}{%
+    \hypersetup{keeppdfinfo=true}%
+  }{}%
   \AtEndPreamble{%
     \hypersetup{%
       pdfborder={0 0 0},
@@ -349,6 +719,9 @@
       filecolor=hcLinkColor,
       breaklinks=true
     }%
+    \ifhc@cjk\ifPDFTeX
+      \hypersetup{CJKbookmarks=true}%
+    \fi\fi
   }
 \else
   \hypersetup{%
@@ -360,6 +733,9 @@
     filecolor=hcLinkColor,
     breaklinks=true
   }
+  \ifhc@cjk\ifPDFTeX
+    \hypersetup{CJKbookmarks=true}%
+  \fi\fi
 \fi
 
 \AtBeginDocument{%
@@ -370,7 +746,7 @@
 \urlstyle{sf}
 
 %% -----------------------------------------------------------------------------
-%% 5. ORCID Helpers (Pure pdfLaTeX Vector via orcidlink)
+%% 6. ORCID Helpers (Pure Vector via orcidlink)
 %% -----------------------------------------------------------------------------
 \DeclareRobustCommand{\hcorcid}[1]{%
   \ifstrempty{#1}{}{%
@@ -384,9 +760,8 @@
 }
 
 %% -----------------------------------------------------------------------------
-%% 6. Logo Slot System (Page 1 Dual Logo Slots + Pages 2+ 10pt Mini Logo)
+%% 7. Logo Slot System (Page 1 Dual Logo Slots + Pages 2+ 10pt Mini Logo)
 %% -----------------------------------------------------------------------------
-%% Default minimalist built-in vector marks (pure TikZ, zero external assets)
 \newcommand{\hc@default@brandmark}{%
   \begin{tikzpicture}[baseline=0.25ex]
     \fill[hcPrimarySoft, rounded corners=3.5pt] (0,0) rectangle (16pt,16pt);
@@ -397,7 +772,6 @@
   \end{tikzpicture}%
 }
 
-%% Default 10pt monochrome miniature logo for Pages 2+ top-left running header
 \newcommand{\hc@default@headerlogo}{%
   \begin{tikzpicture}[baseline=0.15ex]
     \draw[hcMuted, line width=0.65pt, rounded corners=2pt] (0,0) rectangle (10pt,10pt);
@@ -406,7 +780,6 @@
   \end{tikzpicture}%
 }
 
-%% Built-in helper to render a crisp vector logo pill if user wants quick text+mark
 \newcommand{\hcvectorbadge}[2]{%
   \begin{tikzpicture}[baseline=0.25ex]
     \node[
@@ -432,11 +805,6 @@
 \let\hc@brandmark\hc@default@brandmark
 \let\hc@headerlogo\hc@default@headerlogo
 
-%% Public Logo Slot API
-%%   \projectlogo{<TikZ or \includegraphics>}       / \projectlogoimage[18pt]{file}
-%%   \orglogo{<TikZ or \includegraphics>}           / \orglogoimage[18pt]{file}
-%%   \headerlogo{<10pt mini logo>}                  / \headerlogoimage[10pt]{file}
-%%   \noheaderlogo                                  (reverts to tiny theme dot)
 \newcommand{\projectlogo}[1]{\hc@has@projectlogotrue\gdef\hc@projectlogo{#1}}
 \newcommand{\projectlogoimage}[2][18pt]{%
   \hc@has@projectlogotrue
@@ -457,14 +825,18 @@
 \newcommand{\nohcbrandmark}{\hc@showbrandmarkfalse}
 
 %% -----------------------------------------------------------------------------
-%% 7. Document Metadata Storage & Clean Author / Affiliation / Link API
+%% 8. Rich Document & PDF Metadata System (Single-Language & Bilingual)
 %% -----------------------------------------------------------------------------
-\def\hc@reportlabel{Technical Report}
+\let\hc@reportlabel\hc@lbl@report
 \def\hc@reportbadge{}
 \def\hc@reportdate{\today}
+\def\hc@titlezh{}
 \def\hc@subtitle{}
+\def\hc@subtitlezh{}
 \def\hc@shorttitle{}
+\def\hc@shorttitlezh{}
 \def\hc@shortauthors{}
+\def\hc@shortauthorszh{}
 \def\hc@authors@render{}
 \def\hc@authors@plain{}
 \def\hc@authors@orcidlist{}
@@ -473,19 +845,120 @@
 \def\hc@correspondence{}
 \def\hc@metadata{}
 \def\hc@keywords{}
+\def\hc@keywordszh{}
+\long\def\hc@abstractzh{}
+%% Rich academic / PDF metadata fields
+\def\hc@subject{}
+\def\hc@creator{AkaTechReport LaTeX Template v1.2}
+\def\hc@pdftitle{}
+\def\hc@pdfauthor{}
+\def\hc@pdfkeywords{}
+\def\hc@doi{}
+\def\hc@arxiv{}
+\def\hc@license{}
+\def\hc@licenseurl{}
+\def\hc@venue{}
+\def\hc@publisher{}
+\def\hc@version{}
+\def\hc@pdflang{}
+\def\hc@url{}
+\def\hc@contactemail{}
+\def\hc@pubtype{article}
+
 \newcount\hc@authorcount \hc@authorcount=0
 \newcount\hc@affilcount \hc@affilcount=0
 \newcount\hc@notecount \hc@notecount=0
 \newcount\hc@metacount \hc@metacount=0
 \newcount\hc@orcidcount \hc@orcidcount=0
 
+%% Core declarative setters
 \newcommand{\reportlabel}[1]{\gdef\hc@reportlabel{#1}}
 \newcommand{\reportbadge}[1]{\gdef\hc@reportbadge{#1}}
 \newcommand{\reportdate}[1]{\gdef\hc@reportdate{#1}}
-\newcommand{\hcshorttitle}[1]{\gdef\hc@shorttitle{#1}}
-\newcommand{\hcshortauthors}[1]{\gdef\hc@shortauthors{#1}}
-\newcommand{\hckeywords}[1]{\gdef\hc@keywords{#1}}
+\newcommand{\titlezh}[1]{\gdef\hc@titlezh{#1}}
+\newcommand{\subtitlezh}[1]{\gdef\hc@subtitlezh{#1}}
 \newcommand{\hcsubtitle}[1]{\gdef\hc@subtitle{#1}}
+\newcommand{\hcshorttitle}[1]{\gdef\hc@shorttitle{#1}}
+\newcommand{\hcshorttitlezh}[1]{\gdef\hc@shorttitlezh{#1}}
+\newcommand{\hcshortauthors}[1]{\gdef\hc@shortauthors{#1}}
+\newcommand{\hcshortauthorszh}[1]{\gdef\hc@shortauthorszh{#1}}
+\newcommand{\hckeywords}[1]{\gdef\hc@keywords{#1}}
+\newcommand{\hckeywordszh}[1]{\gdef\hc@keywordszh{#1}}
+\newcommand{\hcsubject}[1]{\gdef\hc@subject{#1}}
+\newcommand{\hccreator}[1]{\gdef\hc@creator{#1}}
+\newcommand{\hcpdftitle}[1]{\gdef\hc@pdftitle{#1}}
+\newcommand{\hcpdfauthor}[1]{\gdef\hc@pdfauthor{#1}}
+\newcommand{\hcpdfkeywords}[1]{\gdef\hc@pdfkeywords{#1}}
+\newcommand{\hcvenue}[1]{\gdef\hc@venue{#1}}
+\newcommand{\hcpublisher}[1]{\gdef\hc@publisher{#1}}
+\newcommand{\hcversion}[1]{\gdef\hc@version{#1}}
+\newcommand{\hclicense}[1]{\gdef\hc@license{#1}}
+\newcommand{\hclicenseurl}[1]{\gdef\hc@licenseurl{#1}}
+\newcommand{\hcarxiv}[1]{\gdef\hc@arxiv{#1}}
+\newcommand{\hcpdflang}[1]{\gdef\hc@pdflang{#1}}
+\newcommand{\hcurl}[1]{\gdef\hc@url{#1}}
+\newcommand{\hccontactemail}[1]{\gdef\hc@contactemail{#1}}
+\newcommand{\hcpubtype}[1]{\gdef\hc@pubtype{#1}}
+
+%% Clickable DOI / arXiv link shorthands & metadata pill helpers
+\newcommand{\hcdoilink}[1]{\href{https://doi.org/#1}{doi:#1}}
+\newcommand{\hcarxivlink}[1]{\href{https://arxiv.org/abs/#1}{arXiv:#1}}
+\newcommand{\hcdoi}{\@ifstar{\hc@doi@metaonly}{\hc@doi@withpill}}
+\newcommand{\hc@doi@metaonly}[1]{\gdef\hc@doi{#1}}
+\newcommand{\hc@doi@withpill}[2][DOI]{\gdef\hc@doi{#2}\hcmetadata[#1]{\hcdoilink{#2}}}
+
+%% Unified key-value metadata & label configuration: \hcsetup{...}
+\define@key{hcmeta}{title}{\title{#1}}
+\define@key{hcmeta}{subtitle}{\ifhc@acmart\subtitle{#1}\else\gdef\hc@subtitle{#1}\fi}
+\define@key{hcmeta}{reportlabel}{\gdef\hc@reportlabel{#1}}
+\define@key{hcmeta}{reportbadge}{\gdef\hc@reportbadge{#1}}
+\define@key{hcmeta}{reportdate}{\gdef\hc@reportdate{#1}}
+\define@key{hcmeta}{titlezh}{\gdef\hc@titlezh{#1}}
+\define@key{hcmeta}{subtitlezh}{\gdef\hc@subtitlezh{#1}}
+\define@key{hcmeta}{shorttitle}{\gdef\hc@shorttitle{#1}}
+\define@key{hcmeta}{shorttitlezh}{\gdef\hc@shorttitlezh{#1}}
+\define@key{hcmeta}{shortauthors}{\gdef\hc@shortauthors{#1}}
+\define@key{hcmeta}{shortauthorszh}{\gdef\hc@shortauthorszh{#1}}
+\define@key{hcmeta}{keywords}{\gdef\hc@keywords{#1}}
+\define@key{hcmeta}{keywordszh}{\gdef\hc@keywordszh{#1}}
+\define@key{hcmeta}{subject}{\gdef\hc@subject{#1}}
+\define@key{hcmeta}{creator}{\gdef\hc@creator{#1}}
+\define@key{hcmeta}{pdftitle}{\gdef\hc@pdftitle{#1}}
+\define@key{hcmeta}{pdfauthor}{\gdef\hc@pdfauthor{#1}}
+\define@key{hcmeta}{pdfkeywords}{\gdef\hc@pdfkeywords{#1}}
+\define@key{hcmeta}{pdflang}{\gdef\hc@pdflang{#1}}
+\define@key{hcmeta}{doi}{\gdef\hc@doi{#1}}
+\define@key{hcmeta}{arxiv}{\gdef\hc@arxiv{#1}}
+\define@key{hcmeta}{license}{\gdef\hc@license{#1}}
+\define@key{hcmeta}{licenseurl}{\gdef\hc@licenseurl{#1}}
+\define@key{hcmeta}{venue}{\gdef\hc@venue{#1}}
+\define@key{hcmeta}{publisher}{\gdef\hc@publisher{#1}}
+\define@key{hcmeta}{pubtype}{\gdef\hc@pubtype{#1}}
+\define@key{hcmeta}{url}{\gdef\hc@url{#1}}
+\define@key{hcmeta}{pdfurl}{\gdef\hc@url{#1}}
+\define@key{hcmeta}{contactemail}{\gdef\hc@contactemail{#1}}
+\define@key{hcmeta}{version}{\gdef\hc@version{#1}}
+%% Localized label overrides
+\define@key{hcmeta}{abstractlabel}{\gdef\hc@lbl@abstract{#1}}
+\define@key{hcmeta}{abstractzhlabel}{\gdef\hc@lbl@abstractzh{#1}}
+\define@key{hcmeta}{keywordslabel}{\gdef\hc@lbl@keywords{#1}}
+\define@key{hcmeta}{keywordszhlabel}{\gdef\hc@lbl@keywordszh{#1}}
+\define@key{hcmeta}{figurelabel}{\gdef\hc@lbl@figure{#1}}
+\define@key{hcmeta}{tablelabel}{\gdef\hc@lbl@table{#1}}
+\define@key{hcmeta}{listinglabel}{\gdef\hc@lbl@listing{#1}}
+\define@key{hcmeta}{algorithmlabel}{\gdef\hc@lbl@algorithm{#1}}
+\define@key{hcmeta}{theoremlabel}{\gdef\hc@lbl@theorem{#1}}
+\define@key{hcmeta}{definitionlabel}{\gdef\hc@lbl@definition{#1}}
+\define@key{hcmeta}{propositionlabel}{\gdef\hc@lbl@proposition{#1}}
+\define@key{hcmeta}{referenceslabel}{\gdef\hc@lbl@references{#1}}
+\define@key{hcmeta}{orcidlistlabel}{\gdef\hc@lbl@orcidlist{#1}}
+\define@key{hcmeta}{envcardlabel}{\gdef\hc@lbl@envcard{#1}}
+
+\newcommand{\hcsetup}[1]{\setkeys{hcmeta}{#1}}
+
+%% Abstract environments (English/default `abstract` + Chinese `abstractzh`)
+\long\def\hc@saveabstractzh#1{\long\gdef\hc@abstractzh{#1}}
+\newenvironment{abstractzh}{\Collect@Body\hc@saveabstractzh}{}
 
 \ifhc@acmart\else
   \newcommand{\subtitle}[1]{\gdef\hc@subtitle{#1}}
@@ -543,32 +1016,69 @@
   \gappto\hc@authornotes{{\sffamily\color{hcMuted}#1}}%
 }
 
-\newcommand{\hcemail}[1]{\href{mailto:#1}{\nolinkurl{#1}}}
+\newif\ifhc@in@corresp \hc@in@correspfalse
+\newcommand{\hcemail}[1]{%
+  \ifhc@in@corresp
+    \ifx\hc@contactemail\@empty
+      \gdef\hc@contactemail{#1}%
+      \@ifpackageloaded{hyperxmp}{\hypersetup{pdfcontactemail={#1}}}{}%
+    \fi
+  \fi
+  \href{mailto:#1}{\nolinkurl{#1}}%
+}
 \newcommand{\hccorrespondence}[1]{\gdef\hc@correspondence{#1}}
 
 %% Resource link shorthand helpers
 \newcommand{\hcghlink}[1]{\href{https://github.com/#1}{#1}}
 \newcommand{\hchflink}[1]{\href{https://huggingface.co/#1}{#1}}
 
-%% Automatic FontAwesome5 icon mapper for \hcmetadata[Label]{Value}
+%% Automatic FontAwesome5 icon mapper for \hcmetadata[Label]{Value} (EN + ZH)
 \newcommand{\hc@metaicon}[1]{%
+  \begingroup\noexpandarg
   \IfStrEqCase{#1}{%
     {Code}{\textcolor{hcPrimaryDeep}{\faGithub}}%
     {GitHub}{\textcolor{hcPrimaryDeep}{\faGithub}}%
+    {代码}{\textcolor{hcPrimaryDeep}{\faGithub}}%
+    {源码}{\textcolor{hcPrimaryDeep}{\faGithub}}%
     {Models}{\textcolor{hcAccentDeep}{\faCube}}%
     {Weights}{\textcolor{hcAccentDeep}{\faCube}}%
     {Hugging Face}{\textcolor{hcAccentDeep}{\faCube}}%
+    {模型}{\textcolor{hcAccentDeep}{\faCube}}%
+    {权重}{\textcolor{hcAccentDeep}{\faCube}}%
     {Dataset}{\textcolor{hcPrimaryDeep}{\faDatabase}}%
     {Data}{\textcolor{hcPrimaryDeep}{\faDatabase}}%
+    {数据}{\textcolor{hcPrimaryDeep}{\faDatabase}}%
+    {数据集}{\textcolor{hcPrimaryDeep}{\faDatabase}}%
     {Project}{\textcolor{hcPrimaryDeep}{\faGlobe}}%
     {Website}{\textcolor{hcPrimaryDeep}{\faGlobe}}%
     {Project Page}{\textcolor{hcPrimaryDeep}{\faGlobe}}%
+    {项目}{\textcolor{hcPrimaryDeep}{\faGlobe}}%
+    {主页}{\textcolor{hcPrimaryDeep}{\faGlobe}}%
     {Demo}{\textcolor{hcAccentDeep}{\faPlayCircle}}%
+    {演示}{\textcolor{hcAccentDeep}{\faPlayCircle}}%
     {Leaderboard}{\textcolor{hcAccentDeep}{\faTrophy}}%
+    {榜单}{\textcolor{hcAccentDeep}{\faTrophy}}%
     {Paper}{\textcolor{hcPrimaryDeep}{\faFileAlt}}%
+    {Preprint}{\textcolor{hcPrimaryDeep}{\faFileAlt}}%
+    {arXiv}{\textcolor{hcPrimaryDeep}{\faFileAlt}}%
+    {论文}{\textcolor{hcPrimaryDeep}{\faFileAlt}}%
+    {预印本}{\textcolor{hcPrimaryDeep}{\faFileAlt}}%
+    {Archive}{\textcolor{hcPrimaryDeep}{\faArchive}}%
+    {DOI}{\textcolor{hcPrimaryDeep}{\faArchive}}%
+    {Zenodo}{\textcolor{hcPrimaryDeep}{\faArchive}}%
+    {归档}{\textcolor{hcPrimaryDeep}{\faArchive}}%
+    {License}{\textcolor{hcAccentDeep}{\faBalanceScale}}%
+    {许可}{\textcolor{hcAccentDeep}{\faBalanceScale}}%
+    {Verification}{\textcolor{hcPrimaryDeep}{\faCheckCircle}}%
+    {Audit}{\textcolor{hcPrimaryDeep}{\faCheckCircle}}%
+    {复现}{\textcolor{hcPrimaryDeep}{\faCheckCircle}}%
+    {核验}{\textcolor{hcPrimaryDeep}{\faCheckCircle}}%
     {Blog}{\textcolor{hcAccentDeep}{\faPenNib}}%
+    {博客}{\textcolor{hcAccentDeep}{\faPenNib}}%
     {Docs}{\textcolor{hcPrimaryDeep}{\faBookOpen}}%
+    {文档}{\textcolor{hcPrimaryDeep}{\faBookOpen}}%
   }[\textcolor{hcPrimaryDeep}{\faLink}]%
+  \endgroup
 }
 
 \newcommand{\hcmetadata}[2][Link]{%
@@ -576,6 +1086,25 @@
   \gappto\hc@metadata{%
     \hc@metapill{#1}{#2}\hspace{0.42em}\allowbreak%
   }%
+}
+
+%% Single-source bilingual resource pill: \hcmetabi{中文标签}{English Label}{Value}
+\newcommand{\hcmetabi}[3]{%
+  \ifhc@lang@en
+    \hcmetadata[#2]{#3}%
+  \else
+    \hcmetadata[#1]{#3}%
+  \fi
+}
+
+%% Single-source bilingual DOI pill + metadata setter: \hcdoibi[中文]{EN}{10.xxxx/...}
+\newcommand{\hcdoibi}[3][DOI]{%
+  \gdef\hc@doi{#3}%
+  \ifhc@lang@en
+    \hcmetadata[#2]{\hcdoilink{#3}}%
+  \else
+    \hcmetadata[#1]{\hcdoilink{#3}}%
+  \fi
 }
 
 \DeclareRobustCommand{\hc@metapill}[2]{%
@@ -591,7 +1120,7 @@
     nobeforeafter,
     tcbox raise base
   ]{%
-    \sffamily\fontsize{7.6}{9}\selectfont
+    \sffamily\fontsize{7.5}{9}\selectfont
     \hc@metaicon{#1}\hspace{0.35em}%
     {\bfseries\color{hcPrimaryDark}#1}\hspace{0.32em}%
     \textcolor{hcLine}{|}\hspace{0.32em}%
@@ -600,9 +1129,131 @@
 }
 
 %% -----------------------------------------------------------------------------
-%% 8. Layered Inline Highlight & Table Delta Badge System
+%% 9. Multilingual Content Helpers (Single Source -> EN / ZH / Bilingual!)
 %% -----------------------------------------------------------------------------
-%% Inline micro-highlights (low-saturation pills for Abstract / prose metrics)
+\newcommand{\hcifen}[1]{\ifhc@lang@en#1\fi}
+\newcommand{\hcifzh}[1]{\ifhc@lang@zh#1\fi}
+\newcommand{\hcifbi}[1]{\ifhc@lang@bi#1\fi}
+
+%% Inline bilingual term: \hcbi{中文}{English} (bookmark & PDF-metadata safe)
+\DeclareRobustCommand{\hcbi}[2]{%
+  \ifhc@lang@en #2%
+  \else\ifhc@lang@zh #1%
+  \else
+    \ifhc@bi@enzh #2\texorpdfstring{\hspace{0.26em}{\color{hcMuted}(#1)}}{ (#1)}%
+    \else #1\texorpdfstring{\hspace{0.26em}{\color{hcMuted}(#2)}}{ (#2)}\fi
+  \fi\fi
+}
+
+%% Separator bilingual label: \hcbisep{中文}{English} (bookmark & PDF-metadata safe)
+\DeclareRobustCommand{\hcbisep}[2]{%
+  \ifhc@lang@en #2%
+  \else\ifhc@lang@zh #1%
+  \else
+    \ifhc@bi@enzh #2\texorpdfstring{\;\textperiodcentered\;}{ / }#1%
+    \else #1\texorpdfstring{\;\textperiodcentered\;}{ / }#2\fi
+  \fi\fi
+}
+
+%% Bilingual headings (bookmark-safe via \texorpdfstring)
+\newcommand{\hcsecbi}[2]{%
+  \ifhc@lang@en
+    \section{#2}%
+  \else\ifhc@lang@zh
+    \section{#1}%
+  \else
+    \ifhc@bi@enzh
+      \section[\texorpdfstring{#2 (#1)}{#2 (#1)}]{#2\texorpdfstring{\hspace{0.42em}{\normalfont\sffamily\fontsize{8.8}{11.2}\selectfont\color{hcPrimaryDeep}#1}}{ (#1)}}%
+    \else
+      \section[\texorpdfstring{#1 (#2)}{#1 (#2)}]{#1\texorpdfstring{\hspace{0.42em}{\normalfont\sffamily\fontsize{8.6}{11.0}\selectfont\color{hcPrimaryDeep}#2}}{ (#2)}}%
+    \fi
+  \fi\fi
+}
+
+\newcommand{\hcsecbistar}[2]{%
+  \ifhc@lang@en
+    \section*{#2}%
+  \else\ifhc@lang@zh
+    \section*{#1}%
+  \else
+    \ifhc@bi@enzh
+      \section*{#2\texorpdfstring{\hspace{0.42em}{\normalfont\sffamily\fontsize{8.8}{11.2}\selectfont\color{hcPrimaryDeep}#1}}{ (#1)}}%
+    \else
+      \section*{#1\texorpdfstring{\hspace{0.42em}{\normalfont\sffamily\fontsize{8.6}{11.0}\selectfont\color{hcPrimaryDeep}#2}}{ (#2)}}%
+    \fi
+  \fi\fi
+}
+
+\newcommand{\hcsubsecbi}[2]{%
+  \Needspace{3.8\baselineskip}%
+  \ifhc@lang@en
+    \subsection{#2}%
+  \else\ifhc@lang@zh
+    \subsection{#1}%
+  \else
+    \ifhc@bi@enzh
+      \subsection[\texorpdfstring{#2 (#1)}{#2 (#1)}]{#2\texorpdfstring{\hspace{0.38em}{\normalfont\sffamily\fontsize{8.3}{10.5}\selectfont\color{hcMuted}#1}}{ (#1)}}%
+    \else
+      \subsection[\texorpdfstring{#1 (#2)}{#1 (#2)}]{#1\texorpdfstring{\hspace{0.38em}{\normalfont\sffamily\fontsize{8.2}{10.4}\selectfont\color{hcMuted}#2}}{ (#2)}}%
+    \fi
+  \fi\fi
+}
+
+\newcommand{\hcparbi}[2]{%
+  \ifhc@lang@en
+    \paragraph{#2}%
+  \else\ifhc@lang@zh
+    \paragraph{#1}%
+  \else
+    \ifhc@bi@enzh
+      \paragraph{#2\texorpdfstring{\,{\normalfont\sffamily\fontsize{7.8}{10}\selectfont\color{hcMuted}(#1)}}{ (#1)}}%
+    \else
+      \paragraph{#1\texorpdfstring{\,{\normalfont\sffamily\fontsize{7.8}{10}\selectfont\color{hcMuted}(#2)}}{ (#2)}}%
+    \fi
+  \fi\fi
+}
+
+%% Paired bilingual paragraph block: \hcbipair{中文段落}{English paragraph}
+%% Renders cleanly as a single-language paragraph in en/zh modes, and as a
+%% visually distinct paired block in bilingual mode for effortless scanning.
+\newcommand{\hcbipair}[2]{%
+  \ifhc@lang@en
+    #2\par
+  \else\ifhc@lang@zh
+    #1\par
+  \else
+    \ifhc@bi@enzh
+      \noindent{\color{hcInk}#2\par}%
+      \vskip 2.2pt%
+      \noindent{\fontsize{8.45}{11.8}\selectfont\color{hcInk!84!hcMuted}#1\par}%
+      \vskip 4.8pt%
+    \else
+      \noindent{\fontsize{8.8}{12.5}\selectfont\color{hcInk}#1\par}%
+      \vskip 2.2pt%
+      \noindent{\fontsize{8.35}{10.9}\selectfont\color{hcInk!84!hcMuted}#2\par}%
+      \vskip 4.8pt%
+    \fi
+  \fi\fi
+}
+
+%% Bilingual figure / table caption helper: \hcbicaption{中文图注}{English caption}
+\newcommand{\hcbicaption}[2]{%
+  \ifhc@lang@en
+    \caption{#2}%
+  \else\ifhc@lang@zh
+    \caption{#1}%
+  \else
+    \ifhc@bi@enzh
+      \caption[#2]{#2\protect\\[1.5pt]{\fontsize{7.4}{9.8}\selectfont\color{hcMuted!90!hcInk}#1}}%
+    \else
+      \caption[#1]{#1\protect\\[1.5pt]{\fontsize{7.4}{9.6}\selectfont\color{hcMuted!90!hcInk}#2}}%
+    \fi
+  \fi\fi
+}
+
+%% -----------------------------------------------------------------------------
+%% 10. Layered Inline Highlight & Table Delta Badge System
+%% -----------------------------------------------------------------------------
 \DeclareRobustCommand{\hlprimary}[1]{%
   \tcbox[
     on line, enhanced,
@@ -630,7 +1281,6 @@
 \let\hlblue\hlprimary
 \let\hlpink\hlaccent
 
-%% Compact table / prose status badges
 \DeclareRobustCommand{\hcbadge}[1]{%
   \tcbox[
     on line, enhanced,
@@ -650,7 +1300,6 @@
   ]{\sffamily\bfseries\fontsize{6.8}{8}\selectfont\color{hcAccentDark}#1}%
 }
 
-%% Table delta badges: \gain{+3.8\%}, \speedup{2.4\times}, \drop{-61.5\%}
 \DeclareRobustCommand{\gain}[1]{%
   \hspace{0.25em}%
   \tcbox[
@@ -688,7 +1337,7 @@
         boxrule=0.4pt, arc=3.5pt,
         boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
         nobeforeafter, tcbox raise base
-      ]{\sffamily\fontsize{7.2}{8.4}\selectfont\color{hcPrimaryDark}##1}%
+      ]{\sffamily\fontsize{7.1}{8.4}\selectfont\color{hcPrimaryDark}##1}%
     \else
       \tcbox[
         on line, enhanced,
@@ -696,7 +1345,7 @@
         boxrule=0.4pt, arc=3.5pt,
         boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
         nobeforeafter, tcbox raise base
-      ]{\sffamily\fontsize{7.2}{8.4}\selectfont\color{hcAccentDark}##1}%
+      ]{\sffamily\fontsize{7.1}{8.4}\selectfont\color{hcAccentDark}##1}%
     \fi
     \hspace{0.32em}\allowbreak%
   }%
@@ -704,7 +1353,7 @@
 }
 
 %% -----------------------------------------------------------------------------
-%% 9. Signature Health-Card Header Card (\maketitle)
+%% 11. Signature Health-Card Header Card (\maketitle, EN / ZH / Bilingual)
 %% -----------------------------------------------------------------------------
 \newbox\hc@titlebox
 
@@ -712,8 +1361,13 @@
   \ifhc@ribbon@gradient
     \begin{scope}
       \clip[rounded corners=9pt] (frame.south west) rectangle (frame.north east);
-      \shade[shading=hcRibbonGrad]
-        ([yshift=-3.6pt]frame.north west) rectangle (frame.north east);
+      \ifhc@theme@apple
+        \shade[shading=hcRibbonGrad]
+          ([yshift=-1.8pt]frame.north west) rectangle (frame.north east);
+      \else
+        \shade[shading=hcRibbonGrad]
+          ([yshift=-3.6pt]frame.north west) rectangle (frame.north east);
+      \fi
     \end{scope}
   \else\ifhc@ribbon@stripe
     \begin{scope}
@@ -732,7 +1386,6 @@
   \fi\fi
 }
 
-%% Render right-hand dual logo slot cleanly (16pt-20pt optical alignment)
 \newcommand{\hc@render@logoslot}{%
   \ifhc@has@projectlogo
     \hc@projectlogo
@@ -754,66 +1407,77 @@
   \fi
 }
 
-\newcommand{\hc@buildheadercard}{%
-  \begingroup
-  \setlength{\parindent}{0pt}%
-  \setlength{\parskip}{0pt}%
-  \begin{tcolorbox}[
-    enhanced,
-    width=\textwidth,
-    colback=\ifhc@header@clean hcSurface\else hcPrimaryBg!75!hcSurface\fi,
-    colframe=hcPrimaryBorder,
-    boxrule=0.75pt,
-    arc=9pt,
-    outer arc=9pt,
-    left=14pt, right=14pt,
-    top=\ifhc@ribbon@none 11.5pt\else 13.5pt\fi,
-    bottom=11.5pt,
-    boxsep=0pt,
-    before skip=0pt,
-    after skip=0pt,
-    overlay={\hc@drawribbon}
-  ]
-    %% --- Top Eyebrow Row: Category Pills (+ Date when dual logos set) | Dual Logo Slot ---
-    \noindent
-    \begin{minipage}[c]{0.58\linewidth}
-      \raggedright
-      \ifx\hc@reportlabel\@empty\else
-        \tcbox[
-          on line, enhanced,
-          colback=hcPrimarySoft, colframe=hcPrimaryBorder,
-          boxrule=0.45pt, arc=4.5pt,
-          boxsep=0pt, left=6.5pt, right=6.5pt, top=2.4pt, bottom=2.4pt,
-          nobeforeafter, tcbox raise base
-        ]{\sffamily\bfseries\fontsize{7.4}{8.5}\selectfont\color{hcPrimaryDark}\MakeUppercase{\hc@reportlabel}}%
-      \fi
-      \ifx\hc@reportbadge\@empty\else
-        \hspace{0.45em}%
-        \tcbox[
-          on line, enhanced,
-          colback=hcAccentSoft, colframe=hcAccentBorder,
-          boxrule=0.45pt, arc=4.5pt,
-          boxsep=0pt, left=6pt, right=6pt, top=2.4pt, bottom=2.4pt,
-          nobeforeafter, tcbox raise base
-        ]{\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcAccentDark}\hc@reportbadge}%
-      \fi
-      %% If custom project/org logos occupy the right slot, place date cleanly beside pills
-      \ifboolexpr{ bool {hc@has@projectlogo} or bool {hc@has@orglogo} }{%
-        \ifx\hc@reportdate\@empty\else
-          \hspace{0.6em}\textcolor{hcPrimaryBorder}{\textperiodcentered}\hspace{0.55em}%
-          {\sffamily\fontsize{7.8}{9}\selectfont\color{hcMuted}\hc@reportdate}%
+%% Helper: render Header Card Title & Subtitle per language mode
+\newcommand{\hc@render@titles}{%
+  \ifhc@lang@zh
+    %% Pure Chinese: prefer \titlezh if set, otherwise fall back to \title
+    \ifx\hc@titlezh\@empty
+      {\raggedright\sffamily\bfseries\fontsize{15.2}{19.8}\selectfont\color{hcPrimaryDark}\@title\par}%
+    \else
+      {\raggedright\sffamily\bfseries\fontsize{15.2}{19.8}\selectfont\color{hcPrimaryDark}\hc@titlezh\par}%
+    \fi
+    \ifx\hc@subtitlezh\@empty
+      \ifhc@acmart
+        \ifx\@subtitle\@empty\else
+          \vskip 3pt
+          {\raggedright\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\@subtitle\par}%
         \fi
-      }{}%
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[c]{0.40\linewidth}
-      \raggedleft
-      \hc@render@logoslot
-    \end{minipage}
-
-    \vskip 7.5pt
-
-    %% --- Paper Title & Optional Subtitle ---
+      \fi
+      \ifx\hc@subtitle\@empty\else
+        \vskip 3pt
+        {\raggedright\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\hc@subtitle\par}%
+      \fi
+    \else
+      \vskip 3pt
+      {\raggedright\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
+    \fi
+  \else\ifhc@lang@bi
+    %% Bilingual: paired ZH + EN titles with clear typographic hierarchy
+    \ifhc@bi@enzh
+      {\raggedright\sffamily\bfseries\fontsize{15.2}{19.0}\selectfont\color{hcPrimaryDark}\@title\par}%
+      \ifx\hc@titlezh\@empty\else
+        \vskip 3pt
+        {\raggedright\sffamily\bfseries\fontsize{11.6}{15.4}\selectfont\color{hcPrimaryDeep}\hc@titlezh\par}%
+      \fi
+      \ifhc@acmart
+        \ifx\@subtitle\@empty\else
+          \vskip 2.4pt
+          {\raggedright\sffamily\fontsize{8.9}{11.6}\selectfont\color{hcMuted}\@subtitle\par}%
+        \fi
+      \fi
+      \ifx\hc@subtitle\@empty\else
+        \vskip 2.4pt
+        {\raggedright\sffamily\fontsize{8.9}{11.6}\selectfont\color{hcMuted}\hc@subtitle\par}%
+      \fi
+      \ifx\hc@subtitlezh\@empty\else
+        \vskip 1.8pt
+        {\raggedright\sffamily\fontsize{8.6}{11.8}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
+      \fi
+    \else
+      \ifx\hc@titlezh\@empty
+        {\raggedright\sffamily\bfseries\fontsize{15.2}{19.2}\selectfont\color{hcPrimaryDark}\@title\par}%
+      \else
+        {\raggedright\sffamily\bfseries\fontsize{15.2}{19.6}\selectfont\color{hcPrimaryDark}\hc@titlezh\par}%
+        \vskip 2.8pt
+        {\raggedright\sffamily\bfseries\fontsize{11.2}{14.2}\selectfont\color{hcPrimaryDeep}\@title\par}%
+      \fi
+      \ifx\hc@subtitlezh\@empty\else
+        \vskip 2.4pt
+        {\raggedright\sffamily\fontsize{8.8}{12.0}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
+      \fi
+      \ifhc@acmart
+        \ifx\@subtitle\@empty\else
+          \vskip 1.6pt
+          {\raggedright\sffamily\fontsize{8.5}{11.2}\selectfont\color{hcMuted}\@subtitle\par}%
+        \fi
+      \fi
+      \ifx\hc@subtitle\@empty\else
+        \vskip 1.6pt
+        {\raggedright\sffamily\fontsize{8.5}{11.2}\selectfont\color{hcMuted}\hc@subtitle\par}%
+      \fi
+    \fi
+  \else
+    %% Pure English (100% v1.1 identical)
     {\raggedright\sffamily\bfseries\fontsize{16.5}{20.4}\selectfont\color{hcPrimaryDark}\@title\par}%
     \ifhc@acmart
       \ifx\@subtitle\@empty\else
@@ -825,65 +1489,138 @@
       \vskip 3pt
       {\raggedright\sffamily\fontsize{10.4}{13.2}\selectfont\color{hcMuted}\hc@subtitle\par}%
     \fi
+  \fi\fi
+}
 
-    %% --- Authors with Clickable Vector ORCID Icons ---
-    \ifnum\hc@authorcount>0\relax
-      \vskip 7.2pt
-      {\raggedright\fontsize{9.6}{13.4}\selectfont\hc@authors@render\par}%
-    \fi
+%% Helper: render Abstract + Keywords nested white Health Card per language mode
+\newcommand{\hc@abs@eyebrow}[1]{%
+  {\sffamily\bfseries\fontsize{7.5}{9}\selectfont\color{hcPrimaryDark}%
+    \tikz[baseline=-0.3ex]{\fill[hcPrimary] (0,0) circle (2.0pt); \fill[hcAccent] (5.2pt,0) circle (2.0pt);}%
+    \hspace{0.46em}#1\par}%
+}
 
-    %% --- Affiliations ---
-    \ifnum\hc@affilcount>0\relax
-      \vskip 3.8pt
-      {\raggedright\fontsize{8.3}{11.2}\selectfont\hc@affiliations\par}%
-    \fi
+\newif\ifhc@show@abscard \hc@show@abscardfalse
 
-    %% --- Author Notes & Correspondence ---
-    \ifnum\hc@notecount>0\relax
-      \vskip 2.8pt
-      {\raggedright\fontsize{7.8}{10.4}\selectfont\hc@authornotes
-        \ifx\hc@correspondence\@empty\else
-          \hspace{0.85em}\textcolor{hcPrimaryBorder}{\textperiodcentered}\hspace{0.85em}%
-          \textcolor{hcPrimaryDeep}{\faEnvelope[regular]}\hspace{0.32em}%
-          {\sffamily\color{hcUrlColor}\hc@correspondence}%
+\newcommand{\hc@render@abstractcard}{%
+  \hc@show@abscardfalse
+  \ifhc@lang@en
+    \ifx\@abstract\@empty\else\hc@show@abscardtrue\fi
+  \else
+    \ifx\@abstract\@empty\else\hc@show@abscardtrue\fi
+    \ifx\hc@abstractzh\@empty\else\hc@show@abscardtrue\fi
+  \fi
+  \ifhc@show@abscard
+    \vskip 8pt
+    \begin{tcolorbox}[
+      enhanced,
+      width=\linewidth,
+      colback=\ifhc@header@clean hcCanvas\else hcSurface\fi,
+      colframe=hcAbstractBorder,
+      boxrule=0.55pt,
+      arc=6.5pt,
+      outer arc=6.5pt,
+      borderline west={\hc@abstract@barw}{0pt}{hcAbstractBar},
+      left=10.5pt, right=10.5pt,
+      top=7pt, bottom=7pt,
+      boxsep=0pt,
+      before skip=0pt,
+      after skip=0pt
+    ]
+      \ifhc@lang@zh
+        %% Pure Chinese abstract
+        \hc@abs@eyebrow{\hc@lbl@abstractzh}%
+        \vskip 3.8pt
+        \ifx\hc@abstractzh\@empty
+          {\fontsize{8.75}{12.4}\selectfont\color{hcInk}\@abstract\par}%
+        \else
+          {\fontsize{8.75}{12.4}\selectfont\color{hcInk}\hc@abstractzh\par}%
         \fi
-      \par}%
-    \else
-      \ifx\hc@correspondence\@empty\else
-        \vskip 2.8pt
-        {\raggedright\fontsize{7.8}{10.4}\selectfont
-          \textcolor{hcPrimaryDeep}{\faEnvelope[regular]}\hspace{0.35em}%
-          {\sffamily\color{hcUrlColor}\hc@correspondence}\par}%
-      \fi
-    \fi
-
-    %% --- Resource Metadata Pill Bar ---
-    \ifnum\hc@metacount>0\relax
-      \vskip 7pt
-      {\raggedright\linespread{1.35}\selectfont\hc@metadata\par}%
-    \fi
-
-    %% --- Nested Pure-White Abstract Health Card ---
-    \ifx\@abstract\@empty\else
-      \vskip 8.5pt
-      \begin{tcolorbox}[
-        enhanced,
-        width=\linewidth,
-        colback=\ifhc@header@clean hcCanvas\else hcSurface\fi,
-        colframe=hcLine,
-        boxrule=0.55pt,
-        arc=6.5pt,
-        outer arc=6.5pt,
-        borderline west={2.8pt}{0pt}{hcAccent},
-        left=10.5pt, right=10.5pt,
-        top=7.2pt, bottom=7.2pt,
-        boxsep=0pt,
-        before skip=0pt,
-        after skip=0pt
-      ]
-        {\sffamily\bfseries\fontsize{7.6}{9}\selectfont\color{hcPrimaryDark}%
-          \tikz[baseline=-0.3ex]{\fill[hcPrimary] (0,0) circle (2.1pt); \fill[hcAccent] (5.4pt,0) circle (2.1pt);}%
-          \hspace{0.48em}ABSTRACT\par}%
+        \ifx\hc@keywordszh\@empty
+          \ifx\hc@keywords\@empty\else
+            \vskip 5.8pt
+            {\color{hcLine}\hrule height 0.45pt}%
+            \vskip 4.8pt
+            {\raggedright\linespread{1.32}\selectfont
+              {\sffamily\bfseries\fontsize{7.3}{8.6}\selectfont\color{hcMuted}\hc@lbl@keywordszh\hspace{0.55em}}%
+              \hc@renderkeywords{\hc@keywords}\par}%
+          \fi
+        \else
+          \vskip 5.8pt
+          {\color{hcLine}\hrule height 0.45pt}%
+          \vskip 4.8pt
+          {\raggedright\linespread{1.32}\selectfont
+            {\sffamily\bfseries\fontsize{7.3}{8.6}\selectfont\color{hcMuted}\hc@lbl@keywordszh\hspace{0.55em}}%
+            \hc@renderkeywords{\hc@keywordszh}\par}%
+        \fi
+      \else\ifhc@lang@bi
+        %% Bilingual abstract card (compact dual-language layout for balanced Page 1)
+        \ifhc@bi@enzh
+          \ifx\@abstract\@empty\else
+            \hc@abs@eyebrow{\hc@lbl@abstract}%
+            \vskip 2.4pt
+            {\fontsize{7.85}{10.1}\selectfont\color{hcInk}\@abstract\par}%
+          \fi
+          \ifx\hc@abstractzh\@empty\else
+            \ifx\@abstract\@empty\else
+              \vskip 4.0pt
+              {\color{hcLine!75!hcSurface}\hrule height 0.4pt}%
+              \vskip 3.8pt
+            \fi
+            \hc@abs@eyebrow{\hc@lbl@abstractzh}%
+            \vskip 2.4pt
+            {\fontsize{7.95}{10.9}\selectfont\color{hcInk}\hc@abstractzh\par}%
+          \fi
+        \else
+          \ifx\hc@abstractzh\@empty\else
+            \hc@abs@eyebrow{\hc@lbl@abstractzh}%
+            \vskip 2.4pt
+            {\fontsize{7.95}{10.9}\selectfont\color{hcInk}\hc@abstractzh\par}%
+          \fi
+          \ifx\@abstract\@empty\else
+            \ifx\hc@abstractzh\@empty\else
+              \vskip 4.0pt
+              {\color{hcLine!75!hcSurface}\hrule height 0.4pt}%
+              \vskip 3.8pt
+            \fi
+            \hc@abs@eyebrow{\hc@lbl@abstract}%
+            \vskip 2.4pt
+            {\fontsize{7.85}{10.1}\selectfont\color{hcInk!88!hcMuted}\@abstract\par}%
+          \fi
+        \fi
+        %% Bilingual keyword rows
+        \ifboolexpr{ not test {\ifdefempty{\hc@keywordszh}} or not test {\ifdefempty{\hc@keywords}} }{%
+          \vskip 4.5pt
+          {\color{hcLine}\hrule height 0.45pt}%
+          \vskip 4.0pt
+          \ifhc@bi@enzh
+            \ifx\hc@keywords\@empty\else
+              {\raggedright\linespread{1.24}\selectfont
+                {\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcMuted}\hc@lbl@keywords\hspace{0.5em}}%
+                \hc@renderkeywords{\hc@keywords}\par}%
+            \fi
+            \ifx\hc@keywordszh\@empty\else
+              \ifx\hc@keywords\@empty\else\vskip 2.2pt\fi
+              {\raggedright\linespread{1.24}\selectfont
+                {\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcMuted}\hc@lbl@keywordszh\hspace{0.5em}}%
+                \hc@renderkeywords{\hc@keywordszh}\par}%
+            \fi
+          \else
+            \ifx\hc@keywordszh\@empty\else
+              {\raggedright\linespread{1.24}\selectfont
+                {\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcMuted}\hc@lbl@keywordszh\hspace{0.5em}}%
+                \hc@renderkeywords{\hc@keywordszh}\par}%
+            \fi
+            \ifx\hc@keywords\@empty\else
+              \ifx\hc@keywordszh\@empty\else\vskip 2.2pt\fi
+              {\raggedright\linespread{1.24}\selectfont
+                {\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcMuted}\hc@lbl@keywords\hspace{0.5em}}%
+                \hc@renderkeywords{\hc@keywords}\par}%
+            \fi
+          \fi
+        }{}%
+      \else
+        %% Pure English abstract (100% v1.1 identical)
+        \hc@abs@eyebrow{\hc@lbl@abstract}%
         \vskip 4pt
         {\fontsize{8.75}{11.8}\selectfont\color{hcInk}\@abstract\par}%
         \ifx\hc@keywords\@empty\else
@@ -891,61 +1628,378 @@
           {\color{hcLine}\hrule height 0.45pt}%
           \vskip 5.2pt
           {\raggedright\linespread{1.32}\selectfont
-            {\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcMuted}KEYWORDS\hspace{0.55em}}%
+            {\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcMuted}\hc@lbl@keywords\hspace{0.55em}}%
             \hc@renderkeywords{\hc@keywords}\par}%
         \fi
-      \end{tcolorbox}%
+      \fi\fi
+    \end{tcolorbox}%
+  \fi
+}
+
+\newcommand{\hc@buildheadercard}{%
+  \begingroup
+  \setlength{\parindent}{0pt}%
+  \setlength{\parskip}{0pt}%
+  \begin{tcolorbox}[
+    enhanced,
+    width=\textwidth,
+    colback=\ifhc@header@clean hcSurface\else hcHeaderBg\fi,
+    colframe=hcHeaderBorder,
+    boxrule=\hc@header@rulew,
+    arc=9pt,
+    outer arc=9pt,
+    left=14pt, right=14pt,
+    top=\ifhc@ribbon@none 11.5pt\else \hc@header@toppad\fi,
+    bottom=11.5pt,
+    boxsep=0pt,
+    before skip=0pt,
+    after skip=0pt,
+    overlay={\hc@drawribbon}
+  ]
+    %% --- Top Eyebrow Row: Category Pills (+ Date when dual logos set) | Dual Logo Slot ---
+    \noindent
+    \begin{minipage}[c]{0.64\linewidth}
+      \raggedright
+      \ifx\hc@reportlabel\@empty\else
+        \tcbox[
+          on line, enhanced,
+          colback=hcReportPillBg, colframe=hcReportPillBorder,
+          boxrule=0.45pt, arc=4.5pt,
+          boxsep=0pt, left=6.5pt, right=6.5pt, top=2.4pt, bottom=2.4pt,
+          nobeforeafter, tcbox raise base
+        ]{\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcReportPillInk}\hc@maybecaps{\hc@reportlabel}}%
+      \fi
+      \ifx\hc@reportbadge\@empty\else
+        \hspace{0.45em}%
+        \tcbox[
+          on line, enhanced,
+          colback=hcBadgePillBg, colframe=hcBadgePillBorder,
+          boxrule=0.45pt, arc=4.5pt,
+          boxsep=0pt, left=6pt, right=6pt, top=2.4pt, bottom=2.4pt,
+          nobeforeafter, tcbox raise base
+        ]{\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcBadgePillInk}\hc@reportbadge}%
+      \fi
+      \ifboolexpr{ bool {hc@has@projectlogo} or bool {hc@has@orglogo} }{%
+        \ifx\hc@reportdate\@empty\else
+          \hspace{0.55em}\textcolor{hcPrimaryBorder}{\textperiodcentered}\hspace{0.5em}%
+          {\sffamily\fontsize{7.7}{9}\selectfont\color{hcMuted}\hc@reportdate}%
+        \fi
+      }{}%
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.34\linewidth}
+      \raggedleft
+      \hc@render@logoslot
+    \end{minipage}
+
+    \vskip 7pt
+
+    %% --- Paper Title & Optional Subtitle (Language-Aware) ---
+    \hc@render@titles
+
+    %% --- Authors with Clickable Vector ORCID Icons ---
+    \ifnum\hc@authorcount>0\relax
+      \vskip 6.8pt
+      {\raggedright\fontsize{9.6}{13.4}\selectfont\hc@authors@render\par}%
     \fi
+
+    %% --- Affiliations ---
+    \ifnum\hc@affilcount>0\relax
+      \vskip 3.6pt
+      {\raggedright\fontsize{8.3}{11.4}\selectfont\hc@affiliations\par}%
+    \fi
+
+    %% --- Author Notes & Correspondence ---
+    \ifnum\hc@notecount>0\relax
+      \vskip 2.8pt
+      {\raggedright\fontsize{7.8}{10.6}\selectfont\hc@authornotes
+        \ifx\hc@correspondence\@empty\else
+          \hspace{0.85em}\textcolor{hcPrimaryBorder}{\textperiodcentered}\hspace{0.85em}%
+          \textcolor{hcPrimaryDeep}{\faEnvelope[regular]}\hspace{0.32em}%
+          {\sffamily\color{hcUrlColor}\hc@in@corresptrue\hc@correspondence\hc@in@correspfalse}%
+        \fi
+      \par}%
+    \else
+      \ifx\hc@correspondence\@empty\else
+        \vskip 2.8pt
+        {\raggedright\fontsize{7.8}{10.6}\selectfont
+          \textcolor{hcPrimaryDeep}{\faEnvelope[regular]}\hspace{0.35em}%
+          {\sffamily\color{hcUrlColor}\hc@in@corresptrue\hc@correspondence\hc@in@correspfalse}\par}%
+      \fi
+    \fi
+
+    %% --- Resource Metadata Pill Bar ---
+    \ifnum\hc@metacount>0\relax
+      \vskip 6.6pt
+      {\raggedright\linespread{1.34}\selectfont\hc@metadata\par}%
+    \fi
+
+    %% --- Nested Pure-White Abstract Health Card ---
+    \hc@render@abstractcard
   \end{tcolorbox}%
   \endgroup
 }
 
-%% Resolve effective short title / short authors for running headers & PDF metadata
+%% Resolve effective running headers & PDF metadata cleanly across modes
 \newcommand{\hc@resolve@running}{%
-  \ifx\hc@shorttitle\@empty
-    \ifhc@acmart
-      \ifx\shorttitle\@empty
-        \gdef\hc@effective@title{\@title}%
+  %% Effective short title
+  \ifhc@lang@zh
+    \ifx\hc@shorttitlezh\@empty
+      \ifx\hc@shorttitle\@empty
+        \ifx\hc@titlezh\@empty
+          \gdef\hc@effective@title{\@title}%
+        \else
+          \gdef\hc@effective@title{\hc@titlezh}%
+        \fi
       \else
-        \gdef\hc@effective@title{\shorttitle}%
+        \gdef\hc@effective@title{\hc@shorttitle}%
       \fi
     \else
-      \gdef\hc@effective@title{\@title}%
+      \gdef\hc@effective@title{\hc@shorttitlezh}%
     \fi
   \else
-    \gdef\hc@effective@title{\hc@shorttitle}%
+    \ifx\hc@shorttitle\@empty
+      \ifhc@acmart
+        \ifx\shorttitle\@empty
+          \gdef\hc@effective@title{\@title}%
+        \else
+          \gdef\hc@effective@title{\shorttitle}%
+        \fi
+      \else
+        \gdef\hc@effective@title{\@title}%
+      \fi
+    \else
+      \gdef\hc@effective@title{\hc@shorttitle}%
+    \fi
   \fi
-  \ifx\hc@shortauthors\@empty
-    \ifhc@acmart
-      \ifx\shortauthors\@empty
+  %% Effective short authors
+  \ifhc@lang@zh
+    \ifx\hc@shortauthorszh\@empty
+      \ifx\hc@shortauthors\@empty
         \gdef\hc@effective@authors{\hc@authors@plain}%
       \else
-        \gdef\hc@effective@authors{\shortauthors}%
+        \gdef\hc@effective@authors{\hc@shortauthors}%
       \fi
     \else
-      \gdef\hc@effective@authors{\hc@authors@plain}%
+      \gdef\hc@effective@authors{\hc@shortauthorszh}%
     \fi
   \else
-    \gdef\hc@effective@authors{\hc@shortauthors}%
+    \ifx\hc@shortauthors\@empty
+      \ifhc@acmart
+        \ifx\shortauthors\@empty
+          \gdef\hc@effective@authors{\hc@authors@plain}%
+        \else
+          \gdef\hc@effective@authors{\shortauthors}%
+        \fi
+      \else
+        \gdef\hc@effective@authors{\hc@authors@plain}%
+      \fi
+    \else
+      \gdef\hc@effective@authors{\hc@shortauthors}%
+    \fi
+  \fi
+  %% Resolve PDF title
+  \ifx\hc@pdftitle\@empty
+    \ifhc@lang@zh
+      \ifx\hc@titlezh\@empty
+        \gdef\hc@effective@pdftitle{\@title}%
+      \else
+        \gdef\hc@effective@pdftitle{\hc@titlezh}%
+      \fi
+    \else\ifhc@lang@bi
+      \ifx\hc@titlezh\@empty
+        \gdef\hc@effective@pdftitle{\@title}%
+      \else
+        \ifhc@bi@enzh
+          \gdef\hc@effective@pdftitle{\@title\ (\hc@titlezh)}%
+        \else
+          \gdef\hc@effective@pdftitle{\hc@titlezh\ (\@title)}%
+        \fi
+      \fi
+    \else
+      \gdef\hc@effective@pdftitle{\@title}%
+    \fi\fi
+  \else
+    \gdef\hc@effective@pdftitle{\hc@pdftitle}%
+  \fi
+  %% Resolve PDF subtitle (for XMP prism:subtitle)
+  \ifx\hc@subtitle\@empty
+    \ifhc@acmart\let\hc@raw@ensub\@subtitle\else\def\hc@raw@ensub{}\fi
+  \else
+    \let\hc@raw@ensub\hc@subtitle
+  \fi
+  \ifhc@lang@zh
+    \ifx\hc@subtitlezh\@empty
+      \global\let\hc@effective@pdfsubtitle\hc@raw@ensub
+    \else
+      \global\let\hc@effective@pdfsubtitle\hc@subtitlezh
+    \fi
+  \else\ifhc@lang@bi
+    \ifx\hc@subtitlezh\@empty
+      \global\let\hc@effective@pdfsubtitle\hc@raw@ensub
+    \else\ifx\hc@raw@ensub\@empty
+      \global\let\hc@effective@pdfsubtitle\hc@subtitlezh
+    \else
+      \ifhc@bi@enzh
+        \gdef\hc@effective@pdfsubtitle{\hc@raw@ensub\ (\hc@subtitlezh)}%
+      \else
+        \gdef\hc@effective@pdfsubtitle{\hc@subtitlezh\ (\hc@raw@ensub)}%
+      \fi
+    \fi\fi
+  \else
+    \global\let\hc@effective@pdfsubtitle\hc@raw@ensub
+  \fi\fi
+  %% Resolve PDF author
+  \ifx\hc@pdfauthor\@empty
+    \gdef\hc@effective@pdfauthor{\hc@authors@plain}%
+  \else
+    \gdef\hc@effective@pdfauthor{\hc@pdfauthor}%
+  \fi
+  %% Resolve PDF keywords
+  \ifx\hc@pdfkeywords\@empty
+    \ifhc@lang@en
+      \gdef\hc@effective@pdfkeywords{\hc@keywords}%
+    \else\ifhc@lang@zh
+      \ifx\hc@keywordszh\@empty
+        \gdef\hc@effective@pdfkeywords{\hc@keywords}%
+      \else
+        \gdef\hc@effective@pdfkeywords{\hc@keywordszh}%
+      \fi
+    \else
+      \ifx\hc@keywordszh\@empty
+        \gdef\hc@effective@pdfkeywords{\hc@keywords}%
+      \else
+        \ifx\hc@keywords\@empty
+          \gdef\hc@effective@pdfkeywords{\hc@keywordszh}%
+        \else
+          \ifhc@bi@enzh
+            \gdef\hc@effective@pdfkeywords{\hc@keywords, \hc@keywordszh}%
+          \else
+            \gdef\hc@effective@pdfkeywords{\hc@keywordszh, \hc@keywords}%
+          \fi
+        \fi
+      \fi
+    \fi\fi
+  \else
+    \gdef\hc@effective@pdfkeywords{\hc@pdfkeywords}%
+  \fi
+  %% Resolve PDF language (explicit pdflang or derived from lang/biorder)
+  \ifx\hc@pdflang\@empty
+    \ifhc@lang@zh
+      \gdef\hc@effective@pdflang{zh-CN}%
+    \else\ifhc@lang@bi
+      \ifhc@bi@enzh
+        \gdef\hc@effective@pdflang{en}%
+      \else
+        \gdef\hc@effective@pdflang{zh-CN}%
+      \fi
+    \else
+      \gdef\hc@effective@pdflang{en}%
+    \fi\fi
+  \else
+    \gdef\hc@effective@pdflang{\hc@pdflang}%
+  \fi
+  %% Resolve PDF publisher (explicit publisher, else venue)
+  \ifx\hc@publisher\@empty
+    \global\let\hc@effective@pdfpublisher\hc@venue
+  \else
+    \gdef\hc@effective@pdfpublisher{\hc@publisher}%
+  \fi
+  %% Resolve PDF subject (explicit \hcsubject, or auto-composed from venue/doi/arxiv/license)
+  \ifx\hc@subject\@empty
+    \def\hc@effective@pdfsubject{}%
+    \ifx\hc@venue\@empty\else\appto\hc@effective@pdfsubject{\hc@venue}\fi
+    \ifx\hc@version\@empty\else
+      \ifx\hc@effective@pdfsubject\@empty\else\appto\hc@effective@pdfsubject{ | }\fi
+      \appto\hc@effective@pdfsubject{\hc@version}%
+    \fi
+    \ifx\hc@arxiv\@empty\else
+      \ifx\hc@effective@pdfsubject\@empty\else\appto\hc@effective@pdfsubject{ | }\fi
+      \appto\hc@effective@pdfsubject{arXiv: \hc@arxiv}%
+    \fi
+    \ifx\hc@doi\@empty\else
+      \ifx\hc@effective@pdfsubject\@empty\else\appto\hc@effective@pdfsubject{ | }\fi
+      \appto\hc@effective@pdfsubject{DOI: \hc@doi}%
+    \fi
+    \ifx\hc@license\@empty\else
+      \ifx\hc@effective@pdfsubject\@empty\else\appto\hc@effective@pdfsubject{ | }\fi
+      \appto\hc@effective@pdfsubject{License: \hc@license}%
+    \fi
+  \else
+    \gdef\hc@effective@pdfsubject{\hc@subject}%
   \fi
 }
 
 \newif\ifhc@twocol \hc@twocolfalse
+\newif\ifhc@before@begindoc \hc@before@begindoctrue
+\AtBeginDocument{\hc@before@begindocfalse}
+
+\newcommand{\hc@hypersetup@ifnonempty}[2]{%
+  \ifx#2\@empty\else\hypersetup{#1={#2}}\fi
+}
+
+\newcommand{\hc@sync@pdfmetadata}{%
+  \hc@resolve@running
+  \hypersetup{%
+    pdftitle={\hc@effective@pdftitle},
+    pdfauthor={\hc@effective@pdfauthor},
+    pdfsubject={\hc@effective@pdfsubject},
+    pdfkeywords={\hc@effective@pdfkeywords},
+    pdfcreator={\hc@creator}%
+  }%
+  %% Set pdflang only before \Hy@DisableOption{pdflang} fires at \AtBeginDocument;
+  %% leave pdfmetalang empty so hyperxmp copies clean ASCII \@pdflang.
+  \ifhc@before@begindoc
+    \hypersetup{pdflang={\hc@effective@pdflang}}%
+  \fi
+  \@ifpackageloaded{hyperxmp}{%
+    %% Prevent acmart/hyperxmp from defaulting independent reports to ACM / book
+    \gdef\hyxmp@acm@publisher{}%
+    \hc@hypersetup@ifnonempty{pdfpubtype}{\hc@pubtype}%
+    \hc@hypersetup@ifnonempty{pdfsubtitle}{\hc@effective@pdfsubtitle}%
+    \hc@hypersetup@ifnonempty{pdfpublisher}{\hc@effective@pdfpublisher}%
+    \hc@hypersetup@ifnonempty{pdfpublication}{\hc@venue}%
+    \hc@hypersetup@ifnonempty{pdfcopyright}{\hc@license}%
+    \hc@hypersetup@ifnonempty{pdflicenseurl}{\hc@licenseurl}%
+    \hc@hypersetup@ifnonempty{pdfdoi}{\hc@doi}%
+    \hc@hypersetup@ifnonempty{pdfurl}{\hc@url}%
+    \hc@hypersetup@ifnonempty{pdfcontactemail}{\hc@contactemail}%
+  }{}%
+}
+
+\AddToHook{begindocument/before}{%
+  \ifhc@cjk\ifPDFTeX\else
+    \hc@sync@pdfmetadata
+  \fi\else
+    \hc@sync@pdfmetadata
+  \fi
+}
 
 \renewcommand{\maketitle}{%
   \ifhc@acmart
     \@ACM@maketitle@typesettrue
   \fi
   \hc@resolve@running
-  \hypersetup{%
-    pdftitle={\@title},
-    pdfauthor={\hc@authors@plain},
-    pdfkeywords={\hc@keywords}
-  }%
+  \ifhc@cjk\ifPDFTeX\else
+    \hc@sync@pdfmetadata
+  \fi\else
+    \hc@sync@pdfmetadata
+  \fi
   \global\setbox\hc@titlebox=\vbox{%
     \hsize=\textwidth
+    \ifhc@acmart
+      \let\@vspace\@vspace@orig
+      \let\@vspacer\@vspacer@orig
+      \ifnum\ACM@format@nr=0\relax
+        \vspace*{-16pt}%
+      \else\ifnum\ACM@format@nr=5\relax
+        \vspace*{-16pt}%
+      \else
+        \vspace*{-\dimexpr\headheight+\headsep-4pt\relax}%
+      \fi\fi
+    \fi
     \hc@buildheadercard
-    \vskip 10pt
+    \vskip 9pt
   }%
   \hc@twocolfalse
   \if@twocolumn\hc@twocoltrue\fi
@@ -967,28 +2021,28 @@
 }
 
 %% -----------------------------------------------------------------------------
-%% 10. Section Headings (100% acmart-Safe — Zero Redefinition of \section!)
+%% 12. Section Headings (100% acmart-Safe — Zero Redefinition of \section!)
 %% -----------------------------------------------------------------------------
 \DeclareRobustCommand{\hc@secnumbadge}[1]{%
   \tcbox[
     on line, enhanced,
-    colback=hcPrimarySoft,
-    colframe=hcPrimaryBorder,
+    colback=hcSecNumBg,
+    colframe=hcSecNumBorder,
     boxrule=0.45pt,
     arc=3pt,
     boxsep=0pt,
     left=4pt, right=4pt, top=1.5pt, bottom=1.5pt,
     nobeforeafter, tcbox raise base
-  ]{\sffamily\bfseries\fontsize{8.8}{10}\selectfont\color{hcPrimaryDark}#1}%
+  ]{\sffamily\bfseries\fontsize{8.8}{10}\selectfont\color{hcSecNumInk}#1}%
   \hspace{0.48em}%
 }
 
 \DeclareRobustCommand{\hc@subsecnum}[1]{%
-  {\sffamily\bfseries\color{hcAccentDeep}#1}\hspace{0.48em}%
+  {\sffamily\bfseries\color{hcSubsecNumInk}#1}\hspace{0.48em}%
 }
 
 \DeclareRobustCommand{\hc@subsubsecnum}[1]{%
-  {\sffamily\bfseries\color{hcPrimaryDeep}#1}\hspace{0.42em}%
+  {\sffamily\bfseries\color{hcSubsubsecNumInk}#1}\hspace{0.42em}%
 }
 
 \DeclareRobustCommand{\hc@formatseccnt}[2]{%
@@ -1006,34 +2060,34 @@
 \def\@seccntformat#1{\hc@formatseccnt{#1}{\csname the#1\endcsname}}
 
 \ifhc@acmart
-  \def\@secfont{\sffamily\bfseries\fontsize{11.2}{13.8}\selectfont\color{hcPrimaryDark}\section@raggedright}
-  \def\@subsecfont{\sffamily\bfseries\fontsize{9.8}{12.2}\selectfont\color{hcInk}\section@raggedright}
-  \def\@subsubsecfont{\sffamily\bfseries\fontsize{9}{11.2}\selectfont\color{hcPrimaryDeep}}
-  \def\@parfont{\sffamily\bfseries\fontsize{9}{11.2}\selectfont\color{hcInk}}
+  \def\@secfont{\sffamily\bfseries\fontsize{11.0}{14.0}\selectfont\color{hcSectionInk}\section@raggedright}
+  \def\@subsecfont{\sffamily\bfseries\fontsize{9.6}{12.4}\selectfont\color{hcInk}\section@raggedright}
+  \def\@subsubsecfont{\sffamily\bfseries\fontsize{8.9}{11.4}\selectfont\color{hcSubsubsecNumInk}}
+  \def\@parfont{\sffamily\bfseries\fontsize{8.9}{11.4}\selectfont\color{hcInk}}
 \else
   \RequirePackage{titlesec}
-  \titleformat{\section}{\sffamily\bfseries\fontsize{11.2}{13.8}\selectfont\color{hcPrimaryDark}}{\hc@secnumbadge{\thesection}}{0pt}{}
-  \titleformat{\subsection}{\sffamily\bfseries\fontsize{9.8}{12.2}\selectfont\color{hcInk}}{\hc@subsecnum{\thesubsection}}{0pt}{}
-  \titleformat{\subsubsection}[runin]{\sffamily\bfseries\fontsize{9}{11.2}\selectfont\color{hcPrimaryDeep}}{\hc@subsubsecnum{\thesubsubsection}}{0pt}{}[.]
-  \titleformat{\paragraph}[runin]{\sffamily\bfseries\fontsize{9}{11.2}\selectfont\color{hcInk}}{}{0pt}{}[.]
+  \titleformat{\section}{\sffamily\bfseries\fontsize{11.0}{14.0}\selectfont\color{hcSectionInk}}{\hc@secnumbadge{\thesection}}{0pt}{}
+  \titleformat{\subsection}{\sffamily\bfseries\fontsize{9.6}{12.4}\selectfont\color{hcInk}}{\hc@subsecnum{\thesubsection}}{0pt}{}
+  \titleformat{\subsubsection}[runin]{\sffamily\bfseries\fontsize{8.9}{11.4}\selectfont\color{hcSubsubsecNumInk}}{\hc@subsubsecnum{\thesubsubsection}}{0pt}{}[.]
+  \titleformat{\paragraph}[runin]{\sffamily\bfseries\fontsize{8.9}{11.4}\selectfont\color{hcInk}}{}{0pt}{}[.]
   \titlespacing*{\section}{0pt}{10pt plus 2pt minus 2pt}{4pt plus 1pt}
   \titlespacing*{\subsection}{0pt}{8pt plus 2pt minus 1pt}{3pt plus 1pt}
 \fi
 
 %% -----------------------------------------------------------------------------
-%% 11. Running Headers & Footers (with 10pt Monochrome Mini Logo on Pages 2+)
+%% 13. Running Headers & Footers (with 10pt Monochrome Mini Logo on Pages 2+)
 %% -----------------------------------------------------------------------------
 \DeclareRobustCommand{\hc@pagepill}{%
   \tcbox[
     on line, enhanced,
-    colback=hcPrimaryBg,
-    colframe=hcPrimaryBorder!85!hcSurface,
+    colback=hcPagePillBg,
+    colframe=hcPagePillBorder,
     boxrule=0.45pt,
     arc=4pt,
     boxsep=0pt,
     left=6pt, right=6pt, top=1.8pt, bottom=1.8pt,
     nobeforeafter, tcbox raise base
-  ]{\sffamily\bfseries\fontsize{7.8}{9}\selectfont\color{hcPrimaryDark}\thepage}%
+  ]{\sffamily\bfseries\fontsize{7.8}{9}\selectfont\color{hcPagePillInk}\thepage}%
 }
 
 \newcommand{\hc@pastelheadrule}{%
@@ -1049,6 +2103,10 @@
     \addtolength{\topmargin}{\dimexpr\headheight-20pt\relax}%
     \setlength{\headheight}{20pt}%
   \fi
+  %% Apply localized float & bibliography names cleanly (after acmart init)
+  \renewcommand{\figurename}{\hc@lbl@figure}%
+  \renewcommand{\tablename}{\hc@lbl@table}%
+  \renewcommand{\refname}{\hc@lbl@references}%
   \fancypagestyle{firstpagestyle}{%
     \fancyhf{}%
     \renewcommand{\headrulewidth}{0pt}%
@@ -1066,14 +2124,22 @@
         \ifhc@showheaderlogo
           \hc@headerlogo\hspace{0.5em}%
         \else
-          \tikz[baseline=-0.3ex]{\fill[hcPrimary] (0,0) circle (1.7pt);}\hspace{0.45em}%
+          \ifhc@theme@apple
+            \tikz[baseline=-0.3ex]{\fill[hcMuted] (0,0) circle (1.35pt);}\hspace{0.45em}%
+          \else
+            \tikz[baseline=-0.3ex]{\fill[hcPrimary] (0,0) circle (1.7pt);}\hspace{0.45em}%
+          \fi
         \fi
         \hc@effective@title}%
     }%
     \fancyhead[R]{%
       {\sffamily\fontsize{7.6}{9}\selectfont\color{hcMuted}%
         \hc@effective@authors\hspace{0.45em}%
-        \tikz[baseline=-0.3ex]{\fill[hcAccent] (0,0) circle (1.7pt);}}%
+        \ifhc@theme@apple
+          \tikz[baseline=-0.3ex]{\fill[hcMuted] (0,0) circle (1.35pt);}%
+        \else
+          \tikz[baseline=-0.3ex]{\fill[hcAccent] (0,0) circle (1.7pt);}%
+        \fi}%
     }%
     \fancyfoot[C]{\hc@pagepill}%
   }%
@@ -1081,15 +2147,33 @@
 }
 
 %% -----------------------------------------------------------------------------
-%% 12. Captions & Lists
+%% 14. Captions & Lists
 %% -----------------------------------------------------------------------------
-\captionsetup{%
-  font={small, sf},
-  labelfont={bf, color=hcPrimaryDark},
-  textfont={color=hcMuted},
-  labelsep=period,
-  skip=6pt
-}
+\ifhc@lang@zh
+  \captionsetup{%
+    font={small, sf},
+    labelfont={bf, color=hcPrimaryDark},
+    textfont={color=hcMuted},
+    labelsep=space,
+    skip=6pt
+  }
+\else\ifhc@lang@bi
+  \captionsetup{%
+    font={small, sf},
+    labelfont={bf, color=hcPrimaryDark},
+    textfont={color=hcMuted},
+    labelsep=colon,
+    skip=6pt
+  }
+\else
+  \captionsetup{%
+    font={small, sf},
+    labelfont={bf, color=hcPrimaryDark},
+    textfont={color=hcMuted},
+    labelsep=period,
+    skip=6pt
+  }
+\fi\fi
 
 \setlist[itemize]{%
   leftmargin=1.35em,
@@ -1107,57 +2191,60 @@
 }
 
 %% -----------------------------------------------------------------------------
-%% 13. Health-Card Academic Components (100% Relative Widths)
+%% 15. Health-Card Academic Components (100% Relative Widths, Localized Labels)
 %% -----------------------------------------------------------------------------
 
-%% 13.1 Primary Takeaway / Summary Card
-\newtcolorbox{hccard}[1][Key Takeaway]{%
+%% 15.1 Primary Takeaway / Summary Card
+\newtcolorbox{hccard}[1][\hc@lbl@card]{%
   enhanced,
   breakable,
+  lines before break=5,
   width=\linewidth,
-  colback=hcPrimaryBg!68!hcSurface,
-  colframe=hcPrimaryBorder,
-  boxrule=0.6pt,
+  colback=hcCardBg,
+  colframe=hcCardBorder,
+  boxrule=\hc@card@rulew,
   arc=6pt,
   outer arc=6pt,
-  borderline west={2.6pt}{0pt}{hcPrimary},
+  borderline west={\hc@card@barw}{0pt}{hcPrimary},
   left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt,
   detach title,
   coltitle=hcPrimaryDark,
-  fonttitle=\sffamily\bfseries\fontsize{8.4}{10}\selectfont,
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{8.4}{10.4}\selectfont,
   title={\textcolor{hcPrimaryDeep}{\faIcon{info-circle}}\hspace{0.45em}#1},
-  before upper={\tcbtitle\par\vskip 3pt},
-  fontupper=\fontsize{8.5}{11.2}\selectfont\color{hcInk},
+  before upper={\tcbtitle\par\nopagebreak\vskip 3pt\nopagebreak},
+  fontupper=\fontsize{8.4}{11.4}\selectfont\color{hcInk},
   before skip=6.5pt,
   after skip=6.5pt
 }
 
-%% 13.2 Accent Finding / Clinical / Ablation Card
-\newtcolorbox{hcpinkcard}[1][Key Finding]{%
+%% 15.2 Accent Finding / Clinical / Ablation Card
+\newtcolorbox{hcpinkcard}[1][\hc@lbl@pinkcard]{%
   enhanced,
   breakable,
+  lines before break=5,
   width=\linewidth,
-  colback=hcAccentBg!78!hcSurface,
-  colframe=hcAccentBorder,
-  boxrule=0.6pt,
+  colback=hcPinkCardBg,
+  colframe=hcPinkCardBorder,
+  boxrule=\hc@card@rulew,
   arc=6pt,
   outer arc=6pt,
-  borderline west={2.6pt}{0pt}{hcAccent},
+  borderline west={\hc@card@barw}{0pt}{hcAccent},
   left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt,
   detach title,
   coltitle=hcAccentDark,
-  fonttitle=\sffamily\bfseries\fontsize{8.4}{10}\selectfont,
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{8.4}{10.4}\selectfont,
   title={\textcolor{hcAccentDeep}{\faIcon{star}}\hspace{0.45em}#1},
-  before upper={\tcbtitle\par\vskip 3pt},
-  fontupper=\fontsize{8.5}{11.2}\selectfont\color{hcInk},
+  before upper={\tcbtitle\par\nopagebreak\vskip 3pt\nopagebreak},
+  fontupper=\fontsize{8.4}{11.4}\selectfont\color{hcInk},
   before skip=6.5pt,
   after skip=6.5pt
 }
 
-%% 13.3 Neutral Slate-Gray Note Card (hardware specs, engineering notes)
-\newtcolorbox{hcnote}[1][Implementation Note]{%
+%% 15.3 Neutral Slate-Gray Note Card (hardware specs, engineering notes)
+\newtcolorbox{hcnote}[1][\hc@lbl@note]{%
   enhanced,
   breakable,
+  lines before break=5,
   width=\linewidth,
   colback=hcNoteBg,
   colframe=hcNoteBorder,
@@ -1168,18 +2255,19 @@
   left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt,
   detach title,
   coltitle=hcNoteDark,
-  fonttitle=\sffamily\bfseries\fontsize{8.4}{10}\selectfont,
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{8.4}{10.4}\selectfont,
   title={\textcolor{hcNoteDeep}{\faIcon{clipboard-list}}\hspace{0.45em}#1},
-  before upper={\tcbtitle\par\vskip 3pt},
-  fontupper=\fontsize{8.5}{11.2}\selectfont\color{hcInk},
+  before upper={\tcbtitle\par\nopagebreak\vskip 3pt\nopagebreak},
+  fontupper=\fontsize{8.4}{11.4}\selectfont\color{hcInk},
   before skip=6.5pt,
   after skip=6.5pt
 }
 
-%% 13.4 Warm Amber Caveat / Limitation Card (engineering pitfalls, caveats)
-\newtcolorbox{hccaveat}[1][Caveat \& Limitation]{%
+%% 15.4 Warm Amber Caveat / Limitation Card (engineering pitfalls, caveats)
+\newtcolorbox{hccaveat}[1][\hc@lbl@caveat]{%
   enhanced,
   breakable,
+  lines before break=5,
   width=\linewidth,
   colback=hcCaveatBg,
   colframe=hcCaveatBorder,
@@ -1190,85 +2278,88 @@
   left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt,
   detach title,
   coltitle=hcCaveatDark,
-  fonttitle=\sffamily\bfseries\fontsize{8.4}{10}\selectfont,
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{8.4}{10.4}\selectfont,
   title={\textcolor{hcCaveatDeep}{\faIcon{exclamation-triangle}}\hspace{0.45em}#1},
-  before upper={\tcbtitle\par\vskip 3pt},
-  fontupper=\fontsize{8.5}{11.2}\selectfont\color{hcInk},
+  before upper={\tcbtitle\par\nopagebreak\vskip 3pt\nopagebreak},
+  fontupper=\fontsize{8.4}{11.4}\selectfont\color{hcInk},
   before skip=6.5pt,
   after skip=6.5pt
 }
 
-%% 13.5 Formal Academic Cards (Theorem / Proposition / Definition)
-\newtcbtheorem[auto counter]{hctheorem}{Theorem}{%
+%% 15.5 Formal Academic Cards (Theorem / Proposition / Definition)
+\newtcbtheorem[auto counter]{hctheorem}{\hc@lbl@theorem}{%
   enhanced,
   breakable,
+  lines before break=5,
   width=\linewidth,
   colback=hcSurface,
-  colframe=hcPrimaryBorder,
-  colbacktitle=hcPrimaryBg,
+  colframe=hcCardBorder,
+  colbacktitle=hcTableHeadBg,
   coltitle=hcPrimaryDark,
-  boxrule=0.6pt,
+  boxrule=\hc@thm@rulew,
   titlerule=0.45pt,
-  titlerule style=hcPrimaryBorder!75!hcSurface,
+  titlerule style=hcTableRule!80!hcSurface,
   arc=5.5pt,
   left=8.5pt, right=8.5pt, top=5.5pt, bottom=6pt,
   toptitle=3.5pt, bottomtitle=3.5pt,
-  fonttitle=\sffamily\bfseries\fontsize{8.6}{10}\selectfont,
-  fontupper=\fontsize{8.8}{11.5}\selectfont\itshape\color{hcInk},
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{8.5}{10.4}\selectfont,
+  fontupper=\fontsize{8.6}{11.6}\selectfont\itshape\color{hcInk},
   separator sign none,
   description delimiters parenthesis,
-  terminator sign={.},
+  terminator sign={\hc@lbl@thmterm},
   before skip=6.5pt,
   after skip=6.5pt
 }{thm}
 
-\newtcbtheorem[auto counter]{hcdefinition}{Definition}{%
+\newtcbtheorem[auto counter]{hcdefinition}{\hc@lbl@definition}{%
   enhanced,
   breakable,
+  lines before break=5,
   width=\linewidth,
   colback=hcSurface,
-  colframe=hcAccentBorder,
-  colbacktitle=hcAccentBg,
+  colframe=hcPinkCardBorder,
+  colbacktitle=hcPinkCardBg,
   coltitle=hcAccentDark,
-  boxrule=0.6pt,
+  boxrule=\hc@thm@rulew,
   titlerule=0.45pt,
-  titlerule style=hcAccentBorder!75!hcSurface,
+  titlerule style=hcPinkCardBorder!80!hcSurface,
   arc=5.5pt,
   left=8.5pt, right=8.5pt, top=5.5pt, bottom=6pt,
   toptitle=3.5pt, bottomtitle=3.5pt,
-  fonttitle=\sffamily\bfseries\fontsize{8.6}{10}\selectfont,
-  fontupper=\fontsize{8.8}{11.5}\selectfont\color{hcInk},
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{8.5}{10.4}\selectfont,
+  fontupper=\fontsize{8.6}{11.6}\selectfont\color{hcInk},
   separator sign none,
   description delimiters parenthesis,
-  terminator sign={.},
+  terminator sign={\hc@lbl@thmterm},
   before skip=6.5pt,
   after skip=6.5pt
 }{def}
 
-\newtcbtheorem[auto counter]{hcproposition}{Proposition}{%
+\newtcbtheorem[auto counter]{hcproposition}{\hc@lbl@proposition}{%
   enhanced,
   breakable,
+  lines before break=5,
   width=\linewidth,
   colback=hcSurface,
-  colframe=hcPrimaryBorder,
+  colframe=hcCardBorder,
   colbacktitle=hcCanvas,
   coltitle=hcPrimaryDark,
-  boxrule=0.6pt,
+  boxrule=\hc@thm@rulew,
   titlerule=0.45pt,
   titlerule style=hcLine,
   arc=5.5pt,
   left=8.5pt, right=8.5pt, top=5.5pt, bottom=6pt,
   toptitle=3.5pt, bottomtitle=3.5pt,
-  fonttitle=\sffamily\bfseries\fontsize{8.6}{10}\selectfont,
-  fontupper=\fontsize{8.8}{11.5}\selectfont\itshape\color{hcInk},
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{8.5}{10.4}\selectfont,
+  fontupper=\fontsize{8.6}{11.6}\selectfont\itshape\color{hcInk},
   separator sign none,
   description delimiters parenthesis,
-  terminator sign={.},
+  terminator sign={\hc@lbl@thmterm},
   before skip=6.5pt,
   after skip=6.5pt
 }{prop}
 
-%% 13.6 Health-Card Bento Metric Tiles (Strictly Relative Width via tabularx)
+%% 15.6 Health-Card Bento Metric Tiles (Strictly Relative Width via tabularx)
 \newenvironment{hcmetricgrid}[1][4]{%
   \par\noindent
   \begingroup
@@ -1322,12 +2413,19 @@
       \def\hc@mc@bar{hcPrimary}%
     }%
   }%
+  \ifhc@theme@apple
+    \def\hc@mc@cardborder{hcLine}%
+    \def\hc@mc@rulew{0.55pt}%
+  \else
+    \let\hc@mc@cardborder\hc@mc@border
+    \def\hc@mc@rulew{0.65pt}%
+  \fi
   \begin{tcolorbox}[
     enhanced,
     width=\linewidth,
     colback=hcSurface,
-    colframe=\hc@mc@border,
-    boxrule=0.65pt,
+    colframe=\hc@mc@cardborder,
+    boxrule=\hc@mc@rulew,
     arc=7pt,
     outer arc=7pt,
     left=8pt, right=8pt, top=8pt, bottom=7pt,
@@ -1336,19 +2434,23 @@
     overlay={%
       \begin{scope}
         \clip[rounded corners=7pt] (frame.south west) rectangle (frame.north east);
-        \fill[\hc@mc@bar] ([yshift=-2.3pt]frame.north west) rectangle (frame.north east);
+        \ifhc@theme@apple
+          \fill[\hc@mc@bar] ([yshift=-1.6pt]frame.north west) rectangle (frame.north east);
+        \else
+          \fill[\hc@mc@bar] ([yshift=-2.3pt]frame.north west) rectangle (frame.north east);
+        \fi
       \end{scope}
     }
   ]
     \raggedright
-    {\sffamily\fontsize{6.6}{8}\selectfont\bfseries\color{hcMuted}%
+    {\sffamily\fontsize{6.6}{8.2}\selectfont\bfseries\color{hcMuted}%
       \tcbox[
         on line, enhanced,
         colback=\hc@mc@soft, colframe=\hc@mc@soft,
         boxrule=0pt, arc=3.5pt,
         boxsep=0pt, left=3pt, right=3pt, top=2pt, bottom=2pt,
         nobeforeafter, tcbox raise base
-      ]{\color{\hc@mc@deep}\hc@resolveicon{#2}}\hspace{0.35em}\MakeUppercase{#3}\par}%
+      ]{\color{\hc@mc@deep}\hc@resolveicon{#2}}\hspace{0.35em}\hc@maybecaps{#3}\par}%
     \vskip 4.5pt
     {\sffamily\bfseries\fontsize{14}{15.5}\selectfont\color{\hc@mc@dark}#4\par}%
     \vskip 3.5pt
@@ -1362,7 +2464,7 @@
   \end{tcolorbox}%
 }
 
-%% 13.7 Health-Card Tables (booktabs + colortbl, zero white rule gaps)
+%% 15.7 Health-Card Tables (booktabs + colortbl, zero white rule gaps)
 \newenvironment{hctable}{%
   \begingroup
   \sffamily\footnotesize
@@ -1370,34 +2472,32 @@
   \setlength{\belowrulesep}{0pt}%
   \setlength{\extrarowheight}{2.2pt}%
   \renewcommand{\arraystretch}{1.22}%
-  \arrayrulecolor{hcPrimaryBorder}%
+  \arrayrulecolor{hcTableRule}%
 }{%
   \arrayrulecolor{hcInk}%
   \endgroup
 }
-\newcommand{\hctoprule}{\arrayrulecolor{hcPrimaryDeep}\toprule[1.0pt]\arrayrulecolor{hcPrimaryBorder}}
-\newcommand{\hcmidrule}{\arrayrulecolor{hcPrimaryBorder}\midrule[0.6pt]}
-\newcommand{\hcbottomrule}{\arrayrulecolor{hcPrimaryDeep}\bottomrule[1.0pt]\arrayrulecolor{hcInk}}
-\newcommand{\hctablehead}{\rowcolor{hcPrimaryBg}}
+\newcommand{\hctoprule}{\arrayrulecolor{hcTableHeavyRule}\toprule[1.0pt]\arrayrulecolor{hcTableRule}}
+\newcommand{\hcmidrule}{\arrayrulecolor{hcTableRule}\midrule[\hc@table@midw]}
+\newcommand{\hcbottomrule}{\arrayrulecolor{hcTableHeavyRule}\bottomrule[1.0pt]\arrayrulecolor{hcInk}}
+\newcommand{\hctablehead}{\rowcolor{hcTableHeadBg}}
 \newcommand{\hcbestrow}{\rowcolor{hcAccentBg}}
 \newcommand{\hcaltrow}{\rowcolor{hcStripe}}
-\newcommand{\hcth}[1]{\textbf{\color{hcPrimaryDark}#1}}
+\newcommand{\hcth}[1]{\textbf{\color{hcTableHeadInk}#1}}
 
-%% Optional rounded card wrapper around a figure or table
 \newtcolorbox{hcframecard}[1][]{%
   enhanced,
   width=\linewidth,
   colback=hcSurface,
   colframe=hcLine,
-  boxrule=0.6pt,
+  boxrule=\hc@frame@rulew,
   arc=7pt,
   left=7pt, right=7pt, top=7pt, bottom=7pt,
   boxsep=0pt,
   #1
 }
 
-%% 13.8 Pure pdfLaTeX Code Card with Key-Line Highlighting (ZERO -shell-escape)
-%% Supports hlblue={16,17} / hlprimary={...} and hlpink={21,22} / hlaccent={...}
+%% 15.8 Pure LaTeX Code Card with Key-Line Highlighting (ZERO -shell-escape)
 \def\hc@code@hlprimary{}
 \def\hc@code@hlaccent{}
 
@@ -1458,36 +2558,28 @@
   tabsize=2,
   keepspaces=true,
   columns=flexible,
+  extendedchars=false,
   aboveskip=0pt,
   belowskip=0pt
 }
 
-\ifhc@acmart
-  \AtBeginEnvironment{hccode}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
-\fi
-
 \newtcblisting[auto counter]{hccode}[3][Code]{%
   enhanced,
   breakable,
+  lines before break=5,
   width=\linewidth,
-  colback=hcCanvas,
+  colback=hcCodeBg,
   colframe=hcLine,
-  colbacktitle=hcPrimaryBg,
-  coltitle=hcPrimaryDark,
-  boxrule=0.6pt,
+  colbacktitle=hcCodeTitleBg,
+  coltitle=hcChromeBarTitleInk,
+  boxrule=\hc@code@rulew,
   titlerule=0.45pt,
-  titlerule style=hcPrimaryBorder!70!hcSurface,
+  titlerule style=hcTableRule!85!hcSurface,
   arc=6pt,
   left=17pt, right=5.5pt, top=4.5pt, bottom=4.5pt,
   toptitle=3.2pt, bottomtitle=3.2pt,
-  fonttitle=\sffamily\bfseries\fontsize{7.8}{9.2}\selectfont,
-  title={%
-    \tikz[baseline=-0.35ex]{%
-      \fill[hcPrimary] (0,0) circle (2.0pt);
-      \fill[hcAccent] (5.8pt,0) circle (2.0pt);
-      \fill[hcSurface, draw=hcPrimaryBorder, line width=0.4pt] (11.6pt,0) circle (2.0pt);
-    }\hspace{0.5em}Listing~\thetcbcounter: #1%
-  },
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{7.8}{9.4}\selectfont,
+  title={\hc@code@dots\hspace{0.5em}\hc@lbl@listing~\thetcbcounter: #1},
   listing only,
   listing options={style=hcCodeStyle, #2},
   before skip=6.5pt,
@@ -1495,15 +2587,9 @@
   #3
 }
 
-%% 13.9 Matched Health-Card Algorithm Card (algpseudocode + tcolorbox)
-%% Usage:
-%%   \begin{hcalgorithm}[Conformal Calibration]{label=alg:cal}
-%%     \Require ...
-%%     \Ensure ...
-%%     \State ...
-%%   \end{hcalgorithm}
-\algrenewcommand\algorithmicrequire{\textbf{\sffamily\color{hcPrimaryDark}Input:}}
-\algrenewcommand\algorithmicensure{\textbf{\sffamily\color{hcPrimaryDark}Output:}}
+%% 15.9 Matched Health-Card Algorithm Card (algpseudocode + tcolorbox)
+\algrenewcommand\algorithmicrequire{\textbf{\sffamily\color{hcPrimaryDark}\hc@lbl@alginput}}
+\algrenewcommand\algorithmicensure{\textbf{\sffamily\color{hcPrimaryDark}\hc@lbl@algoutput}}
 \algrenewcommand\algorithmicfor{\textbf{\sffamily\color{hcPrimaryDark}for}}
 \algrenewcommand\algorithmicforall{\textbf{\sffamily\color{hcPrimaryDark}for all}}
 \algrenewcommand\algorithmicdo{\textbf{\sffamily\color{hcPrimaryDark}do}}
@@ -1518,38 +2604,35 @@
 \algrenewcommand\algorithmicfunction{\textbf{\sffamily\color{hcPrimaryDark}function}}
 \algrenewcommand\algorithmicprocedure{\textbf{\sffamily\color{hcPrimaryDark}procedure}}
 \algrenewcommand\alglinenumber[1]{{\sffamily\fontsize{6.6}{8}\selectfont\color{hcCodeNum}#1\hspace{0.2em}}}
-\algrenewcommand\algorithmiccomment[1]{\hfill\mbox{\sffamily\fontsize{7.0}{8.6}\selectfont\color{hcMuted}$\triangleright$ #1}}
+\algrenewcommand\algorithmiccomment[1]{\hfill\mbox{\sffamily\fontsize{6.9}{8.6}\selectfont\color{hcMuted}$\triangleright$ #1}}
 
 \newcounter{hcalg}
 \renewcommand{\thehcalg}{\arabic{hcalg}}
 
-\ifhc@acmart
-  \AtBeginEnvironment{hcalgorithm}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
-\fi
-
-\newtcolorbox[use counter=hcalg]{hcalgorithm}[2][Algorithm]{%
+\newtcolorbox[use counter=hcalg]{hcalgorithm}[2][\hc@lbl@algorithm]{%
   enhanced,
   breakable,
+  lines before break=6,
   width=\linewidth,
   colback=hcSurface,
   colframe=hcLine,
-  colbacktitle=hcPrimaryBg,
-  coltitle=hcPrimaryDark,
-  boxrule=0.6pt,
+  colbacktitle=hcAlgTitleBg,
+  coltitle=hcChromeBarTitleInk,
+  boxrule=\hc@alg@rulew,
   titlerule=0.45pt,
-  titlerule style=hcPrimaryBorder!70!hcSurface,
+  titlerule style=hcTableRule!85!hcSurface,
   arc=6pt,
   boxsep=0pt,
   left=8.5pt, right=8pt, top=5pt, bottom=5.5pt,
   toptitle=4.2pt, bottomtitle=4.2pt,
-  fonttitle=\sffamily\bfseries\fontsize{7.9}{9.3}\selectfont,
+  fonttitle=\raggedright\sffamily\bfseries\fontsize{7.9}{9.5}\selectfont,
   title={%
     \tikz[baseline=-0.35ex]{%
       \fill[hcPrimary] (0,0) circle (2.0pt);
       \fill[hcAccent] (5.8pt,0) circle (2.0pt);
-    }\hspace{0.5em}Algorithm~\thetcbcounter: #1%
+    }\hspace{0.5em}\hc@lbl@algorithm~\thetcbcounter: #1%
   },
-  fontupper=\fontsize{8.1}{10.8}\selectfont\color{hcInk},
+  fontupper=\fontsize{8.0}{10.8}\selectfont\color{hcInk},
   before upper={\begin{algorithmic}[1]},
   after upper={\end{algorithmic}},
   before skip=6.5pt,
@@ -1557,7 +2640,20 @@
   #2
 }
 
-%% 13.10 Native PGFPlots Theme (Relative Widths, Theme-Aware Palette)
+%% Suppress acmart's noisy \vspace warning inside breakable tcolorbox cards
+\ifhc@acmart
+  \AtBeginEnvironment{hccard}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+  \AtBeginEnvironment{hcpinkcard}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+  \AtBeginEnvironment{hcnote}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+  \AtBeginEnvironment{hccaveat}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+  \AtBeginEnvironment{hctheorem}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+  \AtBeginEnvironment{hcdefinition}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+  \AtBeginEnvironment{hcproposition}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+  \AtBeginEnvironment{hccode}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+  \AtBeginEnvironment{hcalgorithm}{\let\@vspace\@vspace@orig\let\@vspacer\@vspacer@orig}
+\fi
+
+%% 15.10 Native PGFPlots Theme (Relative Widths, Theme-Aware Palette)
 \pgfplotscreateplotcyclelist{hcPlotCycle}{%
   {hcPrimaryDeep, line width=1.45pt, mark=*, mark size=2.1pt, mark options={fill=hcSurface, draw=hcPrimaryDeep, line width=1pt}},%
   {hcAccentDeep, line width=1.45pt, mark=square*, mark size=2.0pt, mark options={fill=hcSurface, draw=hcAccentDeep, line width=1pt}},%
@@ -1601,7 +2697,7 @@
   }
 }
 
-%% 13.11 Optional Automatic Author ORCID Directory Card (\makeorcidlist)
+%% 15.11 Optional Automatic Author ORCID Directory Card (\makeorcidlist)
 \newcommand{\hc@orcidrow}[2]{%
   \leavevmode{\sffamily\bfseries\footnotesize\color{hcInk}#1} & \hcorcidfull{#2} \\
 }
@@ -1618,8 +2714,8 @@
       left=8.5pt, right=8.5pt, top=6pt, bottom=6pt,
       before skip=6pt, after skip=6pt
     ]
-      {\sffamily\bfseries\fontsize{8.2}{9.5}\selectfont\color{hcPrimaryDark}%
-        \raisebox{-0.06ex}{\orcidlogo}\hspace{0.45em}Author ORCID Identifiers\par}%
+      {\sffamily\bfseries\fontsize{8.2}{9.8}\selectfont\color{hcPrimaryDark}%
+        \raisebox{-0.06ex}{\orcidlogo}\hspace{0.45em}\hc@lbl@orcidlist\par}%
       \vskip 3.5pt
       \begingroup
       \setlength{\tabcolsep}{3pt}%
@@ -1632,28 +2728,28 @@
   \fi
 }
 
-%% 13.12 Hardware & Reproducibility Spec Card (hcenvcard + \hcenvrow)
+%% 15.12 Hardware & Reproducibility Spec Card (hcenvcard + \hcenvrow)
 \newcommand{\hcenvrow}[2]{%
-  \leavevmode{\sffamily\bfseries\fontsize{7.4}{9.4}\selectfont\color{hcMuted}#1} &
-  \leavevmode{\sffamily\fontsize{7.6}{9.6}\selectfont\color{hcInk}#2} \\
+  \leavevmode{\sffamily\bfseries\fontsize{7.4}{9.6}\selectfont\color{hcMuted}#1} &
+  \leavevmode{\sffamily\fontsize{7.6}{9.8}\selectfont\color{hcInk}#2} \\
 }
 
-\NewEnviron{hcenvcard}[1][Experimental Environment]{%
+\NewEnviron{hcenvcard}[1][\hc@lbl@envcard]{%
   \begin{tcolorbox}[
     enhanced,
     width=\linewidth,
     colback=hcSurface,
     colframe=hcLine,
-    colbacktitle=hcPrimaryBg,
-    coltitle=hcPrimaryDark,
+    colbacktitle=hcTableHeadBg,
+    coltitle=hcChromeBarTitleInk,
     boxrule=0.55pt,
     titlerule=0.45pt,
-    titlerule style=hcPrimaryBorder!70!hcSurface,
+    titlerule style=hcTableRule!85!hcSurface,
     arc=6pt,
     boxsep=0pt,
     left=8.5pt, right=8.5pt, top=5.5pt, bottom=5.5pt,
     toptitle=4.5pt, bottomtitle=4.5pt,
-    fonttitle=\sffamily\bfseries\fontsize{8.0}{9.4}\selectfont,
+    fonttitle=\raggedright\sffamily\bfseries\fontsize{8.0}{9.6}\selectfont,
     title={\textcolor{hcPrimaryDeep}{\faIcon{microchip}}\hspace{0.48em}#1},
     before skip=5.5pt, after skip=6pt
   ]%
@@ -1667,16 +2763,20 @@
   \end{tcolorbox}%
 }
 
-%% Semantic helper to balance the two columns on the final page cleanly
+%% Semantic helper to keep a heading with its following card/block or balance columns
+\newcommand{\hcneedspace}[1][5\baselineskip]{\Needspace{#1}}
 \newcommand{\hcbalance}{\if@twocolumn\balance\fi}
 
 %% -----------------------------------------------------------------------------
-%% 14. Subtle Bibliography Typography Polish
+%% 16. Subtle Bibliography Typography Polish
 %% -----------------------------------------------------------------------------
 \AtBeginDocument{%
   \ifhc@acmart
     \renewcommand{\bibfont}{\footnotesize\color{hcInk}}%
   \fi
+  \@ifundefined{bibliography}{}{%
+    \pretocmd{\bibliography}{\Needspace{5\baselineskip}}{}{}%
+  }%
 }
 
 \endinput

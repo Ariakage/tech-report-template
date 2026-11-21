@@ -1,29 +1,28 @@
 %% =============================================================================
-%% main.tex — Content Entry Point (Completely Decoupled from style/healthcard.sty)
-%% Compile with standard pdfLaTeX (NO -shell-escape required):
-%%   latexmk -pdf main.tex      (outputs to build/main.pdf)
-%%   make                       (or make preview / make clean)
+%% main.tex — Content Entry Point (Single-Source: lang=en | lang=zh | lang=bilingual)
+%% Compile Pure English (default, zero -shell-escape): make  (pdfLaTeX, Type 1)
+%% Compile Pure Chinese / Bilingual:                 make xelatex
 %% =============================================================================
 \documentclass[sigconf, nonacm]{acmart}
 
-%% All visual styling, palette, cards, ORCID badges, and microtype live in style/.
-%% One-click theme & style options:
-%%   theme=pastel|ocean|sage|lavender|mono  (default: pastel = #5BCEFA/#F5A9B8/#FFFFFF)
-%%   orcid=brand|official                   (default: brand)
-%%   ribbon=gradient|stripe|none            (default: gradient)
-%%   accent=blue|pink                       (default: blue)
-%%   headerstyle=layered|clean              (default: layered)
-\usepackage[theme=pastel]{style/healthcard}
+%% All visual styling, palette, cards, ORCID badges, CJK fonts, and microtype live in style/.
+%% One-click theme, language & style options:
+%%   theme=akatechreport|apple|ocean|sage|lavender|mono  (default: akatechreport = #5BCEFA/#F5A9B8/#FFFFFF)
+%%   lang=en|zh|bilingual                          (default: en)
+%%   biorder=zh-en|en-zh                           (default: zh-en in bilingual mode)
+%%   cjkfont=fandol|mac|windows|ubuntu|none        (default: fandol, TeX Live built-in)
+%%   orcid=brand|official                          (default: brand)
+%%   ribbon=gradient|stripe|none                   (default: gradient)
+%%   accent=blue|pink                              (default: blue)
+%%   headerstyle=layered|clean                     (default: layered)
+\usepackage[theme=akatechreport, lang=en]{style/healthcard}
 
 %% Optional custom hex skinning (uncomment to override any 2 hex colors):
 %% \hcsettheme{primary=5BCEFA, accent=F5A9B8}
 
 %% -----------------------------------------------------------------------------
 %% Logo Slots (Page 1 Dual 18pt Logos + Inner-Page 10pt Monochrome Mini Logo)
-%% For custom image files in figures/, simply replace with:
-%%   \projectlogoimage[18pt]{aminfer_logo.pdf}
-%%   \orglogoimage[18pt]{srinternet_logo.pdf}
-%%   \headerlogoimage[10pt]{aminfer_mini.pdf}
+%% For custom image files in figures/, replace with \projectlogoimage / \orglogoimage.
 %% -----------------------------------------------------------------------------
 \input{figures/logos}
 \projectlogo{\demoprojectlogo}
@@ -31,47 +30,62 @@
 \headerlogo{\demoheaderlogo}
 
 %% -----------------------------------------------------------------------------
-%% Paper Metadata
+%% Multilingual & PDF Metadata Configuration
 %% -----------------------------------------------------------------------------
-\reportlabel{Technical Report}
-\reportbadge{v1.0 \textperiodcentered\ Preprint}
-\reportdate{November 21, 2026}
+\hcsetup{
+  reportlabel={\hcbisep{技术报告}{Technical Report}},
+  reportbadge={v1.0 \textperiodcentered\ \hcbi{预印本}{Preprint}},
+  reportdate={2026-11-21},
+  titlezh={AuroraCard：面向纵向临床决策支持的校准多模态生命体征融合架构},
+  subtitlezh={兼具不确定性感知生理监测与可解释风险分层的模块化系统},
+  shorttitle={AuroraCard: Calibrated Multimodal Vital-Sign Fusion},
+  shorttitlezh={AuroraCard：校准多模态生命体征融合架构},
+  shortauthors={Lin, Takahashi, Vance, and Zhou},
+  shortauthorszh={林雅岚, 高桥空, Vance, 周敏娜},
+  keywordszh={临床决策支持, 多模态融合, 不确定性校准, 生命体征建模, 预印本系统},
+  keywords={Clinical Decision Support, Multimodal Fusion, Uncertainty Calibration, Vital-Sign Modeling, Preprint Systems},
+  venue={AkaTechReport Showcase},
+  publisher={Pastel Systems Research Lab},
+  version={v1.0},
+  license={MIT / CC-BY-4.0},
+  licenseurl={https://creativecommons.org/licenses/by/4.0/},
+  url={https://pastelsys.org/auroracard}
+}
 
 \title{AuroraCard: Calibrated Multimodal Vital-Sign Fusion for Longitudinal Clinical Decision Support}
 \subtitle{A Modular Architecture for Uncertainty-Aware Physiological Monitoring and Interpretable Risk Stratification}
-\hcshorttitle{AuroraCard: Calibrated Multimodal Vital-Sign Fusion}
-\hcshortauthors{Lin, Takahashi, Vance, and Zhou}
 
-%% Authors: \hcauthor[affiliation/note marks]{Full Name}{ORCID (or empty)}
-\hcauthor[1,*]{Aria Lin}{0000-0002-1825-0097}
-\hcauthor[1,2,*]{Sora Takahashi}{0000-0001-9432-6104}
+%% Authors: \hcauthor[affil/note marks]{\hcbi{中文名}{English Name}}{ORCID (or empty)}
+\hcauthor[1,*]{\hcbi{林雅岚}{Aria Lin}}{0000-0002-1825-0097}
+\hcauthor[1,2,*]{\hcbi{高桥空}{Sora Takahashi}}{0000-0001-9432-6104}
 \hcauthor[2]{Elena Vance}{0000-0003-2719-8451}
-\hcauthor[1,\dag]{Mina Zhou}{0000-0002-6510-3392}
+\hcauthor[1,\dag]{\hcbi{周敏娜}{Mina Zhou}}{0000-0002-6510-3392}
 
 %% Affiliations
-\hcaffiliation[1]{Pastel Systems Research Lab}
-\hcaffiliation[2]{Department of Biomedical Informatics, Pacific Institute of Technology}
+\hcaffiliation[1]{\hcbisep{浅色系统研究实验室}{Pastel Systems Research Lab}}
+\hcaffiliation[2]{\hcbisep{太平洋理工学院生物医学信息学系}{Department of Biomedical Informatics, Pacific Institute of Technology}}
 
 %% Author Notes & Correspondence
-\hcauthornote{\textsuperscript{*}Equal contribution}
-\hcauthornote{\textsuperscript{\dag}Corresponding author}
+\hcauthornote{\textsuperscript{*}\hcbisep{共同第一作者}{Equal contribution}}
+\hcauthornote{\textsuperscript{\dag}\hcbisep{通讯作者}{Corresponding author}}
 \hccorrespondence{\hcemail{aria.lin@pastelsys.org}, \hcemail{mina.zhou@pastelsys.org}}
 
-%% Resource Metadata Pills (icons auto-matched by label)
-\hcmetadata[Code]{\hcghlink{Ariakage/tech-report-template}}
-\hcmetadata[Models]{\hchflink{pastel-lab/auroracard-v1}}
-\hcmetadata[Dataset]{\hchflink{datasets/pastel-lab/vitalbench-26}}
-\hcmetadata[Project]{\href{https://pastelsys.org/auroracard}{pastelsys.org/auroracard}}
-
-%% Keywords (automatically rendered as pastel pill tags inside the Header Card)
-\hckeywords{Clinical Decision Support, Multimodal Fusion, Uncertainty Calibration, Vital-Sign Modeling, Preprint Systems}
+%% Resource Metadata Pills (100% single-source: icons & labels adapt automatically)
+\hcmetabi{代码}{Code}{\hcghlink{Ariakage/tech-report-template}}
+\hcmetabi{模型}{Models}{\hchflink{pastel-lab/auroracard-v1}}
+\hcmetabi{数据}{Dataset}{\hchflink{datasets/pastel-lab/vitalbench-26}}
+\hcmetabi{项目}{Project}{\href{https://pastelsys.org/auroracard}{pastelsys.org/auroracard}}
 
 %% -----------------------------------------------------------------------------
 %% Document Body
 %% -----------------------------------------------------------------------------
 \begin{document}
 
-%% Place abstract BEFORE \maketitle so it renders inside the Header Card
+%% Abstracts placed BEFORE \maketitle render cleanly inside the Header Card
+\begin{abstractzh}
+\input{sections/00_abstract_zh}
+\end{abstractzh}
+
 \begin{abstract}
 \input{sections/00_abstract}
 \end{abstract}
@@ -83,8 +97,8 @@
 \input{sections/03_experiments}
 \input{sections/04_conclusion}
 
-%% Balance final page columns cleanly before References
-\hcbalance
+%% Balance final page columns cleanly before References when ending in col 1
+\hcifen{\hcbalance}\hcifzh{\hcbalance}
 
 %% Bibliography (TeX Live built-in ACM-Reference-Format)
 \bibliographystyle{ACM-Reference-Format}

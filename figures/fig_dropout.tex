@@ -1,5 +1,5 @@
 %% =============================================================================
-%% figures/fig_dropout.tex — Standalone Native PGFPlots Figure
+%% figures/fig_dropout.tex — Standalone Native PGFPlots Figure (Single-Source)
 %% =============================================================================
 \begin{figure}[t]
   \centering
@@ -7,7 +7,7 @@
     \begin{tikzpicture}
       \begin{axis}[
         hcaxis,
-        xlabel={Missing Sensor Channels (\%)},
+        xlabel={\hcbisep{缺失传感器通道比例}{Missing Sensor Channels} (\%)},
         ylabel={Macro AUROC (\%)},
         xmin=0, xmax=60,
         ymin=67, ymax=99,
@@ -29,7 +29,11 @@
       \end{axis}
     \end{tikzpicture}
   \end{hcframecard}
-  \caption{Graceful degradation under progressive channel dropout. AuroraCard maintains $>91\%$ AUROC even when 60\% of waveform streams are disconnected.}
+  \hcbicaption{%
+    传感器渐进脱落条件下 AUROC 退化曲线。即使 60\% 生理波形流断连，AuroraCard 仍维持 $>91\%$ Macro AUROC。%
+  }{%
+    Graceful degradation under progressive channel dropout. AuroraCard maintains $>91\%$ AUROC even when 60\% of waveform streams are disconnected.%
+  }
   \Description{Line chart comparing Macro AUROC from 0 to 60 percent missing channels for AuroraCard, Multimodal Transformer, S4-Med, and GRU-D.}
   \label{fig:dropout}
 \end{figure}

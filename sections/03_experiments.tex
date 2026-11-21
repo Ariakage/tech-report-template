@@ -1,18 +1,22 @@
 %% =============================================================================
-%% sections/03_experiments.tex
+%% sections/03_experiments.tex — Single-Source Multilingual Experiments
 %% =============================================================================
-\section{Experimental Evaluation}
+\hcsecbi{实验评估}{Experimental Evaluation}
 \label{sec:experiments}
 
 \begin{table*}[t]
   \centering
-  \caption{Multi-center benchmark results on VitalBench-26 ($N = 46{,}050$ held-out stays, mean $\pm$ std over 5 seeds). Lower is better for ECE ($\downarrow$) and Latency ($\downarrow$); higher is better for AUROC ($\uparrow$) and AUPRC ($\uparrow$). Best results are highlighted with delta badges relative to Multimodal Transformer.}
+  \hcbicaption{%
+    VitalBench-26 四中心测试集主实验结果（$N = 46{,}050$ 例留出住院记录，5 个随机种子均值 $\pm$ 标准差）。ECE（$\downarrow$）与时延（$\downarrow$）越低越好，AUROC（$\uparrow$）与 AUPRC（$\uparrow$）越高越好。最优行附带相对 Multimodal Transformer 的增幅徽章。%
+  }{%
+    Multi-center benchmark results on VitalBench-26 ($N = 46{,}050$ held-out stays, mean $\pm$ std over 5 seeds). Lower is better for ECE ($\downarrow$) and Latency ($\downarrow$); higher is better for AUROC ($\uparrow$) and AUPRC ($\uparrow$). Best results include delta badges relative to Multimodal Transformer.%
+  }
   \label{tab:main-results}
   \begin{hctable}
     \begin{tabularx}{\textwidth}{@{}X c c c c c c@{}}
       \hctoprule
       \hctablehead
-      \hcth{Model Architecture} & \hcth{Params} & \hcth{Macro AUROC ($\uparrow$)} & \hcth{AUPRC ($\uparrow$)} & \hcth{ECE ($\downarrow$)} & \hcth{40\% Drop ($\uparrow$)} & \hcth{Latency ($\downarrow$)} \\
+      \hcth{\hcbi{模型架构}{Model Architecture}} & \hcth{\hcbi{参数量}{Params}} & \hcth{Macro AUROC ($\uparrow$)} & \hcth{AUPRC ($\uparrow$)} & \hcth{ECE ($\downarrow$)} & \hcth{\hcbi{40\% 脱落}{40\% Drop} ($\uparrow$)} & \hcth{\hcbi{时延}{Latency} ($\downarrow$)} \\
       \hcmidrule
       GRU-D~\cite{che2018recurrent} & 14.2\,M & 89.7 $\pm$ 0.3 & 54.1 $\pm$ 0.6 & 0.052 & 81.4 $\pm$ 0.5 & 19.6\,ms \\
       \hcaltrow
@@ -22,63 +26,95 @@
       Multimodal Transformer & 19.1\,M & 92.6 $\pm$ 0.2 & 61.9 $\pm$ 0.4 & 0.039 & 86.3 $\pm$ 0.5 & 25.4\,ms \\
       \hcmidrule
       \hcbestrow
-      \textbf{AuroraCard (Ours)} \hcpinkbadge{SOTA} & \textbf{17.4\,M} & \textbf{96.4}\gain{+3.8} & \textbf{69.8}\gain{+7.9} & \textbf{0.015}\drop{$-$61.5\%} & \textbf{94.1}\gain{+7.8} & \textbf{14.2\,ms}\speedup{1.8$\times$} \\
+      \textbf{AuroraCard} \hcpinkbadge{SOTA} & \textbf{17.4\,M} & \textbf{96.4}\gain{+3.8} & \textbf{69.8}\gain{+7.9} & \textbf{0.015}\drop{$-$61.5\%} & \textbf{94.1}\gain{+7.8} & \textbf{14.2\,ms}\speedup{1.8$\times$} \\
       \hcbottomrule
     \end{tabularx}
   \end{hctable}
 \end{table*}
 
-We evaluate AuroraCard on \textbf{VitalBench-26}, a unified multi-center clinical benchmark spanning four hospitals (184{,}200 encounters total; 70\% train, 5\% calibration, 25\% held-out test). All baselines are trained under identical preprocessing, fixed random seeds, and matched parameter budgets ($\approx 18\text{M}$ parameters) on a single NVIDIA L40S GPU.
+\hcbipair{%
+我们在跨越四家医院的 \textbf{VitalBench-26} 统一临床基准上评估 AuroraCard（共 184{,}200 例就诊，按 70\% 训练、5\% 校准、25\% 测试划分）。所有基线模型在单张 NVIDIA L40S GPU 上使用相同预处理、固定随机种子和近似参数预算（$\approx 18\text{M}$）。%
+}{%
+We evaluate AuroraCard on \textbf{VitalBench-26}, a unified multi-center clinical benchmark spanning four hospitals (184{,}200 encounters total; 70\% train, 5\% calibration, 25\% held-out test). All baselines are trained under identical preprocessing, fixed random seeds, and matched parameter budgets ($\approx 18\text{M}$ parameters) on a single NVIDIA L40S GPU.%
+}
 
-\begin{hcnote}[Benchmark Protocol \& Measurement Note]
-  Latency is measured end-to-end with batch size~1 across 1{,}000 warm-started streaming windows (p50 wall-clock time, including irregular-timestamp decay projection and conformal calibration head).
+\begin{hcnote}[\hcbisep{基准评测口径说明}{Benchmark Protocol \& Measurement Note}]
+  \hcbipair{%
+    推理时延以 batch size $= 1$ 在 1{,}000 个预热流式窗口上端到端测量（取 p50 挂钟时间，包含不规则时间戳衰减投影与共形校准层）。%
+  }{%
+    Latency is measured end to end with batch size~1 across 1{,}000 warm-started streaming windows (p50 wall-clock time, including irregular-timestamp decay projection and conformal calibration head).%
+  }
 \end{hcnote}
 
-\subsection{Main Multi-Center Benchmark}
+\hcsubsecbi{四中心主基准对比}{Main Multi-Center Benchmark}
 \label{sec:exp:main}
 
-Table~\ref{tab:main-results} compares AuroraCard against recurrent imputation baselines (GRU-D~\cite{che2018recurrent}), irregular-time attention models (mTAND~\cite{shukla2021multi}), structured state-space encoders (S4-Med~\cite{gu2022efficiently}), and a late-fusion Multimodal Transformer. AuroraCard consistently attains the highest discrimination (\hlblue{96.4\%} Macro AUROC) while cutting Expected Calibration Error (ECE) by \hlpink{61.5\%} across both ICU mortality and acute decompensation endpoints. Notably, our continuous-time encoder runs \hlblue{1.8$\times$} faster than the Multimodal Transformer, comfortably meeting real-time bedside display refresh budgets.
+\hcbipair{%
+表~\ref{tab:main-results} 将 AuroraCard 与循环插补基线（GRU-D~\cite{che2018recurrent}）、不规则时间注意力模型（mTAND~\cite{shukla2021multi}）、结构化状态空间模型（S4-Med~\cite{gu2022efficiently}）及晚期融合多模态 Transformer 对比。AuroraCard 取得最高区分度（\hlblue{96.4\%} Macro AUROC），同时把预期校准误差（ECE）压低 \hlpink{61.5\%}；连续时间编码器推理速度达到多模态 Transformer 的 \hlblue{1.8$\times$}，满足床旁实时刷新预算。%
+}{%
+Table~\ref{tab:main-results} compares AuroraCard against recurrent imputation baselines (GRU-D~\cite{che2018recurrent}), irregular-time attention models (mTAND~\cite{shukla2021multi}), structured state-space encoders (S4-Med~\cite{gu2022efficiently}), and a late-fusion Multimodal Transformer. AuroraCard attains the highest discrimination (\hlblue{96.4\%} Macro AUROC) while reducing Expected Calibration Error (ECE) by \hlpink{61.5\%}, and its continuous-time encoder runs \hlblue{1.8$\times$} faster than the Multimodal Transformer.%
+}
 
-\subsection{Robustness Under Progressive Sensor Dropout}
+\hcsubsecbi{传感器渐进脱落鲁棒性}{Robustness Under Progressive Sensor Dropout}
 \label{sec:exp:dropout}
 
-Real-world clinical telemetry frequently experiences partial lead loss during patient transport or nursing interventions. To simulate realistic degradation, we randomly drop between 0\% and 60\% of continuous waveform channels at inference time without retraining. Figure~\ref{fig:dropout} plots Macro AUROC trajectories across escalating dropout severity. While standard cross-modal attention deteriorates rapidly beyond 30\% missingness, AuroraCard smoothly reweights surviving sensors via Eq.~\eqref{eq:reliability} and sustains $>91\%$ AUROC at 60\% disconnection.
+\hcbipair{%
+转运与护理操作常导致部分波形通道短暂断连。我们在推理阶段随机屏蔽 0\% 至 60\% 的连续波形流而不重新训练。如图~\ref{fig:dropout} 所示，标准跨模态注意力在缺失率超过 30\% 后性能快速下滑，而 AuroraCard 通过式~\eqref{eq:reliability} 平滑重加权存活模态，在 60\% 断连时仍维持 $>91\%$ AUROC。%
+}{%
+Real-world telemetry frequently experiences partial lead loss during patient transport or nursing interventions. We randomly drop between 0\% and 60\% of continuous waveform channels at inference time without retraining. Figure~\ref{fig:dropout} shows that while cross-modal attention degrades rapidly past 30\% missingness, AuroraCard reweights surviving streams via Eq.~\eqref{eq:reliability} and sustains $>91\%$ AUROC at 60\% disconnection.%
+}
 
 \input{figures/fig_dropout}
 
-\subsection{Component Ablation Analysis}
+\hcsubsecbi{关键模块消融分析}{Component Ablation Analysis}
 \label{sec:exp:ablation}
 
-Table~\ref{tab:ablation} isolates the contribution of each architectural module. Removing continuous-time decay degrades missing-data discrimination by 2.9 points, while replacing conformal temperature routing with static temperature scaling nearly doubles calibration error on out-of-hospital shifts.
+\hcbipair{%
+表~\ref{tab:ablation} 拆解各设计组件贡献：移除连续时间衰减会使缺失条件区分度下降 2.9 个百分点；若以静态温度缩放替代共形温度路由，跨院区迁移校准误差几乎翻倍。%
+}{%
+Table~\ref{tab:ablation} isolates each module's contribution. Removing continuous-time decay drops missing-data discrimination by 2.9 points, and replacing conformal temperature routing with static temperature scaling nearly doubles calibration error on out-of-hospital shifts.%
+}
 
 \begin{table}[t]
   \centering
-  \caption{Ablation study on VitalBench-26 isolating continuous decay, reliability gating, and adaptive temperature routing.}
+  \hcbicaption{%
+    VitalBench-26 模块消融实验：连续时间衰减、可靠度门控与自适应温度路由贡献。%
+  }{%
+    Ablation study on VitalBench-26 isolating continuous decay, reliability gating, and adaptive temperature routing.%
+  }
   \label{tab:ablation}
   \begin{hctable}
     \begin{tabularx}{\linewidth}{@{}X c c@{}}
       \hctoprule
       \hctablehead
-      \hcth{Configuration Variant} & \hcth{AUROC ($\uparrow$)} & \hcth{ECE ($\downarrow$)} \\
+      \hcth{\hcbi{配置变体}{Configuration Variant}} & \hcth{AUROC ($\uparrow$)} & \hcth{ECE ($\downarrow$)} \\
       \hcmidrule
       \hcbestrow
-      \textbf{AuroraCard (Full)} & \textbf{96.4} & \textbf{0.015} \\
-      w/o Continuous Decay (Eq.~\ref{eq:ct-decay}) & 93.5 & 0.024 \\
+      \textbf{\hcbi{完整版 AuroraCard}{AuroraCard (Full)}} & \textbf{96.4} & \textbf{0.015} \\
+      \hcbi{移除连续衰减}{w/o Continuous Decay} (Eq.~\ref{eq:ct-decay}) & 93.5 & 0.024 \\
       \hcaltrow
-      w/o Reliability Gating (Eq.~\ref{eq:reliability}) & 94.2 & 0.029 \\
-      w/o Adaptive Temperature (Eq.~\ref{eq:temp-routing}) & 96.3 & 0.031 \\
+      \hcbi{移除可靠度门控}{w/o Reliability Gating} (Eq.~\ref{eq:reliability}) & 94.2 & 0.029 \\
+      \hcbi{移除自适应温度}{w/o Adaptive Temp.} (Eq.~\ref{eq:temp-routing}) & 96.3 & 0.031 \\
       \hcaltrow
-      Static Mean-Imputed Baseline & 91.2 & 0.047 \\
+      \hcbi{静态均值插补基线}{Static Mean-Imputed Baseline} & 91.2 & 0.047 \\
       \hcbottomrule
     \end{tabularx}
   \end{hctable}
 \end{table}
 
-\begin{hcpinkcard}[Key Ablation Insight]
-  Adaptive temperature routing leaves ranking performance virtually unchanged (96.3\% vs. 96.4\% AUROC) while reducing calibration error by \hlpink{51.6\%} (0.031 $\rightarrow$ 0.015). Decoupling uncertainty scaling from feature extraction thus eliminates the traditional accuracy--calibration trade-off.
+\begin{hcpinkcard}[\hcbisep{消融核心洞察}{Key Ablation Insight}]
+  \hcbipair{%
+    自适应温度路由几乎不改变排序性能（96.3\% vs. 96.4\% AUROC），却将校准误差压低 \hlpink{51.6\%}（$0.031 \rightarrow 0.015$）。不确定性缩放与特征提取解耦后，可显著缓解精度与校准之间的传统权衡。%
+  }{%
+    Adaptive temperature routing leaves ranking performance virtually unchanged (96.3\% vs. 96.4\% AUROC) while reducing calibration error by \hlpink{51.6\%} (0.031 $\rightarrow$ 0.015). Decoupling uncertainty scaling from feature extraction reduces the traditional accuracy--calibration trade-off.%
+  }
 \end{hcpinkcard}
 
-\subsection{Cross-Hospital Conformal Coverage}
+\hcsubsecbi{跨院区共形覆盖验证}{Cross-Hospital Conformal Coverage}
 \label{sec:exp:coverage}
 
-To verify Theorem~\ref{thm:coverage} empirically under site shift, we calibrate $\hat{q}_{1-\delta}$ at target miscoverage $\delta = 0.05$ on three source hospitals and evaluate coverage on the held-out fourth center~\cite{angelopoulos2023conformal, vovk2005algorithmic}. AuroraCard achieves \hlblue{95.3\%} empirical coverage with a mean prediction set size of 1.12 classes, compared to 88.4\% empirical coverage for uncalibrated softmax thresholding.
+\hcbipair{%
+为验证定理~\ref{thm:coverage} 在跨院迁移下的有效性，我们在三家源医院以 $\delta = 0.05$ 校准分位数 $\hat{q}_{1-\delta}$，并在第四家留出院区测试覆盖率~\cite{angelopoulos2023conformal, vovk2005algorithmic}。AuroraCard 获得 \hlblue{95.3\%} 的经验覆盖率与 1.12 类的平均预测集大小，而未校准 softmax 阈值仅达到 88.4\%。%
+}{%
+To test Theorem~\ref{thm:coverage} empirically under site shift, we calibrate $\hat{q}_{1-\delta}$ at $\delta = 0.05$ on three source hospitals and evaluate coverage on the fourth held-out center~\cite{angelopoulos2023conformal, vovk2005algorithmic}. AuroraCard reaches \hlblue{95.3\%} empirical coverage with a mean set size of 1.12 classes, versus 88.4\% for uncalibrated softmax thresholding.%
+}

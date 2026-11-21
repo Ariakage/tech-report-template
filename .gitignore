@@ -1,5 +1,6 @@
 # Build outputs & LaTeX auxiliary artifacts
 build/
+.tmp/
 *.aux
 *.bbl
 *.blg
