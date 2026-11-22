@@ -131,50 +131,81 @@ Switch the entire template's ribbon, logos, badges, inline highlights, tables, c
 
 <table>
   <tr>
-    <td width="20%" align="center">
-      <img src="assets/theme-apple.png" alt="theme=apple" width="100%" /><br />
-      <code>theme=apple</code>
+    <td width="33.3%" align="center">
+      <img src="assets/theme-claude.png" alt="theme=claude" width="100%" /><br />
+      <code>theme=claude</code> (<code>anthropic</code>)
     </td>
-    <td width="20%" align="center">
+    <td width="33.3%" align="center">
+      <img src="assets/theme-apple.png" alt="theme=apple" width="100%" /><br />
+      <code>theme=apple</code> (<code>cupertino</code>)
+    </td>
+    <td width="33.3%" align="center">
       <img src="assets/theme-ocean.png" alt="theme=ocean" width="100%" /><br />
       <code>theme=ocean</code>
     </td>
-    <td width="20%" align="center">
+  </tr>
+  <tr>
+    <td width="33.3%" align="center">
       <img src="assets/theme-sage.png" alt="theme=sage" width="100%" /><br />
       <code>theme=sage</code>
     </td>
-    <td width="20%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-lavender.png" alt="theme=lavender" width="100%" /><br />
       <code>theme=lavender</code>
     </td>
-    <td width="20%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-mono.png" alt="theme=mono" width="100%" /><br />
       <code>theme=mono</code>
     </td>
   </tr>
 </table>
 
-#### Featured Theme: `theme=apple` (alias `cupertino` · Apple HIG Editorial)
+#### Featured Theme: `theme=claude` (alias `anthropic` · `anthropic.com` / `claude.ai` Style)
 
-Grounded in Apple's Human Interface Guidelines (`color` / `materials` / `typography` / `accessibility`): Titanium Mist (`#F5F5F7`) grouped base vs. `#FFFFFF` elevated surfaces, `0.5pt–0.55pt` `#D2D2D7` hairlines, restrained `1.8pt` specular header edge, monochrome running chrome, muted macOS code-window dots, neutral `#F5F5F7` booktabs table headers, and surgical System Blue (`#007AFF`) + System Indigo (`#5856D6`) data accents (`>= 6.33:1` WCAG AA/AAA text contrast).
+Drops the Health-Card chrome completely and follows `anthropic.com` + `claude.ai` visual tokens (`frontend-design` + `brand-guidelines`): Warm Parchment (`#F5F4ED`), Ivory (`#FAF9F5`), and Oatmeal (`#F0EEE6`) rounded editorial cards (`arc=8–10pt`, subtle `#E2DFD5` cream borders), **serif display headings** (`#141413`), Anthropic Mono uppercase labels (`TECHNICAL REPORT`, `ABSTRACT`, `KEYWORDS`), solid `#141413` Slate Ink contrast anchors (version pill, primary `Code` CTA capsule, Hero KPI #1 tile, and dark Artifact code block with Terracotta `#E88B6E` / Sage `#A7BE89` / Slate `#9AC2EA` syntax), paired with Terracotta (`#D97757`), Slate Blue (`#6A9BCC`), and Sage (`#788C5D`) accents.
+
+<table>
+  <tr>
+    <td width="25%" align="center">
+      <img src="assets/theme-claude.png" alt="Claude Theme Page 1" width="100%" /><br />
+      <sub><b>Claude · Page 1</b> — Parchment Hero, Obsidian CTA Pill & Oatmeal Abstract</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="assets/theme-claude-2.png" alt="Claude Theme Page 2" width="100%" /><br />
+      <sub><b>Claude · Page 2</b> — Obsidian Feature KPI #1 & Warm Cream Bento</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="assets/theme-claude-3.png" alt="Claude Theme Page 3" width="100%" /><br />
+      <sub><b>Claude · Page 3</b> — `#141413` Artifact Code Block & Sage/Cream Cards</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="assets/theme-claude-4.png" alt="Claude Theme Page 4" width="100%" /><br />
+      <sub><b>Claude · Page 4</b> — Parchment Tables, ORCID & Oatmeal Env Card</sub>
+    </td>
+  </tr>
+</table>
+
+#### Featured Theme: `theme=apple` (alias `cupertino` · `apple.com` Style)
+
+Drops the Health-Card chrome in favor of an `apple.com` + `apple-design` Human Interface layout: subtle top local-nav utility hairline above a **centered keynote Hero** (`#1D1D1F` bold Sans headline, `#6E6E73` Pewter subhead, solid `#0071E3` Apple Action Blue primary `Code` capsule CTA), borderless Studio Grey (`#F5F5F7`, `arc=10pt`) Bento & Abstract cards, monochrome Space Titanium (`#424245`) + Link Blue (`#0066CC`) accents, and **`#000000` Stage Black** contrast blocks for code listings (`#2997FF` Sky Blue keywords & macOS dots) and hardware spec cards.
 
 <table>
   <tr>
     <td width="25%" align="center">
       <img src="assets/theme-apple.png" alt="Apple Theme Page 1" width="100%" /><br />
-      <sub><b>Apple · Page 1</b> — Mist Card & Crisp Specular Edge</sub>
+      <sub><b>Apple · Page 1</b> — Local-Nav Hairline, Centered Hero & Blue CTA</sub>
     </td>
     <td width="25%" align="center">
       <img src="assets/theme-apple-2.png" alt="Apple Theme Page 2" width="100%" /><br />
-      <sub><b>Apple · Page 2</b> — Bento KPIs & macOS Listing Chrome</sub>
+      <sub><b>Apple · Page 2</b> — Borderless Studio Grey Bento & Stage Black Code</sub>
     </td>
     <td width="25%" align="center">
       <img src="assets/theme-apple-3.png" alt="Apple Theme Page 3" width="100%" /><br />
-      <sub><b>Apple · Page 3</b> — Code Highlights, PGFPlots & Callouts</sub>
+      <sub><b>Apple · Page 3</b> — Stage Black Listing & Studio Grey Callouts</sub>
     </td>
     <td width="25%" align="center">
       <img src="assets/theme-apple-4.png" alt="Apple Theme Page 4" width="100%" /><br />
-      <sub><b>Apple · Page 4</b> — Neutral Tables, ORCID & Env Card</sub>
+      <sub><b>Apple · Page 4</b> — Hairline Tables & Stage Black Hardware Tile</sub>
     </td>
   </tr>
 </table>
@@ -269,7 +300,7 @@ Select the canonical `akatechreport` theme or any built-in variant via package o
 
 | Option | Values | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `theme` | `akatechreport` \| `apple` \| `ocean` \| `sage` \| `lavender` \| `mono` | `akatechreport` | Six curated themes (`pastel` alias for default; `cupertino` alias for `apple`, WCAG AA/AAA contrast) |
+| `theme` | `akatechreport` \| `claude` \| `apple` \| `ocean` \| `sage` \| `lavender` \| `mono` | `akatechreport` | Seven curated themes (`pastel` default alias; `anthropic` alias for `claude`; `cupertino` alias for `apple`) |
 | `lang` | `en` \| `zh` \| `bilingual` | `en` | Pure English (`pdfLaTeX` Type 1), Pure Chinese, or Chinese+English Bilingual |
 | `biorder` | `zh-en` \| `en-zh` | `zh-en` | Primary language order in `lang=bilingual` mode |
 | `cjkfont` | `fandol` \| `mac` \| `windows` \| `ubuntu` \| `none` | `fandol` | Built-in TeX Live Fandol OpenType CJK fonts (portable) or OS presets |

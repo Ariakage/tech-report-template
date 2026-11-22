@@ -3,8 +3,8 @@
 %% =============================================================================
 %% Version       : v1.2 (English / Chinese / Bilingual Modes + Rich Metadata)
 %% Default Theme : akatechreport (#5BCEFA Sky Cyan, #F5A9B8 Blossom Pink, #FFFFFF)
-%%                 + 5 built-in themes (apple, ocean, sage, lavender, mono) & one-line
-%%                 custom hex theming via \hcsettheme{primary=..., accent=...}.
+%%                 + 6 built-in themes (claude, apple, ocean, sage, lavender, mono)
+%%                 & one-line custom hex theming via \hcsettheme{primary=..., accent=...}.
 %% Languages     : lang=en        Pure English (default; 100% pdfLaTeX / arXiv
 %%                                Type 1 safe, zero CJK overhead).
 %%                 lang=zh        Pure Chinese (XeLaTeX/LuaLaTeX via TeX Live
@@ -36,6 +36,8 @@
 \newif\ifhc@accent@flip \hc@accent@flipfalse
 \newif\ifhc@header@clean \hc@header@cleanfalse
 \newif\ifhc@theme@apple \hc@theme@applefalse
+\newif\ifhc@theme@claude \hc@theme@claudefalse
+\newif\ifhc@layout@healthcard \hc@layout@healthcardtrue
 \newif\ifhc@acmart \hc@acmartfalse
 
 %% Language mode flags (default: pure English)
@@ -211,12 +213,14 @@
   \fi
 \fi
 
-%% Uppercase helper: uppercase Latin pills in pure EN, preserve clean casing in ZH/BI
-\ifhc@lang@en
-  \newcommand{\hc@maybecaps}[1]{\MakeUppercase{#1}}
-\else
-  \newcommand{\hc@maybecaps}[1]{#1}
-\fi
+%% Uppercase helper: uppercase Latin labels in Health-Card & Claude EN modes; Title Case on Apple
+\newcommand{\hc@maybecaps}[1]{%
+  \ifhc@theme@apple
+    #1%
+  \else
+    \ifhc@lang@en\MakeUppercase{#1}\else#1\fi
+  \fi
+}
 
 %% Mainstream TeX Live packages for cards, tables, icons, code, algorithms & plots
 \RequirePackage{needspace}
@@ -387,44 +391,151 @@
   \colorlet{hcLinkBlue}{hcLinkColor}
   \colorlet{hcCiteBlue}{hcCiteColor}
   \colorlet{hcUrlPink}{hcUrlColor}
-  %% Semantic Chrome Roles (Apple HIG grouped hierarchy vs Pastel expressive cards)
+  %% Semantic Chrome Roles (Apple.com / Anthropic.com vs Health-Card UI)
   \ifhc@theme@apple
     \definecolor{hcInk}{HTML}{1D1D1F}%
-    \definecolor{hcMuted}{HTML}{48484D}%
-    \definecolor{hcCodeNum}{HTML}{515156}%
-    \definecolor{hcSysRed}{HTML}{E05A52}%
-    \definecolor{hcSysYellow}{HTML}{DF9E26}%
-    \definecolor{hcSysGreen}{HTML}{2DA94A}%
-    \colorlet{hcHeaderBg}{hcCanvas}%
+    \definecolor{hcMuted}{HTML}{6E6E73}%
+    \definecolor{hcSkyBlue}{HTML}{2997FF}%
+    \definecolor{hcCodeNum}{HTML}{8E8E93}%
+    \definecolor{hcAlgNum}{HTML}{6E6E73}%
+    \definecolor{hcSysRed}{HTML}{FF5F56}%
+    \definecolor{hcSysYellow}{HTML}{FFBD2E}%
+    \definecolor{hcSysGreen}{HTML}{27C93F}%
+    \definecolor{hcNoteBg}{HTML}{F5F5F7}%
+    \definecolor{hcNoteBorder}{HTML}{D2D2D7}%
+    \definecolor{hcNoteBar}{HTML}{6E6E73}%
+    \definecolor{hcNoteDark}{HTML}{1D1D1F}%
+    \definecolor{hcNoteDeep}{HTML}{48484D}%
+    \definecolor{hcCaveatBg}{HTML}{FFF8E6}%
+    \definecolor{hcCaveatBorder}{HTML}{E5CE99}%
+    \definecolor{hcCaveatBar}{HTML}{B27B00}%
+    \definecolor{hcCaveatDark}{HTML}{5C3C04}%
+    \definecolor{hcCaveatDeep}{HTML}{8A5A00}%
+    \definecolor{hcAppleRuleHeavy}{HTML}{8E8E93}%
+    \definecolor{hcNavRule}{HTML}{E5E5EA}%
+    \colorlet{hcTertiary}{hcPrimary}%
+    \colorlet{hcTertiaryDeep}{hcPrimaryDeep}%
+    \colorlet{hcHeaderBg}{hcSurface}%
+    \colorlet{hcHeaderBorder}{hcLine}%
+    \colorlet{hcAbstractBorder}{hcLine}%
+    \colorlet{hcAbstractBar}{hcLine}%
+    \colorlet{hcReportPillBg}{hcPrimarySoft}%
+    \colorlet{hcReportPillBorder}{hcPrimaryBorder}%
+    \colorlet{hcReportPillInk}{hcPrimaryDeep}%
+    \colorlet{hcBadgePillBg}{hcCanvas}%
+    \colorlet{hcBadgePillBorder}{hcLine}%
+    \colorlet{hcBadgePillInk}{hcMuted}%
+    \colorlet{hcSecNumBg}{hcCanvas}%
+    \colorlet{hcSecNumBorder}{hcLine}%
+    \colorlet{hcSecNumInk}{hcMuted}%
+    \colorlet{hcCardBg}{hcCanvas}%
+    \colorlet{hcCardBorder}{hcLine}%
+    \colorlet{hcPinkCardBg}{hcCanvas}%
+    \colorlet{hcPinkCardBorder}{hcLine}%
+    \colorlet{hcTableHeadBg}{hcSurface}%
+    \colorlet{hcTableRule}{hcNavRule}%
+    \colorlet{hcTableHeavyRule}{hcAppleRuleHeavy}%
+    %% apple.com Stage Black Dark Blocks (#000000 + Sky Blue #2997FF)
+    \definecolor{hcCodeBg}{HTML}{000000}%
+    \definecolor{hcCodeTitleBg}{HTML}{141416}%
+    \definecolor{hcCodeTitleText}{HTML}{FFFFFF}%
+    \definecolor{hcCodeRule}{HTML}{2C2C2E}%
+    \definecolor{hcCodeText}{HTML}{FFFFFF}%
+    \definecolor{hcCodeKw}{HTML}{4DA6FF}%
+    \definecolor{hcCodeKwTwo}{HTML}{70D7FF}%
+    \definecolor{hcCodeStr}{HTML}{7CE896}%
+    \definecolor{hcCodeCom}{HTML}{A1A1A6}%
+    \definecolor{hcCodeHlOneBg}{HTML}{123254}%
+    \colorlet{hcCodeHlOneBar}{hcSkyBlue}%
+    \definecolor{hcCodeHlTwoBg}{HTML}{232832}%
+    \colorlet{hcCodeHlTwoBar}{hcCodeCom}%
+    \definecolor{hcEnvInk}{HTML}{F5F5F7}%
+    \definecolor{hcEnvMuted}{HTML}{A1A1A6}%
+    \colorlet{hcEnvIcon}{hcSkyBlue}%
+    \colorlet{hcEnvTitleText}{hcCodeTitleText}%
+    \colorlet{hcAlgTitleBg}{hcNavRule}%
+    \colorlet{hcPagePillBg}{hcSurface}%
+    \colorlet{hcPagePillBorder}{hcSurface}%
+    \colorlet{hcPagePillInk}{hcMuted}%
+  \else\ifhc@theme@claude
+    \definecolor{hcInk}{HTML}{141413}%
+    \definecolor{hcMuted}{HTML}{5E5D59}%
+    \definecolor{hcCodeNum}{HTML}{7C7A72}%
+    \definecolor{hcAlgNum}{HTML}{5E5D59}%
+    %% Official Anthropic 3-accent palette: #D97757 Terracotta, #6A9BCC Slate Blue, #788C5D Sage
+    \definecolor{hcTertiary}{HTML}{788C5D}%
+    \definecolor{hcTertiaryDeep}{HTML}{4B5C36}%
+    %% Warm Sage-Stone Note card & Ochre Caveat
+    \definecolor{hcNoteBg}{HTML}{F0F2EC}%
+    \definecolor{hcNoteBorder}{HTML}{CDD3C2}%
+    \definecolor{hcNoteBar}{HTML}{788C5D}%
+    \definecolor{hcNoteDark}{HTML}{334022}%
+    \definecolor{hcNoteDeep}{HTML}{4B5C36}%
+    \definecolor{hcCaveatBg}{HTML}{FBF4E6}%
+    \definecolor{hcCaveatBorder}{HTML}{E6CE9E}%
+    \definecolor{hcCaveatBar}{HTML}{C48323}%
+    \definecolor{hcCaveatDark}{HTML}{66420C}%
+    \definecolor{hcCaveatDeep}{HTML}{8A5B14}%
+    %% Warm Parchment & Oatmeal Editorial Surface Hierarchy
+    \definecolor{hcHeaderBg}{HTML}{F5F4ED}%
     \colorlet{hcHeaderBorder}{hcLine}%
     \colorlet{hcAbstractBorder}{hcLine}%
     \colorlet{hcAbstractBar}{hcPrimary}%
     \colorlet{hcReportPillBg}{hcPrimarySoft}%
     \colorlet{hcReportPillBorder}{hcPrimaryBorder}%
-    \colorlet{hcReportPillInk}{hcPrimaryDeep}%
-    \colorlet{hcBadgePillBg}{hcStripe}%
-    \colorlet{hcBadgePillBorder}{hcLine}%
-    \colorlet{hcBadgePillInk}{hcInk}%
+    \colorlet{hcReportPillInk}{hcPrimaryDark}%
+    \colorlet{hcBadgePillBg}{hcInk}%
+    \colorlet{hcBadgePillBorder}{hcInk}%
+    \colorlet{hcBadgePillInk}{hcCanvas}%
     \colorlet{hcSecNumBg}{hcPrimarySoft}%
     \colorlet{hcSecNumBorder}{hcPrimaryBorder}%
     \colorlet{hcSecNumInk}{hcPrimaryDeep}%
-    \colorlet{hcCardBg}{hcCanvas!70!hcSurface}%
+    \definecolor{hcCardBg}{HTML}{F0EEE6}%
     \colorlet{hcCardBorder}{hcLine}%
-    \colorlet{hcPinkCardBg}{hcCanvas!70!hcSurface}%
-    \colorlet{hcPinkCardBorder}{hcLine}%
-    \colorlet{hcTableHeadBg}{hcCanvas}%
+    \definecolor{hcPinkCardBg}{HTML}{F7EDE8}%
+    \definecolor{hcPinkCardBorder}{HTML}{E3C7BA}%
+    \colorlet{hcTableHeadBg}{hcCardBg}%
     \colorlet{hcTableRule}{hcLine}%
     \colorlet{hcTableHeavyRule}{hcInk}%
-    \colorlet{hcCodeBg}{hcSurface}%
-    \colorlet{hcCodeTitleBg}{hcCanvas}%
-    \colorlet{hcAlgTitleBg}{hcCanvas}%
-    \colorlet{hcPagePillBg}{hcCanvas}%
-    \colorlet{hcPagePillBorder}{hcLine}%
-    \colorlet{hcPagePillInk}{hcInk}%
+    %% Claude.ai / Anthropic.com Obsidian Dark Artifact Code Block (#141413)
+    \definecolor{hcCodeBg}{HTML}{141413}%
+    \definecolor{hcCodeTitleBg}{HTML}{1F1F1D}%
+    \definecolor{hcCodeTitleText}{HTML}{FAF9F5}%
+    \definecolor{hcCodeRule}{HTML}{2E2D2A}%
+    \definecolor{hcCodeText}{HTML}{FAF9F5}%
+    \definecolor{hcCodeKw}{HTML}{E88B6E}%
+    \definecolor{hcCodeKwTwo}{HTML}{A7BE89}%
+    \definecolor{hcCodeStr}{HTML}{9AC2EA}%
+    \definecolor{hcCodeCom}{HTML}{9C9A92}%
+    \definecolor{hcCodeHlOneBg}{HTML}{38231C}%
+    \colorlet{hcCodeHlOneBar}{hcPrimary}%
+    \definecolor{hcCodeHlTwoBg}{HTML}{222D38}%
+    \colorlet{hcCodeHlTwoBar}{hcAccent}%
+    \colorlet{hcEnvInk}{hcInk}%
+    \colorlet{hcEnvMuted}{hcMuted}%
+    \colorlet{hcEnvIcon}{hcPrimaryDeep}%
+    \colorlet{hcEnvTitleText}{hcInk}%
+    \colorlet{hcAlgTitleBg}{hcCardBg}%
+    \colorlet{hcPagePillBg}{hcSurface}%
+    \colorlet{hcPagePillBorder}{hcSurface}%
+    \colorlet{hcPagePillInk}{hcMuted}%
   \else
     \definecolor{hcInk}{HTML}{1A2433}%
     \definecolor{hcMuted}{HTML}{3F5062}%
     \definecolor{hcCodeNum}{HTML}{445567}%
+    \colorlet{hcAlgNum}{hcCodeNum}%
+    \definecolor{hcNoteBg}{HTML}{F3F6F9}%
+    \definecolor{hcNoteBorder}{HTML}{C4CFD9}%
+    \definecolor{hcNoteBar}{HTML}{64788C}%
+    \definecolor{hcNoteDark}{HTML}{243342}%
+    \definecolor{hcNoteDeep}{HTML}{46596B}%
+    \definecolor{hcCaveatBg}{HTML}{FDF8EE}%
+    \definecolor{hcCaveatBorder}{HTML}{E3C794}%
+    \definecolor{hcCaveatBar}{HTML}{CF902B}%
+    \definecolor{hcCaveatDark}{HTML}{66420C}%
+    \definecolor{hcCaveatDeep}{HTML}{8A5B14}%
+    \colorlet{hcTertiary}{hcPrimary}%
+    \colorlet{hcTertiaryDeep}{hcPrimary}%
     \colorlet{hcHeaderBg}{hcPrimaryBg!75!hcSurface}%
     \colorlet{hcHeaderBorder}{hcPrimaryBorder}%
     \colorlet{hcAbstractBorder}{hcLine}%
@@ -447,11 +558,26 @@
     \colorlet{hcTableHeavyRule}{hcPrimaryDeep}%
     \colorlet{hcCodeBg}{hcCanvas}%
     \colorlet{hcCodeTitleBg}{hcPrimaryBg}%
+    \colorlet{hcCodeTitleText}{hcPrimaryDark}%
+    \colorlet{hcCodeRule}{hcTableRule!85!hcSurface}%
+    \colorlet{hcCodeText}{hcInk}%
+    \colorlet{hcCodeKw}{hcPrimaryDark}%
+    \colorlet{hcCodeKwTwo}{hcPrimaryDeep}%
+    \colorlet{hcCodeStr}{hcAccentDeep}%
+    \colorlet{hcCodeCom}{hcMuted}%
+    \colorlet{hcCodeHlOneBg}{hcPrimarySoft!72!hcSurface}%
+    \colorlet{hcCodeHlOneBar}{hcPrimary}%
+    \colorlet{hcCodeHlTwoBg}{hcAccentSoft!76!hcSurface}%
+    \colorlet{hcCodeHlTwoBar}{hcAccent}%
+    \colorlet{hcEnvInk}{hcInk}%
+    \colorlet{hcEnvMuted}{hcMuted}%
+    \colorlet{hcEnvIcon}{hcPrimaryDeep}%
+    \colorlet{hcEnvTitleText}{hcPrimaryDark}%
     \colorlet{hcAlgTitleBg}{hcPrimaryBg}%
     \colorlet{hcPagePillBg}{hcPrimaryBg}%
     \colorlet{hcPagePillBorder}{hcPrimaryBorder!85!hcSurface}%
     \colorlet{hcPagePillInk}{hcPrimaryDark}%
-  \fi
+  \fi\fi
   %% ORCID icon color
   \ifhc@orcid@official
     \colorlet{orcidlogocol}{hcOrcidGreen}
@@ -461,13 +587,21 @@
   %% Header ribbon & running-header hairline rule shadings
   \ifhc@theme@apple
     \pgfdeclarehorizontalshading{hcRibbonGrad}{10bp}{%
-      color(0bp)=(hcPrimary!85!hcSurface);
-      color(38bp)=(hcAccent!75!hcSurface);
+      color(0bp)=(hcLine);
+      color(100bp)=(hcLine)
+    }%
+    \pgfdeclarehorizontalshading{hcRuleGrad}{4bp}{%
+      color(0bp)=(hcLine!65!hcSurface);
+      color(50bp)=(hcLine!65!hcSurface);
       color(100bp)=(hcLine!65!hcSurface)
+    }%
+  \else\ifhc@theme@claude
+    \pgfdeclarehorizontalshading{hcRibbonGrad}{10bp}{%
+      color(0bp)=(hcPrimary);
+      color(100bp)=(hcPrimary)
     }%
     \pgfdeclarehorizontalshading{hcRuleGrad}{4bp}{%
       color(0bp)=(hcLine);
-      color(50bp)=(hcLine);
       color(100bp)=(hcLine)
     }%
   \else
@@ -483,35 +617,71 @@
       color(50bp)=(hcAccent!85!hcSurface);
       color(100bp)=(hcPrimary!80!hcSurface)
     }%
-  \fi
+  \fi\fi
 }
 
 %% Built-in theme definitions
+\newcommand{\hc@apply@claude@palette}{%
+  \hc@theme@claudetrue
+  \hc@layout@healthcardfalse
+  \ifhc@lang@zh\else
+    \def\hc@lbl@abstract{Abstract}%
+    \def\hc@lbl@keywords{Keywords}%
+  \fi
+  \definecolor{hcPrimary}{HTML}{D97757}%
+  \definecolor{hcAccent}{HTML}{6A9BCC}%
+  \definecolor{hcPrimaryBg}{HTML}{FAF0EC}%
+  \definecolor{hcPrimarySoft}{HTML}{F4DDD3}%
+  \definecolor{hcPrimaryBorder}{HTML}{E0AA93}%
+  \definecolor{hcAccentBg}{HTML}{EEF3F8}%
+  \definecolor{hcAccentSoft}{HTML}{DCE7F2}%
+  \definecolor{hcAccentBorder}{HTML}{A6C2DC}%
+  \definecolor{hcCanvas}{HTML}{FAF9F5}%
+  \definecolor{hcStripe}{HTML}{F5F4ED}%
+  \definecolor{hcLine}{HTML}{E2DFD5}%
+  \definecolor{hcPrimaryDark}{HTML}{8F381C}%
+  \definecolor{hcPrimaryDeep}{HTML}{B04A28}%
+  \definecolor{hcAccentDark}{HTML}{1E3F61}%
+  \definecolor{hcAccentDeep}{HTML}{2E5882}%
+  \definecolor{hcLinkColor}{HTML}{8F381C}%
+  \definecolor{hcCiteColor}{HTML}{2E5882}%
+  \definecolor{hcUrlColor}{HTML}{2E5882}%
+}
+
 \newcommand{\hc@apply@apple@palette}{%
   \hc@theme@appletrue
-  \definecolor{hcPrimary}{HTML}{007AFF}%
-  \definecolor{hcAccent}{HTML}{5856D6}%
-  \definecolor{hcPrimaryBg}{HTML}{F2F7FF}%
-  \definecolor{hcPrimarySoft}{HTML}{E2EEFF}%
-  \definecolor{hcPrimaryBorder}{HTML}{B6D3FA}%
-  \definecolor{hcAccentBg}{HTML}{F4F3FD}%
-  \definecolor{hcAccentSoft}{HTML}{E7E5FB}%
-  \definecolor{hcAccentBorder}{HTML}{C5C3F4}%
+  \hc@layout@healthcardfalse
+  \ifhc@lang@zh\else
+    \def\hc@lbl@abstract{Abstract}%
+    \def\hc@lbl@keywords{Keywords}%
+  \fi
+  \definecolor{hcPrimary}{HTML}{0071E3}%
+  \definecolor{hcAccent}{HTML}{424245}%
+  \definecolor{hcPrimaryBg}{HTML}{F0F6FF}%
+  \definecolor{hcPrimarySoft}{HTML}{DCEBFF}%
+  \definecolor{hcPrimaryBorder}{HTML}{A9CCF5}%
+  \definecolor{hcAccentBg}{HTML}{EFEFF2}%
+  \definecolor{hcAccentSoft}{HTML}{E4E4E9}%
+  \definecolor{hcAccentBorder}{HTML}{C7C7CC}%
   \definecolor{hcCanvas}{HTML}{F5F5F7}%
-  \definecolor{hcStripe}{HTML}{F8F8FA}%
+  \definecolor{hcStripe}{HTML}{FAFAFC}%
   \definecolor{hcLine}{HTML}{D2D2D7}%
   \definecolor{hcPrimaryDark}{HTML}{1D1D1F}%
-  \definecolor{hcPrimaryDeep}{HTML}{0051B3}%
-  \definecolor{hcAccentDark}{HTML}{2E2C7E}%
-  \definecolor{hcAccentDeep}{HTML}{4240AE}%
-  \definecolor{hcLinkColor}{HTML}{0055BA}%
-  \definecolor{hcCiteColor}{HTML}{005BBF}%
-  \definecolor{hcUrlColor}{HTML}{4340AC}%
+  \definecolor{hcPrimaryDeep}{HTML}{0066CC}%
+  \definecolor{hcAccentDark}{HTML}{1D1D1F}%
+  \definecolor{hcAccentDeep}{HTML}{3A3A3C}%
+  \definecolor{hcLinkColor}{HTML}{0066CC}%
+  \definecolor{hcCiteColor}{HTML}{0066CC}%
+  \definecolor{hcUrlColor}{HTML}{0066CC}%
 }
 
 \newcommand{\hc@apply@builtin@theme}[1]{%
   \hc@theme@applefalse
+  \hc@theme@claudefalse
+  \hc@layout@healthcardtrue
   \IfStrEqCase{#1}{%
+    {claude}{\hc@apply@claude@palette}%
+    {anthropic}{\hc@apply@claude@palette}%
     {apple}{\hc@apply@apple@palette}%
     {cupertino}{\hc@apply@apple@palette}%
     {ocean}{%
@@ -626,38 +796,258 @@
 
 \newcommand{\hc@apply@chrome@dims}{%
   \ifhc@theme@apple
+    \def\hc@hero@align{\centering}%
     \colorlet{hcSectionInk}{hcInk}%
     \colorlet{hcSubsecNumInk}{hcPrimaryDeep}%
     \colorlet{hcSubsubsecNumInk}{hcMuted}%
     \colorlet{hcChromeBarTitleInk}{hcInk}%
     \colorlet{hcTableHeadInk}{hcInk}%
-    \def\hc@abstract@barw{2.0pt}%
-    \def\hc@header@rulew{0.55pt}%
-    \def\hc@header@toppad{12pt}%
-    \def\hc@card@rulew{0.5pt}%
-    \def\hc@card@barw{2.0pt}%
-    \def\hc@thm@rulew{0.55pt}%
-    \def\hc@frame@rulew{0.55pt}%
-    \def\hc@table@midw{0.5pt}%
-    \def\hc@code@rulew{0.55pt}%
-    \def\hc@alg@rulew{0.55pt}%
+    \def\hc@table@heavyw{0.75pt}%
+    \def\hc@table@midw{0.45pt}%
+    \def\hc@sec@font{\sffamily\bfseries\fontsize{11.5}{14.2}\selectfont}%
+    \def\hc@title@font@en{\sffamily\bfseries\fontsize{19.0}{22.2}\selectfont\color{hcInk}}%
+    \def\hc@title@font@zh{\sffamily\bfseries\fontsize{16.8}{21.2}\selectfont\color{hcInk}}%
+    \def\hc@title@font@bi@a{\sffamily\bfseries\fontsize{16.4}{20.4}\selectfont\color{hcInk}}%
+    \def\hc@title@font@bi@b{\sffamily\bfseries\fontsize{11.4}{14.4}\selectfont\color{hcPrimaryDeep}}%
+    \def\hc@plotthree@border{hcPrimaryDeep}%
+    \def\hc@plotthree@fill{hcPrimarySoft}%
+    \tcbset{%
+      hc@headerbox@skin/.style={
+        width=\textwidth, colback=hcSurface, frame hidden, boxrule=0pt, arc=0pt, outer arc=0pt,
+        left=0pt, right=0pt, top=1pt, bottom=6pt, boxsep=0pt, before skip=0pt, after skip=0pt, overlay={}
+      },
+      hc@abstractbox@skin/.style={
+        width=\linewidth, colback=hcCanvas, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt,
+        left=13pt, right=13pt, top=8.5pt, bottom=8.5pt, boxsep=0pt, before skip=0pt, after skip=0pt
+      },
+      hc@hccard@skin/.style={
+        colback=hcCanvas, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt,
+        left=11.5pt, right=11pt, top=8pt, bottom=8pt, coltitle=hcInk
+      },
+      hc@hcpinkcard@skin/.style={
+        colback=hcCanvas, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt,
+        left=11.5pt, right=11pt, top=8pt, bottom=8pt, coltitle=hcInk
+      },
+      hc@hcnote@skin/.style={
+        colback=hcCanvas, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt,
+        left=11.5pt, right=11pt, top=8pt, bottom=8pt, coltitle=hcInk
+      },
+      hc@hccaveat@skin/.style={
+        colback=hcCaveatBg, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt,
+        left=11.5pt, right=11pt, top=8pt, bottom=8pt, coltitle=hcCaveatDark
+      },
+      hc@thm@skin/.style={
+        colback=hcSurface, colframe=hcLine, boxrule=0.45pt, arc=9pt, outer arc=9pt,
+        colbacktitle=hcCanvas, coltitle=hcInk, titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@def@skin/.style={
+        colback=hcSurface, colframe=hcLine, boxrule=0.45pt, arc=9pt, outer arc=9pt,
+        colbacktitle=hcCanvas, coltitle=hcInk, titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@prop@skin/.style={
+        colback=hcSurface, colframe=hcLine, boxrule=0.45pt, arc=9pt, outer arc=9pt,
+        colbacktitle=hcCanvas, coltitle=hcInk, titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@framecard@skin/.style={
+        colback=hcSurface, colframe=hcLine, boxrule=0.45pt, arc=9pt, left=7pt, right=7pt, top=7pt, bottom=7pt
+      },
+      hc@code@skin/.style={
+        colback=hcCodeBg, colupper=hcCodeText, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt,
+        colbacktitle=hcCodeTitleBg, coltitle=hcCodeTitleText, titlerule=0.45pt, titlerule style=hcCodeRule
+      },
+      hc@alg@skin/.style={
+        colback=hcCanvas, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt,
+        colbacktitle=hcAlgTitleBg, coltitle=hcInk, titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@orcid@skin/.style={
+        colback=hcCanvas, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt, left=11pt, right=11pt, top=8pt, bottom=8pt
+      },
+      hc@envcard@skin/.style={
+        colback=hcCodeBg, colupper=hcEnvInk, frame hidden, boxrule=0pt, arc=10pt, outer arc=10pt,
+        colbacktitle=hcCodeTitleBg, coltitle=hcCodeTitleText, titlerule=0.45pt, titlerule style=hcCodeRule
+      }
+    }%
+  \else\ifhc@theme@claude
+    \def\hc@hero@align{\raggedright}%
+    \colorlet{hcSectionInk}{hcInk}%
+    \colorlet{hcSubsecNumInk}{hcMuted}%
+    \colorlet{hcSubsubsecNumInk}{hcMuted}%
+    \colorlet{hcChromeBarTitleInk}{hcInk}%
+    \colorlet{hcTableHeadInk}{hcInk}%
+    \def\hc@table@heavyw{0.95pt}%
+    \def\hc@table@midw{0.45pt}%
+    \def\hc@sec@font{\rmfamily\bfseries\fontsize{11.8}{14.6}\selectfont}%
+    \def\hc@title@font@en{\rmfamily\bfseries\fontsize{18.8}{22.4}\selectfont\color{hcInk}}%
+    \def\hc@title@font@zh{\rmfamily\bfseries\fontsize{16.8}{21.4}\selectfont\color{hcInk}}%
+    \def\hc@title@font@bi@a{\rmfamily\bfseries\fontsize{16.4}{20.6}\selectfont\color{hcInk}}%
+    \def\hc@title@font@bi@b{\rmfamily\bfseries\fontsize{11.6}{14.8}\selectfont\color{hcPrimaryDeep}}%
+    \def\hc@plotthree@border{hcTertiaryDeep}%
+    \def\hc@plotthree@fill{hcNoteBg}%
+    \ifhc@header@clean
+      \def\hc@claude@hdrbg{hcCanvas}%
+    \else
+      \def\hc@claude@hdrbg{hcHeaderBg}%
+    \fi
+    \tcbset{%
+      hc@headerbox@skin/.style={
+        width=\textwidth, frame engine=standard, colback=\hc@claude@hdrbg, colframe=hcHeaderBorder,
+        boxrule=0.55pt, arc=10pt, outer arc=10pt,
+        left=13.5pt, right=13.5pt, top=11.5pt, bottom=11pt, boxsep=0pt, before skip=0pt, after skip=0pt, overlay={}
+      },
+      hc@abstractbox@skin/.style={
+        width=\linewidth, frame engine=standard, colback=hcCanvas, colframe=hcAbstractBorder,
+        boxrule=0.45pt, arc=8pt, outer arc=8pt,
+        left=11.5pt, right=11pt, top=7.5pt, bottom=7.5pt, boxsep=0pt, before skip=0pt, after skip=0pt
+      },
+      hc@hccard@skin/.style={
+        frame engine=standard, colback=hcCardBg, colframe=hcCardBorder, boxrule=0.45pt, arc=8pt, outer arc=8pt,
+        left=11pt, right=10pt, top=7.5pt, bottom=7.5pt, coltitle=hcInk
+      },
+      hc@hcpinkcard@skin/.style={
+        frame engine=standard, colback=hcPinkCardBg, colframe=hcPinkCardBorder, boxrule=0.45pt, arc=8pt, outer arc=8pt,
+        left=11pt, right=10pt, top=7.5pt, bottom=7.5pt, coltitle=hcPrimaryDark
+      },
+      hc@hcnote@skin/.style={
+        frame engine=standard, colback=hcNoteBg, colframe=hcNoteBorder, boxrule=0.45pt, arc=8pt, outer arc=8pt,
+        left=11pt, right=10pt, top=7.5pt, bottom=7.5pt, coltitle=hcNoteDark
+      },
+      hc@hccaveat@skin/.style={
+        frame engine=standard, colback=hcCaveatBg, colframe=hcCaveatBorder, boxrule=0.45pt, arc=8pt, outer arc=8pt,
+        left=11pt, right=10pt, top=7.5pt, bottom=7.5pt, coltitle=hcCaveatDark
+      },
+      hc@thm@skin/.style={
+        frame engine=standard, colback=hcCanvas, colframe=hcLine, boxrule=0.5pt, arc=7pt, outer arc=7pt,
+        colbacktitle=hcCardBg, coltitle=hcPrimaryDark, titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@def@skin/.style={
+        frame engine=standard, colback=hcCanvas, colframe=hcLine, boxrule=0.5pt, arc=7pt, outer arc=7pt,
+        colbacktitle=hcCardBg, coltitle=hcAccentDark, titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@prop@skin/.style={
+        frame engine=standard, colback=hcCanvas, colframe=hcLine, boxrule=0.5pt, arc=7pt, outer arc=7pt,
+        colbacktitle=hcCardBg, coltitle=hcInk, titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@framecard@skin/.style={
+        frame engine=standard, colback=hcSurface, colframe=hcLine, boxrule=0.5pt, arc=8pt, outer arc=8pt,
+        left=7.5pt, right=7.5pt, top=7pt, bottom=7pt
+      },
+      hc@code@skin/.style={
+        frame engine=standard, colback=hcCodeBg, colupper=hcCodeText, colframe=hcCodeTitleBg, boxrule=0.5pt, arc=8pt, outer arc=8pt,
+        colbacktitle=hcCodeTitleBg, coltitle=hcCodeTitleText, titlerule=0.45pt, titlerule style=hcCodeRule
+      },
+      hc@alg@skin/.style={
+        frame engine=standard, colback=hcCanvas, colframe=hcLine, boxrule=0.5pt, arc=8pt, outer arc=8pt,
+        colbacktitle=hcCardBg, coltitle=hcInk, titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@orcid@skin/.style={
+        frame engine=standard, colback=hcCardBg, colframe=hcLine, boxrule=0.45pt, arc=8pt, outer arc=8pt,
+        left=10pt, right=10pt, top=7pt, bottom=7pt
+      },
+      hc@envcard@skin/.style={
+        frame engine=standard, colback=hcCardBg, colframe=hcLine, boxrule=0.5pt, arc=8pt, outer arc=8pt,
+        colbacktitle=hcHeaderBg, coltitle=hcInk, titlerule=0.45pt, titlerule style=hcLine
+      }
+    }%
   \else
+    \def\hc@hero@align{\raggedright}%
     \colorlet{hcSectionInk}{hcPrimaryDark}%
     \colorlet{hcSubsecNumInk}{hcAccentDeep}%
     \colorlet{hcSubsubsecNumInk}{hcPrimaryDeep}%
     \colorlet{hcChromeBarTitleInk}{hcPrimaryDark}%
     \colorlet{hcTableHeadInk}{hcPrimaryDark}%
-    \def\hc@abstract@barw{2.8pt}%
-    \def\hc@header@rulew{0.75pt}%
-    \def\hc@header@toppad{13.5pt}%
-    \def\hc@card@rulew{0.6pt}%
-    \def\hc@card@barw{2.6pt}%
-    \def\hc@thm@rulew{0.6pt}%
-    \def\hc@frame@rulew{0.6pt}%
+    \def\hc@table@heavyw{1.0pt}%
     \def\hc@table@midw{0.6pt}%
-    \def\hc@code@rulew{0.6pt}%
-    \def\hc@alg@rulew{0.6pt}%
-  \fi
+    \def\hc@sec@font{\sffamily\bfseries\fontsize{11.0}{14.0}\selectfont}%
+    \def\hc@title@font@en{\sffamily\bfseries\fontsize{16.5}{20.4}\selectfont\color{hcPrimaryDark}}%
+    \def\hc@title@font@zh{\sffamily\bfseries\fontsize{15.2}{19.8}\selectfont\color{hcPrimaryDark}}%
+    \def\hc@title@font@bi@a{\sffamily\bfseries\fontsize{15.2}{19.6}\selectfont\color{hcPrimaryDark}}%
+    \def\hc@title@font@bi@b{\sffamily\bfseries\fontsize{11.2}{14.2}\selectfont\color{hcPrimaryDeep}}%
+    \def\hc@plotthree@border{hcPrimaryDeep}%
+    \def\hc@plotthree@fill{hcPrimarySoft}%
+    \ifhc@header@clean
+      \def\hc@hc@hdrbg{hcSurface}%
+      \def\hc@hc@absbg{hcCanvas}%
+    \else
+      \def\hc@hc@hdrbg{hcHeaderBg}%
+      \def\hc@hc@absbg{hcSurface}%
+    \fi
+    \ifhc@ribbon@none
+      \def\hc@hc@hdrtop{11.5pt}%
+    \else
+      \def\hc@hc@hdrtop{13.5pt}%
+    \fi
+    \tcbset{%
+      hc@headerbox@skin/.style={
+        width=\textwidth, frame engine=standard, colback=\hc@hc@hdrbg, colframe=hcHeaderBorder,
+        boxrule=0.75pt, arc=9pt, outer arc=9pt, left=14pt, right=14pt,
+        top=\hc@hc@hdrtop, bottom=11.5pt, boxsep=0pt, before skip=0pt, after skip=0pt,
+        overlay={\hc@drawribbon}
+      },
+      hc@abstractbox@skin/.style={
+        width=\linewidth, frame engine=standard, colback=\hc@hc@absbg, colframe=hcAbstractBorder,
+        boxrule=0.55pt, arc=6.5pt, outer arc=6.5pt, borderline west={2.8pt}{0pt}{hcAbstractBar},
+        left=10.5pt, right=10.5pt, top=7pt, bottom=7pt, boxsep=0pt, before skip=0pt, after skip=0pt
+      },
+      hc@hccard@skin/.style={
+        frame engine=standard, colback=hcCardBg, colframe=hcCardBorder, boxrule=0.6pt,
+        arc=6pt, outer arc=6pt, borderline west={2.6pt}{0pt}{hcPrimary},
+        left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt, coltitle=hcPrimaryDark
+      },
+      hc@hcpinkcard@skin/.style={
+        frame engine=standard, colback=hcPinkCardBg, colframe=hcPinkCardBorder, boxrule=0.6pt,
+        arc=6pt, outer arc=6pt, borderline west={2.6pt}{0pt}{hcAccent},
+        left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt, coltitle=hcAccentDark
+      },
+      hc@hcnote@skin/.style={
+        frame engine=standard, colback=hcNoteBg, colframe=hcNoteBorder, boxrule=0.6pt,
+        arc=6pt, outer arc=6pt, borderline west={2.6pt}{0pt}{hcNoteBar},
+        left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt, coltitle=hcNoteDark
+      },
+      hc@hccaveat@skin/.style={
+        frame engine=standard, colback=hcCaveatBg, colframe=hcCaveatBorder, boxrule=0.6pt,
+        arc=6pt, outer arc=6pt, borderline west={2.6pt}{0pt}{hcCaveatBar},
+        left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt, coltitle=hcCaveatDark
+      },
+      hc@thm@skin/.style={
+        frame engine=standard, colback=hcSurface, colframe=hcCardBorder, boxrule=0.6pt,
+        arc=5.5pt, outer arc=5.5pt, colbacktitle=hcTableHeadBg, coltitle=hcPrimaryDark,
+        titlerule=0.45pt, titlerule style=hcTableRule!80!hcSurface
+      },
+      hc@def@skin/.style={
+        frame engine=standard, colback=hcSurface, colframe=hcPinkCardBorder, boxrule=0.6pt,
+        arc=5.5pt, outer arc=5.5pt, colbacktitle=hcPinkCardBg, coltitle=hcAccentDark,
+        titlerule=0.45pt, titlerule style=hcPinkCardBorder!80!hcSurface
+      },
+      hc@prop@skin/.style={
+        frame engine=standard, colback=hcSurface, colframe=hcCardBorder, boxrule=0.6pt,
+        arc=5.5pt, outer arc=5.5pt, colbacktitle=hcCanvas, coltitle=hcPrimaryDark,
+        titlerule=0.45pt, titlerule style=hcLine
+      },
+      hc@framecard@skin/.style={
+        frame engine=standard, colback=hcSurface, colframe=hcLine, boxrule=0.6pt,
+        arc=7pt, left=7pt, right=7pt, top=7pt, bottom=7pt
+      },
+      hc@code@skin/.style={
+        frame engine=standard, colback=hcCodeBg, colupper=hcCodeText, colframe=hcLine, boxrule=0.6pt,
+        arc=6pt, outer arc=6pt, colbacktitle=hcCodeTitleBg, coltitle=hcChromeBarTitleInk,
+        titlerule=0.45pt, titlerule style=hcTableRule!85!hcSurface
+      },
+      hc@alg@skin/.style={
+        frame engine=standard, colback=hcSurface, colframe=hcLine, boxrule=0.6pt,
+        arc=6pt, outer arc=6pt, colbacktitle=hcAlgTitleBg, coltitle=hcChromeBarTitleInk,
+        titlerule=0.45pt, titlerule style=hcTableRule!85!hcSurface
+      },
+      hc@orcid@skin/.style={
+        frame engine=standard, colback=hcCanvas, colframe=hcLine, boxrule=0.55pt,
+        arc=6pt, outer arc=6pt, left=8.5pt, right=8.5pt, top=6pt, bottom=6pt
+      },
+      hc@envcard@skin/.style={
+        frame engine=standard, colback=hcSurface, colframe=hcLine, boxrule=0.55pt,
+        arc=6pt, outer arc=6pt, colbacktitle=hcTableHeadBg, coltitle=hcChromeBarTitleInk,
+        titlerule=0.45pt, titlerule style=hcTableRule!85!hcSurface
+      }
+    }%
+  \fi\fi
 }
 
 \newcommand{\hc@code@dots}{%
@@ -666,18 +1056,45 @@
       \fill[hcSysRed] (0,0) circle (2.0pt);
       \fill[hcSysYellow] (5.8pt,0) circle (2.0pt);
       \fill[hcSysGreen] (11.6pt,0) circle (2.0pt);
-    }%
+    }\hspace{0.5em}%
+  \else\ifhc@theme@claude
+    \tikz[baseline=-0.1ex]{%
+      \fill[hcPrimary, rounded corners=0.8pt] (0,0) rectangle (4.2pt,4.2pt);
+    }\hspace{0.48em}%
   \else
     \tikz[baseline=-0.35ex]{%
       \fill[hcPrimary] (0,0) circle (2.0pt);
       \fill[hcAccent] (5.8pt,0) circle (2.0pt);
       \fill[hcSurface, draw=hcPrimaryBorder, line width=0.4pt] (11.6pt,0) circle (2.0pt);
-    }%
+    }\hspace{0.5em}%
+  \fi\fi
+}
+
+\newcommand{\hc@alg@dots}{%
+  \ifhc@layout@healthcard
+    \tikz[baseline=-0.35ex]{%
+      \fill[hcPrimary] (0,0) circle (2.0pt);
+      \fill[hcAccent] (5.8pt,0) circle (2.0pt);
+    }\hspace{0.5em}%
+  \fi
+}
+
+\newcommand{\hc@headdot@left}{%
+  \ifhc@layout@healthcard
+    \tikz[baseline=-0.3ex]{\fill[hcPrimary] (0,0) circle (1.7pt);}\hspace{0.45em}%
+  \fi
+}
+
+\newcommand{\hc@headdot@right}{%
+  \ifhc@layout@healthcard
+    \hspace{0.45em}\tikz[baseline=-0.3ex]{\fill[hcAccent] (0,0) circle (1.7pt);}%
   \fi
 }
 
 \newcommand{\hcsettheme}[1]{%
   \hc@theme@applefalse
+  \hc@theme@claudefalse
+  \hc@layout@healthcardtrue
   \setkeys{hctheme}{#1}%
   \colorlet{hcPrimaryBg}{hcPrimary!11!hcSurface}%
   \colorlet{hcPrimarySoft}{hcPrimary!24!hcSurface}%
@@ -763,13 +1180,28 @@
 %% 7. Logo Slot System (Page 1 Dual Logo Slots + Pages 2+ 10pt Mini Logo)
 %% -----------------------------------------------------------------------------
 \newcommand{\hc@default@brandmark}{%
-  \begin{tikzpicture}[baseline=0.25ex]
-    \fill[hcPrimarySoft, rounded corners=3.5pt] (0,0) rectangle (16pt,16pt);
-    \draw[hcPrimaryBorder, line width=0.55pt, rounded corners=3.5pt] (0,0) rectangle (16pt,16pt);
-    \draw[hcPrimaryDark, line width=0.95pt, line cap=round, line join=round]
-      (2.2pt,8pt) -- (5.0pt,8pt) -- (6.6pt,12.2pt) -- (9.0pt,3.8pt) -- (10.8pt,8pt) -- (13.8pt,8pt);
-    \fill[hcAccent] (13.8pt,8pt) circle (1.35pt);
-  \end{tikzpicture}%
+  \ifhc@theme@apple
+    \begin{tikzpicture}[baseline=0.25ex]
+      \fill[hcCanvas, rounded corners=4.5pt] (0,0) rectangle (16pt,16pt);
+      \draw[hcPrimaryDeep, line width=0.95pt, line cap=round, line join=round]
+        (2.4pt,8pt) -- (5.0pt,8pt) -- (6.6pt,12pt) -- (9.0pt,4pt) -- (10.8pt,8pt) -- (13.6pt,8pt);
+    \end{tikzpicture}%
+  \else\ifhc@theme@claude
+    \begin{tikzpicture}[baseline=0.25ex]
+      \fill[hcPrimarySoft, rounded corners=2pt] (0,0) rectangle (16pt,16pt);
+      \draw[hcPrimaryBorder, line width=0.45pt, rounded corners=2pt] (0,0) rectangle (16pt,16pt);
+      \draw[hcPrimaryDeep, line width=0.95pt, line cap=round, line join=round]
+        (2.4pt,8pt) -- (5.0pt,8pt) -- (6.6pt,12pt) -- (9.0pt,4pt) -- (10.8pt,8pt) -- (13.6pt,8pt);
+    \end{tikzpicture}%
+  \else
+    \begin{tikzpicture}[baseline=0.25ex]
+      \fill[hcPrimarySoft, rounded corners=3.5pt] (0,0) rectangle (16pt,16pt);
+      \draw[hcPrimaryBorder, line width=0.55pt, rounded corners=3.5pt] (0,0) rectangle (16pt,16pt);
+      \draw[hcPrimaryDark, line width=0.95pt, line cap=round, line join=round]
+        (2.2pt,8pt) -- (5.0pt,8pt) -- (6.6pt,12.2pt) -- (9.0pt,3.8pt) -- (10.8pt,8pt) -- (13.8pt,8pt);
+      \fill[hcAccent] (13.8pt,8pt) circle (1.35pt);
+    \end{tikzpicture}%
+  \fi\fi
 }
 
 \newcommand{\hc@default@headerlogo}{%
@@ -781,18 +1213,44 @@
 }
 
 \newcommand{\hcvectorbadge}[2]{%
-  \begin{tikzpicture}[baseline=0.25ex]
-    \node[
-      inner xsep=5pt, inner ysep=2.6pt,
-      minimum height=17pt,
-      rounded corners=4pt,
-      fill=hcSurface,
-      draw=hcLine,
-      line width=0.55pt,
-      font=\sffamily\bfseries\fontsize{7.4}{8.5}\selectfont,
-      text=hcPrimaryDark
-    ] {#1\hspace{0.35em}#2};
-  \end{tikzpicture}%
+  \ifhc@theme@apple
+    \begin{tikzpicture}[baseline=0.25ex]
+      \node[
+        inner xsep=5.5pt, inner ysep=2.6pt,
+        minimum height=17pt,
+        rounded corners=4.5pt,
+        fill=hcCanvas,
+        font=\sffamily\bfseries\fontsize{7.4}{8.5}\selectfont,
+        text=hcInk
+      ] {#1\hspace{0.35em}#2};
+    \end{tikzpicture}%
+  \else\ifhc@theme@claude
+    \begin{tikzpicture}[baseline=0.25ex]
+      \node[
+        inner xsep=4.5pt, inner ysep=2.4pt,
+        minimum height=16pt,
+        rounded corners=1.8pt,
+        fill=hcSurface,
+        draw=hcLine,
+        line width=0.45pt,
+        font=\sffamily\bfseries\fontsize{7.4}{8.5}\selectfont,
+        text=hcInk
+      ] {#1\hspace{0.35em}#2};
+    \end{tikzpicture}%
+  \else
+    \begin{tikzpicture}[baseline=0.25ex]
+      \node[
+        inner xsep=5pt, inner ysep=2.6pt,
+        minimum height=17pt,
+        rounded corners=4pt,
+        fill=hcSurface,
+        draw=hcLine,
+        line width=0.55pt,
+        font=\sffamily\bfseries\fontsize{7.4}{8.5}\selectfont,
+        text=hcPrimaryDark
+      ] {#1\hspace{0.35em}#2};
+    \end{tikzpicture}%
+  \fi\fi
 }
 
 \newif\ifhc@has@projectlogo \hc@has@projectlogofalse
@@ -1083,9 +1541,11 @@
 
 \newcommand{\hcmetadata}[2][Link]{%
   \global\advance\hc@metacount by 1\relax
-  \gappto\hc@metadata{%
-    \hc@metapill{#1}{#2}\hspace{0.42em}\allowbreak%
-  }%
+  \ifnum\hc@metacount=1\relax
+    \gappto\hc@metadata{\hc@metapill[1]{#1}{#2}}%
+  \else
+    \gappto\hc@metadata{\hspace{0.42em}\allowbreak\hc@metapill[0]{#1}{#2}}%
+  \fi
 }
 
 %% Single-source bilingual resource pill: \hcmetabi{中文标签}{English Label}{Value}
@@ -1107,25 +1567,95 @@
   \fi
 }
 
-\DeclareRobustCommand{\hc@metapill}[2]{%
-  \tcbox[
-    on line,
-    enhanced,
-    colback=hcSurface,
-    colframe=hcLine,
-    boxrule=0.55pt,
-    arc=4.5pt,
-    boxsep=0pt,
-    left=5.5pt, right=6pt, top=2.6pt, bottom=2.6pt,
-    nobeforeafter,
-    tcbox raise base
-  ]{%
-    \sffamily\fontsize{7.5}{9}\selectfont
-    \hc@metaicon{#1}\hspace{0.35em}%
-    {\bfseries\color{hcPrimaryDark}#1}\hspace{0.32em}%
-    \textcolor{hcLine}{|}\hspace{0.32em}%
-    {\color{hcUrlColor}#2}%
-  }%
+\DeclareRobustCommand{\hc@metapill}[3][0]{%
+  \ifhc@theme@claude
+    \ifnum#1=1\relax
+      \tcbox[
+        on line, enhanced,
+        colback=hcInk, colframe=hcInk,
+        boxrule=0.45pt, arc=5.5pt,
+        boxsep=0pt, left=6pt, right=6.5pt, top=2.6pt, bottom=2.6pt,
+        nobeforeafter, tcbox raise base
+      ]{%
+        \begingroup
+        \colorlet{hcUrlColor}{hcCanvas}\colorlet{hcLinkColor}{hcCanvas}%
+        \colorlet{hcPrimaryDeep}{hcPrimary}\colorlet{hcAccentDeep}{hcPrimary}%
+        \sffamily\fontsize{7.4}{8.8}\selectfont
+        \hc@metaicon{#2}\hspace{0.34em}%
+        {\bfseries\color{hcCanvas}#2}\hspace{0.28em}%
+        \textcolor{hcMuted}{\textbar}\hspace{0.28em}%
+        {\color{hcCanvas}#3}%
+        \endgroup
+      }%
+    \else
+      \tcbox[
+        on line, enhanced,
+        colback=hcCardBg, colframe=hcLine,
+        boxrule=0.45pt, arc=5.5pt,
+        boxsep=0pt, left=5.5pt, right=6pt, top=2.5pt, bottom=2.5pt,
+        nobeforeafter, tcbox raise base
+      ]{%
+        \sffamily\fontsize{7.4}{8.8}\selectfont
+        \hc@metaicon{#2}\hspace{0.32em}%
+        {\bfseries\color{hcInk}#2}\hspace{0.26em}%
+        \textcolor{hcMuted}{/}\hspace{0.26em}%
+        {\color{hcUrlColor}#3}%
+      }%
+    \fi
+  \else\ifhc@theme@apple
+    \ifnum#1=1\relax
+      \tcbox[
+        on line, enhanced,
+        colback=hcPrimary, frame hidden,
+        boxrule=0pt, arc=8.5pt,
+        boxsep=0pt, left=7pt, right=7.5pt, top=2.8pt, bottom=2.8pt,
+        nobeforeafter, tcbox raise base
+      ]{%
+        \begingroup
+        \colorlet{hcUrlColor}{hcSurface}\colorlet{hcLinkColor}{hcSurface}%
+        \colorlet{hcPrimaryDeep}{hcSurface}\colorlet{hcAccentDeep}{hcSurface}%
+        \sffamily\fontsize{7.4}{8.8}\selectfont
+        \hc@metaicon{#2}\hspace{0.34em}%
+        {\bfseries\color{hcSurface}#2}\hspace{0.30em}%
+        \textcolor{hcPrimaryBorder}{\textbar}\hspace{0.30em}%
+        {\color{hcSurface}#3}%
+        \endgroup
+      }%
+    \else
+      \tcbox[
+        on line, enhanced,
+        colback=hcCanvas, frame hidden,
+        boxrule=0pt, arc=8.5pt,
+        boxsep=0pt, left=6pt, right=6.5pt, top=2.6pt, bottom=2.6pt,
+        nobeforeafter, tcbox raise base
+      ]{%
+        \sffamily\fontsize{7.4}{8.8}\selectfont
+        \hc@metaicon{#2}\hspace{0.32em}%
+        {\bfseries\color{hcInk}#2}\hspace{0.30em}%
+        \textcolor{hcLine}{|}\hspace{0.30em}%
+        {\color{hcUrlColor}#3}%
+      }%
+    \fi
+  \else
+    \tcbox[
+      on line,
+      enhanced,
+      colback=hcSurface,
+      colframe=hcLine,
+      boxrule=0.55pt,
+      arc=4.5pt,
+      boxsep=0pt,
+      left=5.5pt, right=6pt, top=2.6pt, bottom=2.6pt,
+      nobeforeafter,
+      tcbox raise base
+    ]{%
+      \sffamily\fontsize{7.5}{9}\selectfont
+      \hc@metaicon{#2}\hspace{0.35em}%
+      {\bfseries\color{hcPrimaryDark}#2}\hspace{0.32em}%
+      \textcolor{hcLine}{|}\hspace{0.32em}%
+      {\color{hcUrlColor}#3}%
+    }%
+  \fi\fi
 }
 
 %% -----------------------------------------------------------------------------
@@ -1255,99 +1785,227 @@
 %% 10. Layered Inline Highlight & Table Delta Badge System
 %% -----------------------------------------------------------------------------
 \DeclareRobustCommand{\hlprimary}[1]{%
-  \tcbox[
-    on line, enhanced,
-    colback=hcPrimaryBg,
-    colframe=hcPrimaryBorder!80!hcSurface,
-    boxrule=0.35pt,
-    arc=2.5pt,
-    boxsep=0pt,
-    left=2.6pt, right=2.6pt, top=0.9pt, bottom=0.9pt,
-    nobeforeafter, tcbox raise base
-  ]{\bfseries\color{hcPrimaryDark}#1}%
+  \ifhc@theme@claude
+    \tcbox[
+      on line, enhanced,
+      colback=hcPrimarySoft!72!hcCanvas,
+      frame hidden,
+      boxrule=0pt,
+      arc=1.5pt,
+      boxsep=0pt,
+      left=2.2pt, right=2.2pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\bfseries\color{hcPrimaryDark}#1}%
+  \else\ifhc@theme@apple
+    \tcbox[
+      on line, enhanced,
+      colback=hcPrimarySoft,
+      frame hidden,
+      boxrule=0pt,
+      arc=3pt,
+      boxsep=0pt,
+      left=2.8pt, right=2.8pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\bfseries\color{hcPrimaryDeep}#1}%
+  \else
+    \tcbox[
+      on line, enhanced,
+      colback=hcPrimaryBg,
+      colframe=hcPrimaryBorder!80!hcSurface,
+      boxrule=0.35pt,
+      arc=2.5pt,
+      boxsep=0pt,
+      left=2.6pt, right=2.6pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\bfseries\color{hcPrimaryDark}#1}%
+  \fi\fi
 }
 \DeclareRobustCommand{\hlaccent}[1]{%
-  \tcbox[
-    on line, enhanced,
-    colback=hcAccentBg,
-    colframe=hcAccentBorder!85!hcSurface,
-    boxrule=0.35pt,
-    arc=2.5pt,
-    boxsep=0pt,
-    left=2.6pt, right=2.6pt, top=0.9pt, bottom=0.9pt,
-    nobeforeafter, tcbox raise base
-  ]{\bfseries\color{hcAccentDark}#1}%
+  \ifhc@theme@claude
+    \tcbox[
+      on line, enhanced,
+      colback=hcAccentSoft!78!hcCanvas,
+      frame hidden,
+      boxrule=0pt,
+      arc=1.5pt,
+      boxsep=0pt,
+      left=2.2pt, right=2.2pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\bfseries\color{hcAccentDark}#1}%
+  \else\ifhc@theme@apple
+    \tcbox[
+      on line, enhanced,
+      colback=hcAccentSoft,
+      frame hidden,
+      boxrule=0pt,
+      arc=3pt,
+      boxsep=0pt,
+      left=2.8pt, right=2.8pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\bfseries\color{hcAccentDeep}#1}%
+  \else
+    \tcbox[
+      on line, enhanced,
+      colback=hcAccentBg,
+      colframe=hcAccentBorder!85!hcSurface,
+      boxrule=0.35pt,
+      arc=2.5pt,
+      boxsep=0pt,
+      left=2.6pt, right=2.6pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\bfseries\color{hcAccentDark}#1}%
+  \fi\fi
 }
 \let\hlblue\hlprimary
 \let\hlpink\hlaccent
 
 \DeclareRobustCommand{\hcbadge}[1]{%
-  \tcbox[
-    on line, enhanced,
-    colback=hcPrimarySoft, colframe=hcPrimaryBorder,
-    boxrule=0.45pt, arc=3pt,
-    boxsep=0pt, left=4pt, right=4pt, top=1.2pt, bottom=1.2pt,
-    nobeforeafter, tcbox raise base
-  ]{\sffamily\bfseries\fontsize{6.8}{8}\selectfont\color{hcPrimaryDark}#1}%
+  \ifhc@theme@claude
+    \tcbox[
+      on line, enhanced,
+      colback=hcPrimarySoft!80!hcCanvas, colframe=hcPrimaryBorder!70!hcLine,
+      boxrule=0.35pt, arc=4pt,
+      boxsep=0pt, left=4pt, right=4pt, top=1.2pt, bottom=1.2pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.6}{7.8}\selectfont\color{hcPrimaryDark}#1}%
+  \else\ifhc@theme@apple
+    \tcbox[
+      on line, enhanced,
+      colback=hcPrimarySoft, frame hidden,
+      boxrule=0pt, arc=4pt,
+      boxsep=0pt, left=4.5pt, right=4.5pt, top=1.2pt, bottom=1.2pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.7}{8}\selectfont\color{hcPrimaryDeep}#1}%
+  \else
+    \tcbox[
+      on line, enhanced,
+      colback=hcPrimarySoft, colframe=hcPrimaryBorder,
+      boxrule=0.45pt, arc=3pt,
+      boxsep=0pt, left=4pt, right=4pt, top=1.2pt, bottom=1.2pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.8}{8}\selectfont\color{hcPrimaryDark}#1}%
+  \fi\fi
 }
 \DeclareRobustCommand{\hcpinkbadge}[1]{%
-  \tcbox[
-    on line, enhanced,
-    colback=hcAccentSoft, colframe=hcAccentBorder,
-    boxrule=0.45pt, arc=3pt,
-    boxsep=0pt, left=4pt, right=4pt, top=1.2pt, bottom=1.2pt,
-    nobeforeafter, tcbox raise base
-  ]{\sffamily\bfseries\fontsize{6.8}{8}\selectfont\color{hcAccentDark}#1}%
+  \ifhc@theme@claude
+    \tcbox[
+      on line, enhanced,
+      colback=hcAccentSoft!85!hcCanvas, colframe=hcAccentBorder!70!hcLine,
+      boxrule=0.35pt, arc=4pt,
+      boxsep=0pt, left=4pt, right=4pt, top=1.2pt, bottom=1.2pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.6}{7.8}\selectfont\color{hcAccentDark}#1}%
+  \else\ifhc@theme@apple
+    \tcbox[
+      on line, enhanced,
+      colback=hcAccentSoft, frame hidden,
+      boxrule=0pt, arc=4pt,
+      boxsep=0pt, left=4.5pt, right=4.5pt, top=1.2pt, bottom=1.2pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.7}{8}\selectfont\color{hcAccentDeep}#1}%
+  \else
+    \tcbox[
+      on line, enhanced,
+      colback=hcAccentSoft, colframe=hcAccentBorder,
+      boxrule=0.45pt, arc=3pt,
+      boxsep=0pt, left=4pt, right=4pt, top=1.2pt, bottom=1.2pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.8}{8}\selectfont\color{hcAccentDark}#1}%
+  \fi\fi
 }
 
 \DeclareRobustCommand{\gain}[1]{%
   \hspace{0.25em}%
-  \tcbox[
-    on line, enhanced,
-    colback=hcPrimarySoft!85!hcSurface,
-    colframe=hcPrimaryBorder!85!hcSurface,
-    boxrule=0.35pt, arc=2.4pt,
-    boxsep=0pt, left=2.5pt, right=2.5pt, top=0.9pt, bottom=0.9pt,
-    nobeforeafter, tcbox raise base
-  ]{\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont\color{hcPrimaryDark}#1}%
+  \ifhc@theme@claude
+    {\sffamily\bfseries\fontsize{6.6}{7.6}\selectfont\color{hcPrimaryDeep}#1}%
+  \else\ifhc@theme@apple
+    \tcbox[
+      on line, enhanced,
+      colback=hcPrimarySoft, frame hidden,
+      boxrule=0pt, arc=3.5pt,
+      boxsep=0pt, left=2.8pt, right=2.8pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont\color{hcPrimaryDeep}#1}%
+  \else
+    \tcbox[
+      on line, enhanced,
+      colback=hcPrimarySoft!85!hcSurface,
+      colframe=hcPrimaryBorder!85!hcSurface,
+      boxrule=0.35pt, arc=2.4pt,
+      boxsep=0pt, left=2.5pt, right=2.5pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont\color{hcPrimaryDark}#1}%
+  \fi\fi
 }
 \DeclareRobustCommand{\speedup}[1]{%
   \hspace{0.25em}%
-  \tcbox[
-    on line, enhanced,
-    colback=hcAccentSoft!85!hcSurface,
-    colframe=hcAccentBorder!90!hcSurface,
-    boxrule=0.35pt, arc=2.4pt,
-    boxsep=0pt, left=2.5pt, right=2.5pt, top=0.9pt, bottom=0.9pt,
-    nobeforeafter, tcbox raise base
-  ]{\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont\color{hcAccentDark}#1}%
+  \ifhc@theme@claude
+    {\sffamily\bfseries\fontsize{6.6}{7.6}\selectfont\color{hcAccentDeep}#1}%
+  \else\ifhc@theme@apple
+    \tcbox[
+      on line, enhanced,
+      colback=hcAccentSoft, frame hidden,
+      boxrule=0pt, arc=3.5pt,
+      boxsep=0pt, left=2.8pt, right=2.8pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont\color{hcAccentDeep}#1}%
+  \else
+    \tcbox[
+      on line, enhanced,
+      colback=hcAccentSoft!85!hcSurface,
+      colframe=hcAccentBorder!90!hcSurface,
+      boxrule=0.35pt, arc=2.4pt,
+      boxsep=0pt, left=2.5pt, right=2.5pt, top=0.9pt, bottom=0.9pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont\color{hcAccentDark}#1}%
+  \fi\fi
 }
 \let\drop\speedup
 
-%% Keyword tag renderer (alternating primary/accent pastel pills)
+%% Keyword tag renderer (Health-Card capsules vs Claude oatmeal editorial tags vs Apple white chips)
 \newcount\hc@kwidx
 \newcommand{\hc@renderkeywords}[1]{%
   \hc@kwidx=0\relax
   \renewcommand*{\do}[1]{%
     \advance\hc@kwidx by 1\relax
-    \ifodd\hc@kwidx
+    \ifhc@theme@claude
       \tcbox[
         on line, enhanced,
-        colback=hcPrimaryBg, colframe=hcPrimaryBorder!85!hcSurface,
-        boxrule=0.4pt, arc=3.5pt,
+        colback=hcCardBg, colframe=hcLine,
+        boxrule=0.35pt, arc=4pt,
         boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
         nobeforeafter, tcbox raise base
-      ]{\sffamily\fontsize{7.1}{8.4}\selectfont\color{hcPrimaryDark}##1}%
+      ]{\sffamily\fontsize{7.1}{8.4}\selectfont\color{hcInk}##1}%
+      \hspace{0.32em}\allowbreak%
+    \else\ifhc@theme@apple
+      \tcbox[
+        on line, enhanced,
+        colback=hcSurface, frame hidden,
+        boxrule=0pt, arc=4.5pt,
+        boxsep=0pt, left=5.2pt, right=5.2pt, top=1.8pt, bottom=1.8pt,
+        nobeforeafter, tcbox raise base
+      ]{\sffamily\fontsize{7.1}{8.4}\selectfont\color{hcInk}##1}%
+      \hspace{0.32em}\allowbreak%
     \else
-      \tcbox[
-        on line, enhanced,
-        colback=hcAccentBg, colframe=hcAccentBorder!90!hcSurface,
-        boxrule=0.4pt, arc=3.5pt,
-        boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
-        nobeforeafter, tcbox raise base
-      ]{\sffamily\fontsize{7.1}{8.4}\selectfont\color{hcAccentDark}##1}%
-    \fi
-    \hspace{0.32em}\allowbreak%
+      \ifodd\hc@kwidx
+        \tcbox[
+          on line, enhanced,
+          colback=hcPrimaryBg, colframe=hcPrimaryBorder!85!hcSurface,
+          boxrule=0.4pt, arc=3.5pt,
+          boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
+          nobeforeafter, tcbox raise base
+        ]{\sffamily\fontsize{7.1}{8.4}\selectfont\color{hcPrimaryDark}##1}%
+      \else
+        \tcbox[
+          on line, enhanced,
+          colback=hcAccentBg, colframe=hcAccentBorder!90!hcSurface,
+          boxrule=0.4pt, arc=3.5pt,
+          boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
+          nobeforeafter, tcbox raise base
+        ]{\sffamily\fontsize{7.1}{8.4}\selectfont\color{hcAccentDark}##1}%
+      \fi
+      \hspace{0.32em}\allowbreak%
+    \fi\fi
   }%
   \expandafter\docsvlist\expandafter{#1}%
 }
@@ -1360,18 +2018,27 @@
 \newcommand{\hc@drawribbon}{%
   \ifhc@ribbon@gradient
     \begin{scope}
-      \clip[rounded corners=9pt] (frame.south west) rectangle (frame.north east);
       \ifhc@theme@apple
+        \clip[rounded corners=9pt] (frame.south west) rectangle (frame.north east);
         \shade[shading=hcRibbonGrad]
           ([yshift=-1.8pt]frame.north west) rectangle (frame.north east);
+      \else\ifhc@theme@claude
+        \clip[rounded corners=6.5pt] (frame.south west) rectangle (frame.north east);
+        \shade[shading=hcRibbonGrad]
+          ([yshift=-2.2pt]frame.north west) rectangle (frame.north east);
       \else
+        \clip[rounded corners=9pt] (frame.south west) rectangle (frame.north east);
         \shade[shading=hcRibbonGrad]
           ([yshift=-3.6pt]frame.north west) rectangle (frame.north east);
-      \fi
+      \fi\fi
     \end{scope}
   \else\ifhc@ribbon@stripe
     \begin{scope}
-      \clip[rounded corners=9pt] (frame.south west) rectangle (frame.north east);
+      \ifhc@theme@claude
+        \clip[rounded corners=6.5pt] (frame.south west) rectangle (frame.north east);
+      \else
+        \clip[rounded corners=9pt] (frame.south west) rectangle (frame.north east);
+      \fi
       \fill[hcPrimary] ([yshift=-3.6pt]frame.north west)
         rectangle ($(frame.north west)!0.20!(frame.north east)$);
       \fill[hcAccent] ($([yshift=-3.6pt]frame.north west)!0.20!([yshift=-3.6pt]frame.north east)$)
@@ -1407,96 +2074,118 @@
   \fi
 }
 
-%% Helper: render Header Card Title & Subtitle per language mode
+%% Helper: render Header Title & Subtitle per language mode and theme voice
 \newcommand{\hc@render@titles}{%
   \ifhc@lang@zh
     %% Pure Chinese: prefer \titlezh if set, otherwise fall back to \title
     \ifx\hc@titlezh\@empty
-      {\raggedright\sffamily\bfseries\fontsize{15.2}{19.8}\selectfont\color{hcPrimaryDark}\@title\par}%
+      {\hc@hero@align\hc@title@font@zh\@title\par}%
     \else
-      {\raggedright\sffamily\bfseries\fontsize{15.2}{19.8}\selectfont\color{hcPrimaryDark}\hc@titlezh\par}%
+      {\hc@hero@align\hc@title@font@zh\hc@titlezh\par}%
     \fi
     \ifx\hc@subtitlezh\@empty
       \ifhc@acmart
         \ifx\@subtitle\@empty\else
           \vskip 3pt
-          {\raggedright\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\@subtitle\par}%
+          {\hc@hero@align\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\@subtitle\par}%
         \fi
       \fi
       \ifx\hc@subtitle\@empty\else
         \vskip 3pt
-        {\raggedright\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\hc@subtitle\par}%
+        {\hc@hero@align\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\hc@subtitle\par}%
       \fi
     \else
       \vskip 3pt
-      {\raggedright\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
+      {\hc@hero@align\sffamily\fontsize{10.0}{13.6}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
     \fi
   \else\ifhc@lang@bi
     %% Bilingual: paired ZH + EN titles with clear typographic hierarchy
     \ifhc@bi@enzh
-      {\raggedright\sffamily\bfseries\fontsize{15.2}{19.0}\selectfont\color{hcPrimaryDark}\@title\par}%
+      {\hc@hero@align\hc@title@font@bi@a\@title\par}%
       \ifx\hc@titlezh\@empty\else
         \vskip 3pt
-        {\raggedright\sffamily\bfseries\fontsize{11.6}{15.4}\selectfont\color{hcPrimaryDeep}\hc@titlezh\par}%
+        {\hc@hero@align\hc@title@font@bi@b\hc@titlezh\par}%
       \fi
       \ifhc@acmart
         \ifx\@subtitle\@empty\else
           \vskip 2.4pt
-          {\raggedright\sffamily\fontsize{8.9}{11.6}\selectfont\color{hcMuted}\@subtitle\par}%
+          {\hc@hero@align\sffamily\fontsize{8.9}{11.6}\selectfont\color{hcMuted}\@subtitle\par}%
         \fi
       \fi
       \ifx\hc@subtitle\@empty\else
         \vskip 2.4pt
-        {\raggedright\sffamily\fontsize{8.9}{11.6}\selectfont\color{hcMuted}\hc@subtitle\par}%
+        {\hc@hero@align\sffamily\fontsize{8.9}{11.6}\selectfont\color{hcMuted}\hc@subtitle\par}%
       \fi
       \ifx\hc@subtitlezh\@empty\else
         \vskip 1.8pt
-        {\raggedright\sffamily\fontsize{8.6}{11.8}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
+        {\hc@hero@align\sffamily\fontsize{8.6}{11.8}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
       \fi
     \else
       \ifx\hc@titlezh\@empty
-        {\raggedright\sffamily\bfseries\fontsize{15.2}{19.2}\selectfont\color{hcPrimaryDark}\@title\par}%
+        {\hc@hero@align\hc@title@font@bi@a\@title\par}%
       \else
-        {\raggedright\sffamily\bfseries\fontsize{15.2}{19.6}\selectfont\color{hcPrimaryDark}\hc@titlezh\par}%
+        {\hc@hero@align\hc@title@font@bi@a\hc@titlezh\par}%
         \vskip 2.8pt
-        {\raggedright\sffamily\bfseries\fontsize{11.2}{14.2}\selectfont\color{hcPrimaryDeep}\@title\par}%
+        {\hc@hero@align\hc@title@font@bi@b\@title\par}%
       \fi
       \ifx\hc@subtitlezh\@empty\else
         \vskip 2.4pt
-        {\raggedright\sffamily\fontsize{8.8}{12.0}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
+        {\hc@hero@align\sffamily\fontsize{8.8}{12.0}\selectfont\color{hcMuted}\hc@subtitlezh\par}%
       \fi
       \ifhc@acmart
         \ifx\@subtitle\@empty\else
           \vskip 1.6pt
-          {\raggedright\sffamily\fontsize{8.5}{11.2}\selectfont\color{hcMuted}\@subtitle\par}%
+          {\hc@hero@align\sffamily\fontsize{8.5}{11.2}\selectfont\color{hcMuted}\@subtitle\par}%
         \fi
       \fi
       \ifx\hc@subtitle\@empty\else
         \vskip 1.6pt
-        {\raggedright\sffamily\fontsize{8.5}{11.2}\selectfont\color{hcMuted}\hc@subtitle\par}%
+        {\hc@hero@align\sffamily\fontsize{8.5}{11.2}\selectfont\color{hcMuted}\hc@subtitle\par}%
       \fi
     \fi
   \else
-    %% Pure English (100% v1.1 identical)
-    {\raggedright\sffamily\bfseries\fontsize{16.5}{20.4}\selectfont\color{hcPrimaryDark}\@title\par}%
+    %% Pure English
+    {\hc@hero@align\hc@title@font@en\@title\par}%
     \ifhc@acmart
       \ifx\@subtitle\@empty\else
         \vskip 3pt
-        {\raggedright\sffamily\fontsize{10.4}{13.2}\selectfont\color{hcMuted}\@subtitle\par}%
+        {\hc@hero@align\sffamily\fontsize{10.4}{13.2}\selectfont\color{hcMuted}\@subtitle\par}%
       \fi
     \fi
     \ifx\hc@subtitle\@empty\else
       \vskip 3pt
-      {\raggedright\sffamily\fontsize{10.4}{13.2}\selectfont\color{hcMuted}\hc@subtitle\par}%
+      {\hc@hero@align\sffamily\fontsize{10.4}{13.2}\selectfont\color{hcMuted}\hc@subtitle\par}%
     \fi
   \fi\fi
 }
 
-%% Helper: render Abstract + Keywords nested white Health Card per language mode
-\newcommand{\hc@abs@eyebrow}[1]{%
-  {\sffamily\bfseries\fontsize{7.5}{9}\selectfont\color{hcPrimaryDark}%
-    \tikz[baseline=-0.3ex]{\fill[hcPrimary] (0,0) circle (2.0pt); \fill[hcAccent] (5.2pt,0) circle (2.0pt);}%
-    \hspace{0.46em}#1\par}%
+%% Helper: render Abstract + Keywords panel per language mode and theme
+\newcommand{\hc@abs@eyebrow}[2][en]{%
+  \ifhc@theme@claude
+    \IfStrEq{#1}{zh}{%
+      {\sffamily\bfseries\fontsize{8.4}{10.2}\selectfont\color{hcPrimaryDeep}#2\par}%
+    }{%
+      {\ttfamily\bfseries\fontsize{7.7}{9.4}\selectfont\color{hcPrimaryDeep}\hc@maybecaps{#2}\par}%
+    }%
+  \else\ifhc@theme@apple
+    {\sffamily\bfseries\fontsize{8.8}{10.4}\selectfont\color{hcInk}#2\par}%
+  \else
+    {\sffamily\bfseries\fontsize{7.5}{9}\selectfont\color{hcPrimaryDark}%
+      \tikz[baseline=-0.3ex]{\fill[hcPrimary] (0,0) circle (2.0pt); \fill[hcAccent] (5.2pt,0) circle (2.0pt);}%
+      \hspace{0.46em}#2\par}%
+  \fi\fi
+}
+
+\newcommand{\hc@kw@label}[4][en]{%
+  \ifhc@theme@claude
+    \IfStrEq{#1}{zh}{%
+      {\sffamily\bfseries\fontsize{#2}{#3}\selectfont\color{hcMuted}#4}%
+    }{%
+      {\ttfamily\bfseries\fontsize{#2}{#3}\selectfont\color{hcMuted}\hc@maybecaps{#4}}%
+    }%
+  \else
+    {\sffamily\bfseries\fontsize{#2}{#3}\selectfont\color{hcMuted}#4}%
+  \fi
 }
 
 \newif\ifhc@show@abscard \hc@show@abscardfalse
@@ -1513,22 +2202,11 @@
     \vskip 8pt
     \begin{tcolorbox}[
       enhanced,
-      width=\linewidth,
-      colback=\ifhc@header@clean hcCanvas\else hcSurface\fi,
-      colframe=hcAbstractBorder,
-      boxrule=0.55pt,
-      arc=6.5pt,
-      outer arc=6.5pt,
-      borderline west={\hc@abstract@barw}{0pt}{hcAbstractBar},
-      left=10.5pt, right=10.5pt,
-      top=7pt, bottom=7pt,
-      boxsep=0pt,
-      before skip=0pt,
-      after skip=0pt
+      hc@abstractbox@skin
     ]
       \ifhc@lang@zh
         %% Pure Chinese abstract
-        \hc@abs@eyebrow{\hc@lbl@abstractzh}%
+        \hc@abs@eyebrow[zh]{\hc@lbl@abstractzh}%
         \vskip 3.8pt
         \ifx\hc@abstractzh\@empty
           {\fontsize{8.75}{12.4}\selectfont\color{hcInk}\@abstract\par}%
@@ -1541,7 +2219,7 @@
             {\color{hcLine}\hrule height 0.45pt}%
             \vskip 4.8pt
             {\raggedright\linespread{1.32}\selectfont
-              {\sffamily\bfseries\fontsize{7.3}{8.6}\selectfont\color{hcMuted}\hc@lbl@keywordszh\hspace{0.55em}}%
+              \hc@kw@label[en]{7.3}{8.6}{\hc@lbl@keywordszh}\hspace{0.55em}%
               \hc@renderkeywords{\hc@keywords}\par}%
           \fi
         \else
@@ -1549,14 +2227,14 @@
           {\color{hcLine}\hrule height 0.45pt}%
           \vskip 4.8pt
           {\raggedright\linespread{1.32}\selectfont
-            {\sffamily\bfseries\fontsize{7.3}{8.6}\selectfont\color{hcMuted}\hc@lbl@keywordszh\hspace{0.55em}}%
+            \hc@kw@label[zh]{7.3}{8.6}{\hc@lbl@keywordszh}\hspace{0.55em}%
             \hc@renderkeywords{\hc@keywordszh}\par}%
         \fi
       \else\ifhc@lang@bi
         %% Bilingual abstract card (compact dual-language layout for balanced Page 1)
         \ifhc@bi@enzh
           \ifx\@abstract\@empty\else
-            \hc@abs@eyebrow{\hc@lbl@abstract}%
+            \hc@abs@eyebrow[en]{\hc@lbl@abstract}%
             \vskip 2.4pt
             {\fontsize{7.85}{10.1}\selectfont\color{hcInk}\@abstract\par}%
           \fi
@@ -1566,13 +2244,13 @@
               {\color{hcLine!75!hcSurface}\hrule height 0.4pt}%
               \vskip 3.8pt
             \fi
-            \hc@abs@eyebrow{\hc@lbl@abstractzh}%
+            \hc@abs@eyebrow[zh]{\hc@lbl@abstractzh}%
             \vskip 2.4pt
             {\fontsize{7.95}{10.9}\selectfont\color{hcInk}\hc@abstractzh\par}%
           \fi
         \else
           \ifx\hc@abstractzh\@empty\else
-            \hc@abs@eyebrow{\hc@lbl@abstractzh}%
+            \hc@abs@eyebrow[zh]{\hc@lbl@abstractzh}%
             \vskip 2.4pt
             {\fontsize{7.95}{10.9}\selectfont\color{hcInk}\hc@abstractzh\par}%
           \fi
@@ -1582,7 +2260,7 @@
               {\color{hcLine!75!hcSurface}\hrule height 0.4pt}%
               \vskip 3.8pt
             \fi
-            \hc@abs@eyebrow{\hc@lbl@abstract}%
+            \hc@abs@eyebrow[en]{\hc@lbl@abstract}%
             \vskip 2.4pt
             {\fontsize{7.85}{10.1}\selectfont\color{hcInk!88!hcMuted}\@abstract\par}%
           \fi
@@ -1595,32 +2273,32 @@
           \ifhc@bi@enzh
             \ifx\hc@keywords\@empty\else
               {\raggedright\linespread{1.24}\selectfont
-                {\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcMuted}\hc@lbl@keywords\hspace{0.5em}}%
+                \hc@kw@label[en]{7.0}{8.2}{\hc@lbl@keywords}\hspace{0.5em}%
                 \hc@renderkeywords{\hc@keywords}\par}%
             \fi
             \ifx\hc@keywordszh\@empty\else
               \ifx\hc@keywords\@empty\else\vskip 2.2pt\fi
               {\raggedright\linespread{1.24}\selectfont
-                {\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcMuted}\hc@lbl@keywordszh\hspace{0.5em}}%
+                \hc@kw@label[zh]{7.0}{8.2}{\hc@lbl@keywordszh}\hspace{0.5em}%
                 \hc@renderkeywords{\hc@keywordszh}\par}%
             \fi
           \else
             \ifx\hc@keywordszh\@empty\else
               {\raggedright\linespread{1.24}\selectfont
-                {\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcMuted}\hc@lbl@keywordszh\hspace{0.5em}}%
+                \hc@kw@label[zh]{7.0}{8.2}{\hc@lbl@keywordszh}\hspace{0.5em}%
                 \hc@renderkeywords{\hc@keywordszh}\par}%
             \fi
             \ifx\hc@keywords\@empty\else
               \ifx\hc@keywordszh\@empty\else\vskip 2.2pt\fi
               {\raggedright\linespread{1.24}\selectfont
-                {\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcMuted}\hc@lbl@keywords\hspace{0.5em}}%
+                \hc@kw@label[en]{7.0}{8.2}{\hc@lbl@keywords}\hspace{0.5em}%
                 \hc@renderkeywords{\hc@keywords}\par}%
             \fi
           \fi
         }{}%
       \else
         %% Pure English abstract (100% v1.1 identical)
-        \hc@abs@eyebrow{\hc@lbl@abstract}%
+        \hc@abs@eyebrow[en]{\hc@lbl@abstract}%
         \vskip 4pt
         {\fontsize{8.75}{11.8}\selectfont\color{hcInk}\@abstract\par}%
         \ifx\hc@keywords\@empty\else
@@ -1628,12 +2306,68 @@
           {\color{hcLine}\hrule height 0.45pt}%
           \vskip 5.2pt
           {\raggedright\linespread{1.32}\selectfont
-            {\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcMuted}\hc@lbl@keywords\hspace{0.55em}}%
+            \hc@kw@label[en]{7.3}{8.5}{\hc@lbl@keywords}\hspace{0.55em}%
             \hc@renderkeywords{\hc@keywords}\par}%
         \fi
       \fi\fi
     \end{tcolorbox}%
   \fi
+}
+
+\newcommand{\hc@render@eyebrow}{%
+  \ifhc@theme@claude
+    \ifx\hc@reportlabel\@empty\else
+      \ifhc@lang@en
+        {\ttfamily\bfseries\fontsize{7.5}{9.0}\selectfont\color{hcPrimaryDeep}\hc@maybecaps{\hc@reportlabel}}%
+      \else
+        {\sffamily\bfseries\fontsize{7.7}{9.2}\selectfont\color{hcPrimaryDeep}\hc@reportlabel}%
+      \fi
+    \fi
+    \ifx\hc@reportbadge\@empty\else
+      \ifx\hc@reportlabel\@empty\else\hspace{0.5em}\fi
+      \tcbox[
+        on line, enhanced,
+        colback=hcBadgePillBg, colframe=hcBadgePillBorder,
+        boxrule=0.35pt, arc=5pt,
+        boxsep=0pt, left=5.5pt, right=5.5pt, top=2.0pt, bottom=2.0pt,
+        nobeforeafter, tcbox raise base
+      ]{\sffamily\bfseries\fontsize{7.0}{8.2}\selectfont\color{hcBadgePillInk}\hc@reportbadge}%
+    \fi
+  \else\ifhc@theme@apple
+    \ifx\hc@reportlabel\@empty\else
+      {\sffamily\bfseries\fontsize{8.0}{9.4}\selectfont\color{hcInk}\hc@reportlabel}%
+    \fi
+    \ifx\hc@reportbadge\@empty\else
+      \ifx\hc@reportlabel\@empty\else\hspace{0.5em}\textcolor{hcMuted}{\textperiodcentered}\hspace{0.5em}\fi
+      {\sffamily\fontsize{7.8}{9.2}\selectfont\color{hcMuted}\hc@reportbadge}%
+    \fi
+  \else
+    \ifx\hc@reportlabel\@empty\else
+      \tcbox[
+        on line, enhanced,
+        colback=hcReportPillBg, colframe=hcReportPillBorder,
+        boxrule=0.45pt, arc=4.5pt,
+        boxsep=0pt, left=6.5pt, right=6.5pt, top=2.4pt, bottom=2.4pt,
+        nobeforeafter, tcbox raise base
+      ]{\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcReportPillInk}\hc@maybecaps{\hc@reportlabel}}%
+    \fi
+    \ifx\hc@reportbadge\@empty\else
+      \hspace{0.45em}%
+      \tcbox[
+        on line, enhanced,
+        colback=hcBadgePillBg, colframe=hcBadgePillBorder,
+        boxrule=0.45pt, arc=4.5pt,
+        boxsep=0pt, left=6pt, right=6pt, top=2.4pt, bottom=2.4pt,
+        nobeforeafter, tcbox raise base
+      ]{\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcBadgePillInk}\hc@reportbadge}%
+    \fi
+  \fi\fi
+  \ifboolexpr{ bool {hc@has@projectlogo} or bool {hc@has@orglogo} }{%
+    \ifx\hc@reportdate\@empty\else
+      \hspace{0.55em}\textcolor{hcLine}{\rule[-0.15em]{0.45pt}{0.85em}}\hspace{0.55em}%
+      {\sffamily\fontsize{7.7}{9}\selectfont\color{hcMuted}\hc@reportdate}%
+    \fi
+  }{}%
 }
 
 \newcommand{\hc@buildheadercard}{%
@@ -1642,49 +2376,13 @@
   \setlength{\parskip}{0pt}%
   \begin{tcolorbox}[
     enhanced,
-    width=\textwidth,
-    colback=\ifhc@header@clean hcSurface\else hcHeaderBg\fi,
-    colframe=hcHeaderBorder,
-    boxrule=\hc@header@rulew,
-    arc=9pt,
-    outer arc=9pt,
-    left=14pt, right=14pt,
-    top=\ifhc@ribbon@none 11.5pt\else \hc@header@toppad\fi,
-    bottom=11.5pt,
-    boxsep=0pt,
-    before skip=0pt,
-    after skip=0pt,
-    overlay={\hc@drawribbon}
+    hc@headerbox@skin
   ]
-    %% --- Top Eyebrow Row: Category Pills (+ Date when dual logos set) | Dual Logo Slot ---
+    %% --- Top Eyebrow Row: Category Labels / Pills (+ Date) | Dual Logo Slot ---
     \noindent
     \begin{minipage}[c]{0.64\linewidth}
       \raggedright
-      \ifx\hc@reportlabel\@empty\else
-        \tcbox[
-          on line, enhanced,
-          colback=hcReportPillBg, colframe=hcReportPillBorder,
-          boxrule=0.45pt, arc=4.5pt,
-          boxsep=0pt, left=6.5pt, right=6.5pt, top=2.4pt, bottom=2.4pt,
-          nobeforeafter, tcbox raise base
-        ]{\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcReportPillInk}\hc@maybecaps{\hc@reportlabel}}%
-      \fi
-      \ifx\hc@reportbadge\@empty\else
-        \hspace{0.45em}%
-        \tcbox[
-          on line, enhanced,
-          colback=hcBadgePillBg, colframe=hcBadgePillBorder,
-          boxrule=0.45pt, arc=4.5pt,
-          boxsep=0pt, left=6pt, right=6pt, top=2.4pt, bottom=2.4pt,
-          nobeforeafter, tcbox raise base
-        ]{\sffamily\bfseries\fontsize{7.3}{8.5}\selectfont\color{hcBadgePillInk}\hc@reportbadge}%
-      \fi
-      \ifboolexpr{ bool {hc@has@projectlogo} or bool {hc@has@orglogo} }{%
-        \ifx\hc@reportdate\@empty\else
-          \hspace{0.55em}\textcolor{hcPrimaryBorder}{\textperiodcentered}\hspace{0.5em}%
-          {\sffamily\fontsize{7.7}{9}\selectfont\color{hcMuted}\hc@reportdate}%
-        \fi
-      }{}%
+      \hc@render@eyebrow
     \end{minipage}%
     \hfill
     \begin{minipage}[c]{0.34\linewidth}
@@ -1692,7 +2390,13 @@
       \hc@render@logoslot
     \end{minipage}
 
-    \vskip 7pt
+    \ifhc@theme@apple
+      \vskip 5pt
+      {\color{hcNavRule}\hrule height 0.45pt}%
+      \vskip 8.5pt
+    \else
+      \vskip 7pt
+    \fi
 
     %% --- Paper Title & Optional Subtitle (Language-Aware) ---
     \hc@render@titles
@@ -1700,19 +2404,19 @@
     %% --- Authors with Clickable Vector ORCID Icons ---
     \ifnum\hc@authorcount>0\relax
       \vskip 6.8pt
-      {\raggedright\fontsize{9.6}{13.4}\selectfont\hc@authors@render\par}%
+      {\hc@hero@align\fontsize{9.6}{13.4}\selectfont\hc@authors@render\par}%
     \fi
 
     %% --- Affiliations ---
     \ifnum\hc@affilcount>0\relax
       \vskip 3.6pt
-      {\raggedright\fontsize{8.3}{11.4}\selectfont\hc@affiliations\par}%
+      {\hc@hero@align\fontsize{8.3}{11.4}\selectfont\hc@affiliations\par}%
     \fi
 
     %% --- Author Notes & Correspondence ---
     \ifnum\hc@notecount>0\relax
       \vskip 2.8pt
-      {\raggedright\fontsize{7.8}{10.6}\selectfont\hc@authornotes
+      {\hc@hero@align\fontsize{7.8}{10.6}\selectfont\hc@authornotes
         \ifx\hc@correspondence\@empty\else
           \hspace{0.85em}\textcolor{hcPrimaryBorder}{\textperiodcentered}\hspace{0.85em}%
           \textcolor{hcPrimaryDeep}{\faEnvelope[regular]}\hspace{0.32em}%
@@ -1722,7 +2426,7 @@
     \else
       \ifx\hc@correspondence\@empty\else
         \vskip 2.8pt
-        {\raggedright\fontsize{7.8}{10.6}\selectfont
+        {\hc@hero@align\fontsize{7.8}{10.6}\selectfont
           \textcolor{hcPrimaryDeep}{\faEnvelope[regular]}\hspace{0.35em}%
           {\sffamily\color{hcUrlColor}\hc@in@corresptrue\hc@correspondence\hc@in@correspfalse}\par}%
       \fi
@@ -1730,8 +2434,8 @@
 
     %% --- Resource Metadata Pill Bar ---
     \ifnum\hc@metacount>0\relax
-      \vskip 6.6pt
-      {\raggedright\linespread{1.34}\selectfont\hc@metadata\par}%
+      \vskip 7.2pt
+      {\hc@hero@align\linespread{\ifhc@layout@healthcard 1.34\else 1.44\fi}\selectfont\hc@metadata\par}%
     \fi
 
     %% --- Nested Pure-White Abstract Health Card ---
@@ -2024,17 +2728,23 @@
 %% 12. Section Headings (100% acmart-Safe — Zero Redefinition of \section!)
 %% -----------------------------------------------------------------------------
 \DeclareRobustCommand{\hc@secnumbadge}[1]{%
-  \tcbox[
-    on line, enhanced,
-    colback=hcSecNumBg,
-    colframe=hcSecNumBorder,
-    boxrule=0.45pt,
-    arc=3pt,
-    boxsep=0pt,
-    left=4pt, right=4pt, top=1.5pt, bottom=1.5pt,
-    nobeforeafter, tcbox raise base
-  ]{\sffamily\bfseries\fontsize{8.8}{10}\selectfont\color{hcSecNumInk}#1}%
-  \hspace{0.48em}%
+  \ifhc@theme@claude
+    {\rmfamily\bfseries\fontsize{11.8}{14.6}\selectfont\color{hcPrimary}#1}\hspace{0.52em}%
+  \else\ifhc@theme@apple
+    {\sffamily\bfseries\fontsize{11.5}{14.2}\selectfont\color{hcMuted}#1}\hspace{0.48em}%
+  \else
+    \tcbox[
+      on line, enhanced,
+      colback=hcSecNumBg,
+      colframe=hcSecNumBorder,
+      boxrule=0.45pt,
+      arc=3pt,
+      boxsep=0pt,
+      left=4pt, right=4pt, top=1.5pt, bottom=1.5pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{8.8}{10}\selectfont\color{hcSecNumInk}#1}%
+    \hspace{0.48em}%
+  \fi\fi
 }
 
 \DeclareRobustCommand{\hc@subsecnum}[1]{%
@@ -2060,13 +2770,13 @@
 \def\@seccntformat#1{\hc@formatseccnt{#1}{\csname the#1\endcsname}}
 
 \ifhc@acmart
-  \def\@secfont{\sffamily\bfseries\fontsize{11.0}{14.0}\selectfont\color{hcSectionInk}\section@raggedright}
+  \def\@secfont{\hc@sec@font\color{hcSectionInk}\section@raggedright}
   \def\@subsecfont{\sffamily\bfseries\fontsize{9.6}{12.4}\selectfont\color{hcInk}\section@raggedright}
   \def\@subsubsecfont{\sffamily\bfseries\fontsize{8.9}{11.4}\selectfont\color{hcSubsubsecNumInk}}
   \def\@parfont{\sffamily\bfseries\fontsize{8.9}{11.4}\selectfont\color{hcInk}}
 \else
   \RequirePackage{titlesec}
-  \titleformat{\section}{\sffamily\bfseries\fontsize{11.0}{14.0}\selectfont\color{hcSectionInk}}{\hc@secnumbadge{\thesection}}{0pt}{}
+  \titleformat{\section}{\hc@sec@font\color{hcSectionInk}}{\hc@secnumbadge{\thesection}}{0pt}{}
   \titleformat{\subsection}{\sffamily\bfseries\fontsize{9.6}{12.4}\selectfont\color{hcInk}}{\hc@subsecnum{\thesubsection}}{0pt}{}
   \titleformat{\subsubsection}[runin]{\sffamily\bfseries\fontsize{8.9}{11.4}\selectfont\color{hcSubsubsecNumInk}}{\hc@subsubsecnum{\thesubsubsection}}{0pt}{}[.]
   \titleformat{\paragraph}[runin]{\sffamily\bfseries\fontsize{8.9}{11.4}\selectfont\color{hcInk}}{}{0pt}{}[.]
@@ -2078,22 +2788,32 @@
 %% 13. Running Headers & Footers (with 10pt Monochrome Mini Logo on Pages 2+)
 %% -----------------------------------------------------------------------------
 \DeclareRobustCommand{\hc@pagepill}{%
-  \tcbox[
-    on line, enhanced,
-    colback=hcPagePillBg,
-    colframe=hcPagePillBorder,
-    boxrule=0.45pt,
-    arc=4pt,
-    boxsep=0pt,
-    left=6pt, right=6pt, top=1.8pt, bottom=1.8pt,
-    nobeforeafter, tcbox raise base
-  ]{\sffamily\bfseries\fontsize{7.8}{9}\selectfont\color{hcPagePillInk}\thepage}%
+  \ifhc@theme@claude
+    {\rmfamily\fontsize{8.2}{9.4}\selectfont\color{hcMuted}\thepage}%
+  \else\ifhc@theme@apple
+    {\sffamily\fontsize{8.0}{9.2}\selectfont\color{hcMuted}\thepage}%
+  \else
+    \tcbox[
+      on line, enhanced,
+      colback=hcPagePillBg,
+      colframe=hcPagePillBorder,
+      boxrule=0.45pt,
+      arc=4pt,
+      boxsep=0pt,
+      left=6pt, right=6pt, top=1.8pt, bottom=1.8pt,
+      nobeforeafter, tcbox raise base
+    ]{\sffamily\bfseries\fontsize{7.8}{9}\selectfont\color{hcPagePillInk}\thepage}%
+  \fi\fi
 }
 
 \newcommand{\hc@pastelheadrule}{%
   \vskip 2pt
   \noindent\begin{tikzpicture}
-    \shade[shading=hcRuleGrad] (0,0) rectangle (\headwidth, 0.75pt);
+    \ifhc@layout@healthcard
+      \shade[shading=hcRuleGrad] (0,0) rectangle (\headwidth, 0.75pt);
+    \else
+      \shade[shading=hcRuleGrad] (0,0) rectangle (\headwidth, 0.45pt);
+    \fi
   \end{tikzpicture}%
   \vskip -4pt
 }
@@ -2124,22 +2844,14 @@
         \ifhc@showheaderlogo
           \hc@headerlogo\hspace{0.5em}%
         \else
-          \ifhc@theme@apple
-            \tikz[baseline=-0.3ex]{\fill[hcMuted] (0,0) circle (1.35pt);}\hspace{0.45em}%
-          \else
-            \tikz[baseline=-0.3ex]{\fill[hcPrimary] (0,0) circle (1.7pt);}\hspace{0.45em}%
-          \fi
+          \hc@headdot@left
         \fi
         \hc@effective@title}%
     }%
     \fancyhead[R]{%
       {\sffamily\fontsize{7.6}{9}\selectfont\color{hcMuted}%
-        \hc@effective@authors\hspace{0.45em}%
-        \ifhc@theme@apple
-          \tikz[baseline=-0.3ex]{\fill[hcMuted] (0,0) circle (1.35pt);}%
-        \else
-          \tikz[baseline=-0.3ex]{\fill[hcAccent] (0,0) circle (1.7pt);}%
-        \fi}%
+        \hc@effective@authors
+        \hc@headdot@right}%
     }%
     \fancyfoot[C]{\hc@pagepill}%
   }%
@@ -2191,8 +2903,15 @@
 }
 
 %% -----------------------------------------------------------------------------
-%% 15. Health-Card Academic Components (100% Relative Widths, Localized Labels)
+%% 15. Academic Component Cards (Dispatched Cleanly Across Visual Paradigms)
 %% -----------------------------------------------------------------------------
+\newcommand{\hc@card@leadingicon}[2]{%
+  \ifhc@theme@claude
+    \tikz[baseline=-0.2ex]{\fill[#1] (0,0) circle (1.7pt);}\hspace{0.45em}%
+  \else
+    \textcolor{#1}{\faIcon{#2}}\hspace{0.45em}%
+  \fi
+}
 
 %% 15.1 Primary Takeaway / Summary Card
 \newtcolorbox{hccard}[1][\hc@lbl@card]{%
@@ -2200,17 +2919,10 @@
   breakable,
   lines before break=5,
   width=\linewidth,
-  colback=hcCardBg,
-  colframe=hcCardBorder,
-  boxrule=\hc@card@rulew,
-  arc=6pt,
-  outer arc=6pt,
-  borderline west={\hc@card@barw}{0pt}{hcPrimary},
-  left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt,
+  hc@hccard@skin,
   detach title,
-  coltitle=hcPrimaryDark,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{8.4}{10.4}\selectfont,
-  title={\textcolor{hcPrimaryDeep}{\faIcon{info-circle}}\hspace{0.45em}#1},
+  title={\hc@card@leadingicon{hcPrimaryDeep}{info-circle}#1},
   before upper={\tcbtitle\par\nopagebreak\vskip 3pt\nopagebreak},
   fontupper=\fontsize{8.4}{11.4}\selectfont\color{hcInk},
   before skip=6.5pt,
@@ -2223,40 +2935,26 @@
   breakable,
   lines before break=5,
   width=\linewidth,
-  colback=hcPinkCardBg,
-  colframe=hcPinkCardBorder,
-  boxrule=\hc@card@rulew,
-  arc=6pt,
-  outer arc=6pt,
-  borderline west={\hc@card@barw}{0pt}{hcAccent},
-  left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt,
+  hc@hcpinkcard@skin,
   detach title,
-  coltitle=hcAccentDark,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{8.4}{10.4}\selectfont,
-  title={\textcolor{hcAccentDeep}{\faIcon{star}}\hspace{0.45em}#1},
+  title={\hc@card@leadingicon{hcAccentDeep}{star}#1},
   before upper={\tcbtitle\par\nopagebreak\vskip 3pt\nopagebreak},
   fontupper=\fontsize{8.4}{11.4}\selectfont\color{hcInk},
   before skip=6.5pt,
   after skip=6.5pt
 }
 
-%% 15.3 Neutral Slate-Gray Note Card (hardware specs, engineering notes)
+%% 15.3 Neutral Slate-Gray / Sage-Stone Note Card (hardware specs, engineering notes)
 \newtcolorbox{hcnote}[1][\hc@lbl@note]{%
   enhanced,
   breakable,
   lines before break=5,
   width=\linewidth,
-  colback=hcNoteBg,
-  colframe=hcNoteBorder,
-  boxrule=0.6pt,
-  arc=6pt,
-  outer arc=6pt,
-  borderline west={2.6pt}{0pt}{hcNoteBar},
-  left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt,
+  hc@hcnote@skin,
   detach title,
-  coltitle=hcNoteDark,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{8.4}{10.4}\selectfont,
-  title={\textcolor{hcNoteDeep}{\faIcon{clipboard-list}}\hspace{0.45em}#1},
+  title={\hc@card@leadingicon{hcNoteDeep}{clipboard-list}#1},
   before upper={\tcbtitle\par\nopagebreak\vskip 3pt\nopagebreak},
   fontupper=\fontsize{8.4}{11.4}\selectfont\color{hcInk},
   before skip=6.5pt,
@@ -2269,17 +2967,10 @@
   breakable,
   lines before break=5,
   width=\linewidth,
-  colback=hcCaveatBg,
-  colframe=hcCaveatBorder,
-  boxrule=0.6pt,
-  arc=6pt,
-  outer arc=6pt,
-  borderline west={2.6pt}{0pt}{hcCaveatBar},
-  left=9.5pt, right=9pt, top=6.5pt, bottom=6.5pt,
+  hc@hccaveat@skin,
   detach title,
-  coltitle=hcCaveatDark,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{8.4}{10.4}\selectfont,
-  title={\textcolor{hcCaveatDeep}{\faIcon{exclamation-triangle}}\hspace{0.45em}#1},
+  title={\hc@card@leadingicon{hcCaveatDeep}{exclamation-triangle}#1},
   before upper={\tcbtitle\par\nopagebreak\vskip 3pt\nopagebreak},
   fontupper=\fontsize{8.4}{11.4}\selectfont\color{hcInk},
   before skip=6.5pt,
@@ -2292,14 +2983,7 @@
   breakable,
   lines before break=5,
   width=\linewidth,
-  colback=hcSurface,
-  colframe=hcCardBorder,
-  colbacktitle=hcTableHeadBg,
-  coltitle=hcPrimaryDark,
-  boxrule=\hc@thm@rulew,
-  titlerule=0.45pt,
-  titlerule style=hcTableRule!80!hcSurface,
-  arc=5.5pt,
+  hc@thm@skin,
   left=8.5pt, right=8.5pt, top=5.5pt, bottom=6pt,
   toptitle=3.5pt, bottomtitle=3.5pt,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{8.5}{10.4}\selectfont,
@@ -2316,14 +3000,7 @@
   breakable,
   lines before break=5,
   width=\linewidth,
-  colback=hcSurface,
-  colframe=hcPinkCardBorder,
-  colbacktitle=hcPinkCardBg,
-  coltitle=hcAccentDark,
-  boxrule=\hc@thm@rulew,
-  titlerule=0.45pt,
-  titlerule style=hcPinkCardBorder!80!hcSurface,
-  arc=5.5pt,
+  hc@def@skin,
   left=8.5pt, right=8.5pt, top=5.5pt, bottom=6pt,
   toptitle=3.5pt, bottomtitle=3.5pt,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{8.5}{10.4}\selectfont,
@@ -2340,14 +3017,7 @@
   breakable,
   lines before break=5,
   width=\linewidth,
-  colback=hcSurface,
-  colframe=hcCardBorder,
-  colbacktitle=hcCanvas,
-  coltitle=hcPrimaryDark,
-  boxrule=\hc@thm@rulew,
-  titlerule=0.45pt,
-  titlerule style=hcLine,
-  arc=5.5pt,
+  hc@prop@skin,
   left=8.5pt, right=8.5pt, top=5.5pt, bottom=6pt,
   toptitle=3.5pt, bottomtitle=3.5pt,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{8.5}{10.4}\selectfont,
@@ -2360,7 +3030,11 @@
 }{prop}
 
 %% 15.6 Health-Card Bento Metric Tiles (Strictly Relative Width via tabularx)
+\newcount\hc@metricidx
+\def\hc@metric@cols{4}
 \newenvironment{hcmetricgrid}[1][4]{%
+  \gdef\hc@metric@cols{#1}%
+  \global\hc@metricidx=0\relax
   \par\noindent
   \begingroup
   \setlength{\tabcolsep}{3.5pt}%
@@ -2389,6 +3063,10 @@
 }
 
 \newcommand{\hcmetriccard}[5]{%
+  \global\advance\hc@metricidx by 1\relax
+  \ifnum\hc@metricidx>\hc@metric@cols\relax
+    \global\hc@metricidx=1\relax
+  \fi
   \IfStrEq{#1}{pink}{%
     \def\hc@mc@border{hcAccentBorder}%
     \def\hc@mc@soft{hcAccentSoft}%
@@ -2413,58 +3091,118 @@
       \def\hc@mc@bar{hcPrimary}%
     }%
   }%
-  \ifhc@theme@apple
-    \def\hc@mc@cardborder{hcLine}%
-    \def\hc@mc@rulew{0.55pt}%
-  \else
-    \let\hc@mc@cardborder\hc@mc@border
-    \def\hc@mc@rulew{0.65pt}%
-  \fi
-  \begin{tcolorbox}[
-    enhanced,
-    width=\linewidth,
-    colback=hcSurface,
-    colframe=\hc@mc@cardborder,
-    boxrule=\hc@mc@rulew,
-    arc=7pt,
-    outer arc=7pt,
-    left=8pt, right=8pt, top=8pt, bottom=7pt,
-    boxsep=0pt,
-    before skip=0pt, after skip=0pt,
-    overlay={%
-      \begin{scope}
-        \clip[rounded corners=7pt] (frame.south west) rectangle (frame.north east);
-        \ifhc@theme@apple
-          \fill[\hc@mc@bar] ([yshift=-1.6pt]frame.north west) rectangle (frame.north east);
-        \else
-          \fill[\hc@mc@bar] ([yshift=-2.3pt]frame.north west) rectangle (frame.north east);
-        \fi
-      \end{scope}
-    }
-  ]
-    \raggedright
-    {\sffamily\fontsize{6.6}{8.2}\selectfont\bfseries\color{hcMuted}%
+  \ifhc@theme@claude
+    \ifnum\hc@metricidx=1\relax
+      \begin{tcolorbox}[
+        enhanced,
+        width=\linewidth,
+        colback=hcInk,
+        colframe=hcInk,
+        boxrule=0.45pt,
+        arc=8pt,
+        outer arc=8pt,
+        left=8.5pt, right=7.5pt, top=8pt, bottom=7.5pt,
+        boxsep=0pt,
+        before skip=0pt, after skip=0pt
+      ]
+        \raggedright
+        {\ifhc@cjk\sffamily\else\ttfamily\fi\fontsize{6.6}{8.2}\selectfont\bfseries\color{hcPrimary}\hc@maybecaps{#3}\par}%
+        \vskip 3.8pt
+        {\rmfamily\bfseries\fontsize{15}{16.5}\selectfont\color{hcCanvas}#4\par}%
+        \vskip 2.5pt
+        {\sffamily\fontsize{6.8}{8.0}\selectfont\color{hcCanvas!78!hcMuted}#5}%
+      \end{tcolorbox}%
+    \else
+      \begin{tcolorbox}[
+        enhanced,
+        width=\linewidth,
+        colback=hcCardBg,
+        colframe=hcLine,
+        boxrule=0.45pt,
+        arc=8pt,
+        outer arc=8pt,
+        left=8.5pt, right=7.5pt, top=8pt, bottom=7.5pt,
+        boxsep=0pt,
+        before skip=0pt, after skip=0pt
+      ]
+        \raggedright
+        {\ifhc@cjk\sffamily\else\ttfamily\fi\fontsize{6.6}{8.2}\selectfont\bfseries\color{hcMuted}\hc@maybecaps{#3}\par}%
+        \vskip 3.8pt
+        {\rmfamily\bfseries\fontsize{15}{16.5}\selectfont\color{hcInk}#4\par}%
+        \vskip 2.5pt
+        {\sffamily\fontsize{6.8}{8.0}\selectfont\color{\hc@mc@deep}#5}%
+      \end{tcolorbox}%
+    \fi
+  \else\ifhc@theme@apple
+    \begin{tcolorbox}[
+      enhanced,
+      width=\linewidth,
+      colback=hcCanvas,
+      frame hidden,
+      boxrule=0pt,
+      arc=10pt,
+      outer arc=10pt,
+      left=9pt, right=8pt, top=8pt, bottom=7.5pt,
+      boxsep=0pt,
+      before skip=0pt, after skip=0pt
+    ]
+      \raggedright
+      {\sffamily\fontsize{6.8}{8.4}\selectfont\bfseries\color{hcMuted}%
+        {\color{\hc@mc@deep}\hc@resolveicon{#2}}\hspace{0.38em}\hc@maybecaps{#3}\par}%
+      \vskip 4pt
+      {\sffamily\bfseries\fontsize{14.5}{16}\selectfont\color{hcInk}#4\par}%
+      \vskip 3.5pt
       \tcbox[
         on line, enhanced,
-        colback=\hc@mc@soft, colframe=\hc@mc@soft,
-        boxrule=0pt, arc=3.5pt,
-        boxsep=0pt, left=3pt, right=3pt, top=2pt, bottom=2pt,
+        colback=hcSurface, frame hidden,
+        boxrule=0pt, arc=4pt,
+        boxsep=0pt, left=4.5pt, right=4.5pt, top=1.6pt, bottom=1.6pt,
         nobeforeafter, tcbox raise base
-      ]{\color{\hc@mc@deep}\hc@resolveicon{#2}}\hspace{0.35em}\hc@maybecaps{#3}\par}%
-    \vskip 4.5pt
-    {\sffamily\bfseries\fontsize{14}{15.5}\selectfont\color{\hc@mc@dark}#4\par}%
-    \vskip 3.5pt
-    \tcbox[
-      on line, enhanced,
-      colback=\hc@mc@bg, colframe=\hc@mc@border!75!hcSurface,
-      boxrule=0.35pt, arc=3pt,
-      boxsep=0pt, left=4pt, right=4pt, top=1.4pt, bottom=1.4pt,
-      nobeforeafter, tcbox raise base
-    ]{\sffamily\fontsize{6.7}{7.8}\selectfont\color{\hc@mc@deep}#5}%
-  \end{tcolorbox}%
+      ]{\sffamily\fontsize{6.7}{7.8}\selectfont\color{\hc@mc@deep}#5}%
+    \end{tcolorbox}%
+  \else
+    \begin{tcolorbox}[
+      enhanced,
+      width=\linewidth,
+      colback=hcSurface,
+      colframe=\hc@mc@border,
+      boxrule=0.65pt,
+      arc=7pt,
+      outer arc=7pt,
+      left=8pt, right=8pt, top=8pt, bottom=7pt,
+      boxsep=0pt,
+      before skip=0pt, after skip=0pt,
+      overlay={%
+        \begin{scope}
+          \clip[rounded corners=7pt] (frame.south west) rectangle (frame.north east);
+          \fill[\hc@mc@bar] ([yshift=-2.3pt]frame.north west) rectangle (frame.north east);
+        \end{scope}
+      }
+    ]
+      \raggedright
+      {\sffamily\fontsize{6.6}{8.2}\selectfont\bfseries\color{hcMuted}%
+        \tcbox[
+          on line, enhanced,
+          colback=\hc@mc@soft, colframe=\hc@mc@soft,
+          boxrule=0pt, arc=3.5pt,
+          boxsep=0pt, left=3pt, right=3pt, top=2pt, bottom=2pt,
+          nobeforeafter, tcbox raise base
+        ]{\color{\hc@mc@deep}\hc@resolveicon{#2}}\hspace{0.35em}\hc@maybecaps{#3}\par}%
+      \vskip 4.5pt
+      {\sffamily\bfseries\fontsize{14}{15.5}\selectfont\color{\hc@mc@dark}#4\par}%
+      \vskip 3.5pt
+      \tcbox[
+        on line, enhanced,
+        colback=\hc@mc@bg, colframe=\hc@mc@border!75!hcSurface,
+        boxrule=0.35pt, arc=3pt,
+        boxsep=0pt, left=4pt, right=4pt, top=1.4pt, bottom=1.4pt,
+        nobeforeafter, tcbox raise base
+      ]{\sffamily\fontsize{6.7}{7.8}\selectfont\color{\hc@mc@deep}#5}%
+    \end{tcolorbox}%
+  \fi\fi
 }
 
-%% 15.7 Health-Card Tables (booktabs + colortbl, zero white rule gaps)
+%% 15.7 Tables (booktabs + colortbl, adapted per paradigm)
 \newenvironment{hctable}{%
   \begingroup
   \sffamily\footnotesize
@@ -2477,22 +3215,18 @@
   \arrayrulecolor{hcInk}%
   \endgroup
 }
-\newcommand{\hctoprule}{\arrayrulecolor{hcTableHeavyRule}\toprule[1.0pt]\arrayrulecolor{hcTableRule}}
+\newcommand{\hctoprule}{\arrayrulecolor{hcTableHeavyRule}\toprule[\hc@table@heavyw]\arrayrulecolor{hcTableRule}}
 \newcommand{\hcmidrule}{\arrayrulecolor{hcTableRule}\midrule[\hc@table@midw]}
-\newcommand{\hcbottomrule}{\arrayrulecolor{hcTableHeavyRule}\bottomrule[1.0pt]\arrayrulecolor{hcInk}}
+\newcommand{\hcbottomrule}{\arrayrulecolor{hcTableHeavyRule}\bottomrule[\hc@table@heavyw]\arrayrulecolor{hcInk}}
 \newcommand{\hctablehead}{\rowcolor{hcTableHeadBg}}
-\newcommand{\hcbestrow}{\rowcolor{hcAccentBg}}
-\newcommand{\hcaltrow}{\rowcolor{hcStripe}}
+\newcommand{\hcbestrow}{\ifhc@theme@claude\rowcolor{hcPrimaryBg}\else\ifhc@theme@apple\rowcolor{hcPrimaryBg}\else\rowcolor{hcAccentBg}\fi\fi}
+\newcommand{\hcaltrow}{\ifhc@theme@claude\rowcolor{hcCanvas}\else\rowcolor{hcStripe}\fi}
 \newcommand{\hcth}[1]{\textbf{\color{hcTableHeadInk}#1}}
 
 \newtcolorbox{hcframecard}[1][]{%
   enhanced,
   width=\linewidth,
-  colback=hcSurface,
-  colframe=hcLine,
-  boxrule=\hc@frame@rulew,
-  arc=7pt,
-  left=7pt, right=7pt, top=7pt, bottom=7pt,
+  hc@framecard@skin,
   boxsep=0pt,
   #1
 }
@@ -2534,20 +3268,21 @@
 
 \lst@AddToHook{EveryPar}{%
   \xifinlist{\the\c@lstnumber}{\hc@code@hlprimary}{%
-    \hc@code@drawlinehl{hcPrimarySoft!72!hcSurface}{hcPrimary}%
+    \hc@code@drawlinehl{hcCodeHlOneBg}{hcCodeHlOneBar}%
   }{%
     \xifinlist{\the\c@lstnumber}{\hc@code@hlaccent}{%
-      \hc@code@drawlinehl{hcAccentSoft!76!hcSurface}{hcAccent}%
+      \hc@code@drawlinehl{hcCodeHlTwoBg}{hcCodeHlTwoBar}%
     }{}%
   }%
+  \color{hcCodeText}%
 }
 
 \lstdefinestyle{hcCodeStyle}{%
-  basicstyle=\ttfamily\fontsize{7.0}{9.6}\selectfont\color{hcInk},
-  keywordstyle=\bfseries\color{hcPrimaryDark},
-  keywordstyle=[2]\color{hcPrimaryDeep},
-  stringstyle=\color{hcAccentDeep},
-  commentstyle=\color{hcMuted},
+  basicstyle=\ttfamily\fontsize{7.0}{9.6}\selectfont\color{hcCodeText},
+  keywordstyle=\bfseries\color{hcCodeKw},
+  keywordstyle=[2]\color{hcCodeKwTwo},
+  stringstyle=\color{hcCodeStr},
+  commentstyle=\color{hcCodeCom},
   numberstyle=\sffamily\fontsize{6.6}{8}\selectfont\color{hcCodeNum},
   numbers=left,
   numbersep=7pt,
@@ -2568,18 +3303,11 @@
   breakable,
   lines before break=5,
   width=\linewidth,
-  colback=hcCodeBg,
-  colframe=hcLine,
-  colbacktitle=hcCodeTitleBg,
-  coltitle=hcChromeBarTitleInk,
-  boxrule=\hc@code@rulew,
-  titlerule=0.45pt,
-  titlerule style=hcTableRule!85!hcSurface,
-  arc=6pt,
+  hc@code@skin,
   left=17pt, right=5.5pt, top=4.5pt, bottom=4.5pt,
   toptitle=3.2pt, bottomtitle=3.2pt,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{7.8}{9.4}\selectfont,
-  title={\hc@code@dots\hspace{0.5em}\hc@lbl@listing~\thetcbcounter: #1},
+  title={\hc@code@dots\hc@lbl@listing~\thetcbcounter: #1},
   listing only,
   listing options={style=hcCodeStyle, #2},
   before skip=6.5pt,
@@ -2603,7 +3331,7 @@
 \algrenewcommand\algorithmicreturn{\textbf{\sffamily\color{hcAccentDark}return}}
 \algrenewcommand\algorithmicfunction{\textbf{\sffamily\color{hcPrimaryDark}function}}
 \algrenewcommand\algorithmicprocedure{\textbf{\sffamily\color{hcPrimaryDark}procedure}}
-\algrenewcommand\alglinenumber[1]{{\sffamily\fontsize{6.6}{8}\selectfont\color{hcCodeNum}#1\hspace{0.2em}}}
+\algrenewcommand\alglinenumber[1]{{\sffamily\fontsize{6.6}{8}\selectfont\color{hcAlgNum}#1\hspace{0.2em}}}
 \algrenewcommand\algorithmiccomment[1]{\hfill\mbox{\sffamily\fontsize{6.9}{8.6}\selectfont\color{hcMuted}$\triangleright$ #1}}
 
 \newcounter{hcalg}
@@ -2614,24 +3342,12 @@
   breakable,
   lines before break=6,
   width=\linewidth,
-  colback=hcSurface,
-  colframe=hcLine,
-  colbacktitle=hcAlgTitleBg,
-  coltitle=hcChromeBarTitleInk,
-  boxrule=\hc@alg@rulew,
-  titlerule=0.45pt,
-  titlerule style=hcTableRule!85!hcSurface,
-  arc=6pt,
+  hc@alg@skin,
   boxsep=0pt,
   left=8.5pt, right=8pt, top=5pt, bottom=5.5pt,
   toptitle=4.2pt, bottomtitle=4.2pt,
   fonttitle=\raggedright\sffamily\bfseries\fontsize{7.9}{9.5}\selectfont,
-  title={%
-    \tikz[baseline=-0.35ex]{%
-      \fill[hcPrimary] (0,0) circle (2.0pt);
-      \fill[hcAccent] (5.8pt,0) circle (2.0pt);
-    }\hspace{0.5em}\hc@lbl@algorithm~\thetcbcounter: #1%
-  },
+  title={\hc@alg@dots\hc@lbl@algorithm~\thetcbcounter: #1},
   fontupper=\fontsize{8.0}{10.8}\selectfont\color{hcInk},
   before upper={\begin{algorithmic}[1]},
   after upper={\end{algorithmic}},
@@ -2657,7 +3373,7 @@
 \pgfplotscreateplotcyclelist{hcPlotCycle}{%
   {hcPrimaryDeep, line width=1.45pt, mark=*, mark size=2.1pt, mark options={fill=hcSurface, draw=hcPrimaryDeep, line width=1pt}},%
   {hcAccentDeep, line width=1.45pt, mark=square*, mark size=2.0pt, mark options={fill=hcSurface, draw=hcAccentDeep, line width=1pt}},%
-  {hcPrimary, line width=1.35pt, dashed, mark=triangle*, mark size=2.3pt, mark options={fill=hcPrimarySoft, draw=hcPrimaryDeep, line width=0.8pt}},%
+  {\hc@plotthree@border, line width=1.35pt, dashed, mark=triangle*, mark size=2.3pt, mark options={fill=\hc@plotthree@fill, draw=\hc@plotthree@border, line width=0.8pt}},%
   {hcAccent, line width=1.35pt, densely dotted, mark=diamond*, mark size=2.3pt, mark options={fill=hcAccentSoft, draw=hcAccentDeep, line width=0.8pt}}%
 }
 
@@ -2707,11 +3423,7 @@
     \begin{tcolorbox}[
       enhanced,
       width=\linewidth,
-      colback=hcCanvas,
-      colframe=hcLine,
-      boxrule=0.55pt,
-      arc=6pt,
-      left=8.5pt, right=8.5pt, top=6pt, bottom=6pt,
+      hc@orcid@skin,
       before skip=6pt, after skip=6pt
     ]
       {\sffamily\bfseries\fontsize{8.2}{9.8}\selectfont\color{hcPrimaryDark}%
@@ -2730,27 +3442,20 @@
 
 %% 15.12 Hardware & Reproducibility Spec Card (hcenvcard + \hcenvrow)
 \newcommand{\hcenvrow}[2]{%
-  \leavevmode{\sffamily\bfseries\fontsize{7.4}{9.6}\selectfont\color{hcMuted}#1} &
-  \leavevmode{\sffamily\fontsize{7.6}{9.8}\selectfont\color{hcInk}#2} \\
+  \leavevmode{\sffamily\bfseries\fontsize{7.4}{9.6}\selectfont\color{hcEnvMuted}#1} &
+  \leavevmode{\sffamily\fontsize{7.6}{9.8}\selectfont\color{hcEnvInk}#2} \\
 }
 
 \NewEnviron{hcenvcard}[1][\hc@lbl@envcard]{%
   \begin{tcolorbox}[
     enhanced,
     width=\linewidth,
-    colback=hcSurface,
-    colframe=hcLine,
-    colbacktitle=hcTableHeadBg,
-    coltitle=hcChromeBarTitleInk,
-    boxrule=0.55pt,
-    titlerule=0.45pt,
-    titlerule style=hcTableRule!85!hcSurface,
-    arc=6pt,
+    hc@envcard@skin,
     boxsep=0pt,
     left=8.5pt, right=8.5pt, top=5.5pt, bottom=5.5pt,
     toptitle=4.5pt, bottomtitle=4.5pt,
     fonttitle=\raggedright\sffamily\bfseries\fontsize{8.0}{9.6}\selectfont,
-    title={\textcolor{hcPrimaryDeep}{\faIcon{microchip}}\hspace{0.48em}#1},
+    title={\hc@card@leadingicon{hcEnvIcon}{microchip}#1},
     before skip=5.5pt, after skip=6pt
   ]%
   \begingroup

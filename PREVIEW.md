@@ -2,9 +2,10 @@
 
 All screenshots below are compiled directly from the same single-source files ([`main.tex`](main.tex), [`sections/*.tex`](sections/), [`figures/*.tex`](figures/)) by switching only the `theme=` and `lang=` options of [`style/healthcard.sty`](style/healthcard.sty).
 
-- **Default Theme (`theme=akatechreport`)**: Sky Cyan `#5BCEFA` · Blossom Pink `#F5A9B8` · Pure White `#FFFFFF` (with B&W print-verified high-contrast shades; `theme=pastel` kept as an alias).
-- **Featured Editorial Theme (`theme=apple`, alias `cupertino`)**: Apple HIG grouped hierarchy — Titanium Mist `#F5F5F7` canvas · Pure `#FFFFFF` elevated cards · `#D2D2D7` hairlines · System Blue `#007AFF` + System Indigo `#5856D6` accents (`>= 6.33:1` WCAG AA/AAA text contrast).
-- **Quick Navigation**: [Pure English (`lang=en`)](#1-pure-english-themeakatechreport-langen--pdflatex-type-1) · [Pure Chinese (`lang=zh`)](#2-pure-chinese-themeakatechreport-langzh--xelatex) · [Bilingual (`lang=bilingual`)](#3-bilingual-themeakatechreport-langbilingual--xelatex) · [Apple HIG (`theme=apple`)](#4-apple-hig-theme--apple-主题全览-themeapple--cupertino) · [Theme Gallery](#5-built-in-theme-gallery--内置主题对比)
+- **Default Theme (`theme=akatechreport`)**: Health-Card UI — Sky Cyan `#5BCEFA` · Blossom Pink `#F5A9B8` · Pure White `#FFFFFF` (with B&W print-verified high-contrast shades; `theme=pastel` kept as an alias).
+- **Featured Theme (`theme=claude`, alias `anthropic`)**: `anthropic.com` / `claude.ai` Editorial System (`frontend-design` + `brand-guidelines`) — Warm Parchment `#F5F4ED` / `#FAF9F5` / Oatmeal `#F0EEE6` rounded cards (`arc=8–10pt`), Serif Display `#141413`, Mono metadata labels (`TECHNICAL REPORT`, `ABSTRACT`, `KEYWORDS`), Obsidian `#141413` contrast CTA/KPI #1/Artifact code blocks, Terracotta `#D97757` + Slate Blue `#6A9BCC` + Sage `#788C5D`.
+- **Featured Theme (`theme=apple`, alias `cupertino`)**: `apple.com` + `apple-design` System — Top Local-Nav Hairline · Centered Keynote Hero `#1D1D1F` · Solid `#0071E3` Action Blue Primary CTA · Borderless Studio Grey `#F5F5F7` Bento Sheets (`arc=10pt`) · Stage Black `#000000` Code & Hardware Spec Tiles (`#2997FF` Sky Blue).
+- **Quick Navigation**: [Pure English (`lang=en`)](#1-pure-english-themeakatechreport-langen--pdflatex-type-1) · [Pure Chinese (`lang=zh`)](#2-pure-chinese-themeakatechreport-langzh--xelatex) · [Bilingual (`lang=bilingual`)](#3-bilingual-themeakatechreport-langbilingual--xelatex) · [Claude Editorial (`theme=claude`)](#4-anthropic--claude-theme--claude-主题全览-themeclaude--anthropic) · [Apple Style (`theme=apple`)](#5-apple-theme--apple-主题全览-themeapple--cupertino) · [Theme Gallery](#6-built-in-theme-gallery--内置主题对比)
 
 ---
 
@@ -101,58 +102,93 @@ Switch `lang=bilingual` (`biorder=zh-en` or `en-zh`) to render paired Chinese + 
 
 ---
 
-## 4. Apple HIG Theme / Apple 主题全览 (`theme=apple` · alias `cupertino`)
+## 4. Anthropic / Claude Theme / Claude 主题全览 (`theme=claude` · alias `anthropic`)
 
-Use `\usepackage[theme=apple, lang=en]{style/healthcard}` (or `theme=cupertino`). Built around Apple Human Interface Guidelines: `#F5F5F7` Titanium Mist grouped base vs. `#FFFFFF` elevated inset cards, `0.5pt–0.55pt` `#D2D2D7` hairlines, a `1.8pt` specular header accent edge, monochrome running chrome, muted macOS traffic-light window headers on `hccode`, `#F5F5F7` table headers with `#1D1D1F` booktabs rules, and restrained System Blue (`#007AFF`) / System Indigo (`#5856D6`) accents across metrics, badges, and plots.
+Use `\usepackage[theme=claude, lang=en]{style/healthcard}` (or `theme=anthropic`). Modeled directly after `anthropic.com` and `claude.ai` (`frontend-design` + `brand-guidelines`): Warm Parchment `#F5F4ED` hero card, `#FAF9F5` / Oatmeal `#F0EEE6` rounded containers (`arc=8–10pt`, subtle `#E2DFD5` cream borders), Serif display typography (`#141413`), Anthropic Mono uppercase labels (`TECHNICAL REPORT`, `ABSTRACT`, `KEYWORDS`), solid `#141413` Slate Ink dark contrast anchors (version pill, `Code` CTA capsule, Hero KPI #1 card, and `#141413` Artifact code block), and Terracotta `#D97757` / Slate Blue `#6A9BCC` / Sage `#788C5D` accents.
 
 <table>
   <tr>
     <td width="50%" align="center">
-      <img src="assets/theme-apple.png" alt="Apple Theme Page 1" width="100%" /><br />
-      <sub><b>Apple · Page 1</b> — Titanium Mist Header Card, Elevated White Abstract Card & Monochrome Titles</sub>
+      <img src="assets/theme-claude.png" alt="Claude Theme Page 1" width="100%" /><br />
+      <sub><b>Claude · Page 1</b> — Warm Parchment Hero, Obsidian CTA Capsule & Mono Eyebrow Abstract</sub>
     </td>
     <td width="50%" align="center">
-      <img src="assets/theme-apple-2.png" alt="Apple Theme Page 2" width="100%" /><br />
-      <sub><b>Apple · Page 2</b> — Hairline Bento KPI Tiles, Neutral Theorem Bar, Algorithm Card & macOS Traffic-Light Code Window</sub>
+      <img src="assets/theme-claude-2.png" alt="Claude Theme Page 2" width="100%" /><br />
+      <sub><b>Claude · Page 2</b> — Obsidian KPI #1 Contrast Tile, Cream Cards & `#141413` Code Block</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <img src="assets/theme-apple-3.png" alt="Apple Theme Page 3" width="100%" /><br />
-      <sub><b>Apple · Page 3</b> — Line-Highlighted Listing, PGFPlots Curves, System Indigo Insight & Amber Caveat Cards</sub>
+      <img src="assets/theme-claude-3.png" alt="Claude Theme Page 3" width="100%" /><br />
+      <sub><b>Claude · Page 3</b> — Warm Artifact Code Continuation, Anthropic Plot & Sage/Terracotta Callouts</sub>
     </td>
     <td width="50%" align="center">
-      <img src="assets/theme-apple-4.png" alt="Apple Theme Page 4" width="100%" /><br />
-      <sub><b>Apple · Page 4</b> — Neutral <code>#F5F5F7</code> Table Headers, Delta Badges, ORCID Directory & Hardware Environment Card</sub>
+      <img src="assets/theme-claude-4.png" alt="Claude Theme Page 4" width="100%" /><br />
+      <sub><b>Claude · Page 4</b> — Parchment Tables, Terracotta Deltas, Oatmeal ORCID & Env Cards</sub>
     </td>
   </tr>
 </table>
 
 ---
 
-## 5. Built-in Theme Gallery / 内置主题对比
+## 5. Apple Theme / Apple 主题全览 (`theme=apple` · alias `cupertino`)
+
+Use `\usepackage[theme=apple, lang=en]{style/healthcard}` (or `theme=cupertino`). Modeled directly after `apple.com` and `apple-design`: crisp local-nav hairline strip above a **centered keynote Hero** (`#1D1D1F` bold Sans + `#6E6E73` Pewter subhead + solid `#0071E3` Action Blue primary CTA capsule), borderless Studio Grey (`#F5F5F7`, `arc=10pt`) Bento & Abstract cards, monochrome Space Titanium (`#424245`) + Link Blue (`#0066CC`) accents, and **`#000000` Stage Black** dark product blocks for code listings (`#2997FF` Sky Blue keywords & macOS dots) and hardware specs.
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/theme-apple.png" alt="Apple Theme Page 1" width="100%" /><br />
+      <sub><b>Apple · Page 1</b> — Local-Nav Hairline, Centered Keynote Hero, Solid `#0071E3` CTA & Grey Abstract</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/theme-apple-2.png" alt="Apple Theme Page 2" width="100%" /><br />
+      <sub><b>Apple · Page 2</b> — Borderless Studio Grey Bento, Hairline Theorem & Stage Black `#000000` Code</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/theme-apple-3.png" alt="Apple Theme Page 3" width="100%" /><br />
+      <sub><b>Apple · Page 3</b> — Stage Black Listing, Studio Grey Sheets (No Side Bars) & Clean Plot</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/theme-apple-4.png" alt="Apple Theme Page 4" width="100%" /><br />
+      <sub><b>Apple · Page 4</b> — Soft Hairline Tables, Titanium Deltas, Grey ORCID & Stage Black Hardware Tile</sub>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 6. Built-in Theme Gallery / 内置主题对比
 
 Switch palette across the entire template with a single `theme=` option (plus custom HEX skinning via `\hcsettheme{primary=..., accent=...}`).
 
 <table>
   <tr>
-    <td width="20%" align="center">
+    <td width="33.3%" align="center">
+      <img src="assets/theme-claude.png" alt="theme=claude" width="100%" /><br />
+      <code>theme=claude</code>
+    </td>
+    <td width="33.3%" align="center">
       <img src="assets/theme-apple.png" alt="theme=apple" width="100%" /><br />
       <code>theme=apple</code>
     </td>
-    <td width="20%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-ocean.png" alt="theme=ocean" width="100%" /><br />
       <code>theme=ocean</code>
     </td>
-    <td width="20%" align="center">
+  </tr>
+  <tr>
+    <td width="33.3%" align="center">
       <img src="assets/theme-sage.png" alt="theme=sage" width="100%" /><br />
       <code>theme=sage</code>
     </td>
-    <td width="20%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-lavender.png" alt="theme=lavender" width="100%" /><br />
       <code>theme=lavender</code>
     </td>
-    <td width="20%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-mono.png" alt="theme=mono" width="100%" /><br />
       <code>theme=mono</code>
     </td>
