@@ -7,7 +7,7 @@
 [![Theme](https://img.shields.io/badge/Default%20Theme-akatechreport-5BCEFA?style=flat-square&labelColor=0E3E59)](style/healthcard.sty)
 [![Engine](https://img.shields.io/badge/Engine-pdfLaTeX%20%7C%20XeLaTeX-F5A9B8?style=flat-square&labelColor=632436)](latexmkrc)
 [![Languages](https://img.shields.io/badge/Lang-EN%20%7C%20ZH%20%7C%20Bilingual-5BCEFA?style=flat-square)](#multilingual-modes--中文与双语适配)
-[![Shell Escape](https://img.shields.io/badge/-shell--escape-Not%20Required-F5A9B8?style=flat-square&labelColor=632436)](latexmkrc)
+[![Shell Escape](https://img.shields.io/badge/Shell%20Escape-Not%20Required-F5A9B8?style=flat-square&labelColor=632436)](latexmkrc)
 
 *Default `akatechreport` palette: Sky Cyan `#5BCEFA` · Blossom Pink `#F5A9B8` · Pure White `#FFFFFF` (with B&W print-verified high-contrast shades).*
 
@@ -17,9 +17,11 @@
 
 ## Visual Preview / 渲染预览
 
+> Preview showcase rendered from the single-source methods paper **[ProteinSplitAudit](https://github.com/Ariakage/protein-split-audit)** across all 3 language modes and all 7 built-in themes — exercising every template feature (`\hcsetup` PDF/XMP metadata, dual TikZ logos, Bento KPI tiles, 12-stage TikZ flowchart, 2 PGFPlots charts, `hcdefinition` / `hctheorem` / `hcproposition`, `hcalgorithm`, key-line `hccode`, all 4 callout cards `hccard` / `hcpinkcard` / `hcnote` / `hccaveat`, 2 `hctable`s with `\hcbadge` / `\hcpinkbadge` / `\gain` / `\drop`, `\makeorcidlist`, and `hcenvcard`).
+
 ### Single-Source Multilingual Modes (`theme=akatechreport` · `lang=en|zh|bilingual`)
 
-Compiled from the **exact same `.tex` source** by switching only `lang=en`, `lang=zh`, or `lang=bilingual` — see **[PREVIEW.md](PREVIEW.md)** for full page-by-page spreads of every mode.
+Compiled from the **exact same `.tex` source** by switching only `lang=en`, `lang=zh`, or `lang=bilingual` — see **[PREVIEW.md](PREVIEW.md)** for full page-by-page spreads of every mode and theme.
 
 <table>
   <tr>
@@ -38,99 +40,131 @@ Compiled from the **exact same `.tex` source** by switching only `lang=en`, `lan
   </tr>
   <tr>
     <td width="33.3%" align="center">
-      <img src="assets/lang-en-2.png" alt="Pure English Page 2" width="100%" /><br />
-      <sub>EN · Bento Metrics & Code Card</sub>
+      <img src="assets/lang-en-3.png" alt="Pure English Page 3" width="100%" /><br />
+      <sub>EN · Bento Metrics, TikZ Flowchart & Algorithm</sub>
     </td>
     <td width="33.3%" align="center">
-      <img src="assets/lang-zh-2.png" alt="Pure Chinese Page 2" width="100%" /><br />
-      <sub>ZH · 算法框与代码行高亮</sub>
+      <img src="assets/lang-zh-3.png" alt="Pure Chinese Page 3" width="100%" /><br />
+      <sub>ZH · 算法框、代码高亮与 PGFPlots 曲线</sub>
     </td>
     <td width="33.3%" align="center">
-      <img src="assets/lang-bilingual-3.png" alt="Bilingual Page 3" width="100%" /><br />
-      <sub>Bilingual · 双语 Bento 指标与算法代码</sub>
+      <img src="assets/lang-bilingual-6.png" alt="Bilingual Page 6" width="100%" /><br />
+      <sub>Bilingual · 双语徽章表、折线图与多色提示卡</sub>
     </td>
   </tr>
 </table>
 
-### Pure English Full Preview (`theme=akatechreport, lang=en` · `pdfLaTeX` Type 1)
+### Pure English Full Preview (`theme=akatechreport, lang=en` · `pdfLaTeX` Type 1, 6 Pages)
 
 <table>
   <tr>
-    <td width="25%" align="center">
-      <img src="assets/page-1.png" alt="EN Page 1" width="100%" /><br />
-      <sub><b>Page 1</b> — Header Card, Dual Logos & ORCID</sub>
+    <td width="33.3%" align="center">
+      <img src="assets/lang-en-1.png" alt="EN Page 1" width="100%" /><br />
+      <sub><b>Page 1</b> — Header Card, Dual Logos, ORCID & Abstract</sub>
     </td>
-    <td width="25%" align="center">
-      <img src="assets/page-2.png" alt="EN Page 2" width="100%" /><br />
-      <sub><b>Page 2</b> — Bento KPIs, Math & Code Card</sub>
+    <td width="33.3%" align="center">
+      <img src="assets/lang-en-2.png" alt="EN Page 2" width="100%" /><br />
+      <sub><b>Page 2</b> — Rules Card, Definition, Theorem & Proposition</sub>
     </td>
-    <td width="25%" align="center">
-      <img src="assets/page-3.png" alt="EN Page 3" width="100%" /><br />
-      <sub><b>Page 3</b> — Main Table, Note & PGFPlots</sub>
+    <td width="33.3%" align="center">
+      <img src="assets/lang-en-3.png" alt="EN Page 3" width="100%" /><br />
+      <sub><b>Page 3</b> — Bento KPI Grid, TikZ Flowchart & Algorithm</sub>
     </td>
-    <td width="25%" align="center">
-      <img src="assets/page-4.png" alt="EN Page 4" width="100%" /><br />
-      <sub><b>Page 4</b> — ORCID Index, Env Card & Refs</sub>
+  </tr>
+  <tr>
+    <td width="33.3%" align="center">
+      <img src="assets/lang-en-4.png" alt="EN Page 4" width="100%" /><br />
+      <sub><b>Page 4</b> — Highlighted Code, PGFPlots, Pink & Note Cards</sub>
+    </td>
+    <td width="33.3%" align="center">
+      <img src="assets/lang-en-5.png" alt="EN Page 5" width="100%" /><br />
+      <sub><b>Page 5</b> — Wide & Single-Col Tables (Badges/Deltas) & Caveat</sub>
+    </td>
+    <td width="33.3%" align="center">
+      <img src="assets/lang-en-6.png" alt="EN Page 6" width="100%" /><br />
+      <sub><b>Page 6</b> — ORCID Directory, Env Spec Card & Balanced Refs</sub>
     </td>
   </tr>
 </table>
 
-### Pure Chinese Full Preview (`theme=akatechreport, lang=zh` · `XeLaTeX`)
+### Pure Chinese Full Preview (`theme=akatechreport, lang=zh` · `XeLaTeX`, 5 Pages)
 
 <table>
   <tr>
-    <td width="25%" align="center">
+    <td width="20%" align="center">
       <img src="assets/lang-zh-1.png" alt="ZH Page 1" width="100%" /><br />
-      <sub><b>第 1 页</b> — 中文封面卡、摘要与关键词</sub>
+      <sub><b>第 1 页</b> — 中文主标、摘要与规则卡</sub>
     </td>
-    <td width="25%" align="center">
+    <td width="20%" align="center">
       <img src="assets/lang-zh-2.png" alt="ZH Page 2" width="100%" /><br />
-      <sub><b>第 2 页</b> — Bento 指标、算法与代码高亮</sub>
+      <sub><b>第 2 页</b> — Bento、流程图与三大数理卡</sub>
     </td>
-    <td width="25%" align="center">
+    <td width="20%" align="center">
       <img src="assets/lang-zh-3.png" alt="ZH Page 3" width="100%" /><br />
-      <sub><b>第 3 页</b> — 跨栏实验表、折线图与提示卡</sub>
+      <sub><b>第 3 页</b> — 算法、代码高亮与曲线图</sub>
+    </td>
+    <td width="20%" align="center">
+      <img src="assets/lang-zh-4.png" alt="ZH Page 4" width="100%" /><br />
+      <sub><b>第 4 页</b> — 双表格徽章、森林图与警告卡</sub>
+    </td>
+    <td width="20%" align="center">
+      <img src="assets/lang-zh-5.png" alt="ZH Page 5" width="100%" /><br />
+      <sub><b>第 5 页</b> — ORCID、环境卡与参考文献</sub>
+    </td>
+  </tr>
+</table>
+
+### Bilingual Full Preview (`theme=akatechreport, lang=bilingual` · `XeLaTeX`, 8 Pages)
+
+<table>
+  <tr>
+    <td width="25%" align="center">
+      <img src="assets/lang-bilingual-1.png" alt="Bilingual Page 1" width="100%" /><br />
+      <sub><b>Page 1</b> — 双语标题、双摘要与引言</sub>
     </td>
     <td width="25%" align="center">
-      <img src="assets/lang-zh-4.png" alt="ZH Page 4" width="100%" /><br />
-      <sub><b>第 4 页</b> — ORCID 索引、环境卡与文献</sub>
-    </td>
-  </tr>
-</table>
-
-### Bilingual Full Preview (`theme=akatechreport, lang=bilingual` · `XeLaTeX`)
-
-<table>
-  <tr>
-    <td width="20%" align="center">
-      <img src="assets/lang-bilingual-1.png" alt="Bilingual Page 1" width="100%" /><br />
-      <sub><b>Page 1</b> — 双语标题、摘要与引言</sub>
-    </td>
-    <td width="20%" align="center">
       <img src="assets/lang-bilingual-2.png" alt="Bilingual Page 2" width="100%" /><br />
-      <sub><b>Page 2</b> — 核心贡献、公式与定理</sub>
+      <sub><b>Page 2</b> — 双语约束卡与协议沿革</sub>
     </td>
-    <td width="20%" align="center">
+    <td width="25%" align="center">
       <img src="assets/lang-bilingual-3.png" alt="Bilingual Page 3" width="100%" /><br />
-      <sub><b>Page 3</b> — 双语 Bento、算法与代码</sub>
+      <sub><b>Page 3</b> — Bento KPI 与定义/定理卡</sub>
     </td>
-    <td width="20%" align="center">
+    <td width="25%" align="center">
       <img src="assets/lang-bilingual-4.png" alt="Bilingual Page 4" width="100%" /><br />
-      <sub><b>Page 4</b> — 双语表注、图注与消融</sub>
+      <sub><b>Page 4</b> — 12 阶段架构图与命题卡</sub>
     </td>
-    <td width="20%" align="center">
+  </tr>
+  <tr>
+    <td width="25%" align="center">
       <img src="assets/lang-bilingual-5.png" alt="Bilingual Page 5" width="100%" /><br />
-      <sub><b>Page 5</b> — 声明、ORCID 与环境卡</sub>
+      <sub><b>Page 5</b> — 双语算法与 CLI 代码清单</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="assets/lang-bilingual-6.png" alt="Bilingual Page 6" width="100%" /><br />
+      <sub><b>Page 6</b> — 徽章实验表、曲线与提示卡</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="assets/lang-bilingual-7.png" alt="Bilingual Page 7" width="100%" /><br />
+      <sub><b>Page 7</b> — CI 森林图、研究局限与结论</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="assets/lang-bilingual-8.png" alt="Bilingual Page 8" width="100%" /><br />
+      <sub><b>Page 8</b> — 声明、ORCID、环境与文献</sub>
     </td>
   </tr>
 </table>
 
-### One-Click Theme Gallery / 一键换肤实测
+### All 7 Built-in Themes Gallery / 全 7 款内置主题一键换肤预览
 
-Switch the entire template's ribbon, logos, badges, inline highlights, tables, code bars, and plots with **a single package option**:
+Switch the entire template's hero chrome, logos, badges, inline highlights, tables, code windows, callout cards, and plots with **a single package option**:
 
 <table>
   <tr>
+    <td width="33.3%" align="center">
+      <img src="assets/theme-akatechreport.png" alt="theme=akatechreport" width="100%" /><br />
+      <code>theme=akatechreport</code> (default)
+    </td>
     <td width="33.3%" align="center">
       <img src="assets/theme-claude.png" alt="theme=claude" width="100%" /><br />
       <code>theme=claude</code> (<code>anthropic</code>)
@@ -139,21 +173,24 @@ Switch the entire template's ribbon, logos, badges, inline highlights, tables, c
       <img src="assets/theme-apple.png" alt="theme=apple" width="100%" /><br />
       <code>theme=apple</code> (<code>cupertino</code>)
     </td>
-    <td width="33.3%" align="center">
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="25%" align="center">
       <img src="assets/theme-ocean.png" alt="theme=ocean" width="100%" /><br />
       <code>theme=ocean</code>
     </td>
-  </tr>
-  <tr>
-    <td width="33.3%" align="center">
+    <td width="25%" align="center">
       <img src="assets/theme-sage.png" alt="theme=sage" width="100%" /><br />
       <code>theme=sage</code>
     </td>
-    <td width="33.3%" align="center">
+    <td width="25%" align="center">
       <img src="assets/theme-lavender.png" alt="theme=lavender" width="100%" /><br />
       <code>theme=lavender</code>
     </td>
-    <td width="33.3%" align="center">
+    <td width="25%" align="center">
       <img src="assets/theme-mono.png" alt="theme=mono" width="100%" /><br />
       <code>theme=mono</code>
     </td>
@@ -162,55 +199,75 @@ Switch the entire template's ribbon, logos, badges, inline highlights, tables, c
 
 #### Featured Theme: `theme=claude` (alias `anthropic` · `anthropic.com` / `claude.ai` Style)
 
-Drops the Health-Card chrome completely and follows `anthropic.com` + `claude.ai` visual tokens (`frontend-design` + `brand-guidelines`): Warm Parchment (`#F5F4ED`), Ivory (`#FAF9F5`), and Oatmeal (`#F0EEE6`) rounded editorial cards (`arc=8–10pt`, subtle `#E2DFD5` cream borders), **serif display headings** (`#141413`), Anthropic Mono uppercase labels (`TECHNICAL REPORT`, `ABSTRACT`, `KEYWORDS`), solid `#141413` Slate Ink contrast anchors (version pill, primary `Code` CTA capsule, Hero KPI #1 tile, and dark Artifact code block with Terracotta `#E88B6E` / Sage `#A7BE89` / Slate `#9AC2EA` syntax), paired with Terracotta (`#D97757`), Slate Blue (`#6A9BCC`), and Sage (`#788C5D`) accents.
+Drops the Health-Card chrome completely and follows `anthropic.com` + `claude.ai` visual tokens (`frontend-design` + `brand-guidelines`): Warm Parchment (`#F5F4ED`), Ivory (`#FAF9F5`), and Oatmeal (`#F0EEE6`) rounded editorial cards (`arc=8–10pt`, subtle `#E2DFD5` cream borders), **serif display headings** (`#141413`), Anthropic Mono uppercase labels (`TECHNICAL REPORT` / `METHODS PREPRINT`, `ABSTRACT`, `KEYWORDS`), solid `#141413` Slate Ink contrast anchors (version pill, primary `Code` CTA capsule, Hero KPI #1 tile, and dark Artifact code block with Terracotta `#E88B6E` / Sage `#A7BE89` / Slate `#9AC2EA` syntax), paired with Terracotta (`#D97757`), Slate Blue (`#6A9BCC`), and Sage (`#788C5D`) accents.
 
 <table>
   <tr>
-    <td width="25%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-claude.png" alt="Claude Theme Page 1" width="100%" /><br />
-      <sub><b>Claude · Page 1</b> — Parchment Hero, Obsidian CTA Pill & Oatmeal Abstract</sub>
+      <sub><b>Claude · Page 1</b> — Parchment Hero, Obsidian CTA & Abstract</sub>
     </td>
-    <td width="25%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-claude-2.png" alt="Claude Theme Page 2" width="100%" /><br />
-      <sub><b>Claude · Page 2</b> — Obsidian Feature KPI #1 & Warm Cream Bento</sub>
+      <sub><b>Claude · Page 2</b> — Rules, Definition, Theorem & Proposition</sub>
     </td>
-    <td width="25%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-claude-3.png" alt="Claude Theme Page 3" width="100%" /><br />
-      <sub><b>Claude · Page 3</b> — `#141413` Artifact Code Block & Sage/Cream Cards</sub>
+      <sub><b>Claude · Page 3</b> — Obsidian KPI #1, TikZ Diagram & Algorithm</sub>
     </td>
-    <td width="25%" align="center">
+  </tr>
+  <tr>
+    <td width="33.3%" align="center">
       <img src="assets/theme-claude-4.png" alt="Claude Theme Page 4" width="100%" /><br />
-      <sub><b>Claude · Page 4</b> — Parchment Tables, ORCID & Oatmeal Env Card</sub>
+      <sub><b>Claude · Page 4</b> — <code>#141413</code> Artifact Code, Plots & Callouts</sub>
+    </td>
+    <td width="33.3%" align="center">
+      <img src="assets/theme-claude-5.png" alt="Claude Theme Page 5" width="100%" /><br />
+      <sub><b>Claude · Page 5</b> — Parchment Tables, Probe/Delta Badges & Caveat</sub>
+    </td>
+    <td width="33.3%" align="center">
+      <img src="assets/theme-claude-6.png" alt="Claude Theme Page 6" width="100%" /><br />
+      <sub><b>Claude · Page 6</b> — ORCID, Oatmeal Env Card & Balanced Refs</sub>
     </td>
   </tr>
 </table>
 
 #### Featured Theme: `theme=apple` (alias `cupertino` · `apple.com` Style)
 
-Drops the Health-Card chrome in favor of an `apple.com` + `apple-design` Human Interface layout: subtle top local-nav utility hairline above a **centered keynote Hero** (`#1D1D1F` bold Sans headline, `#6E6E73` Pewter subhead, solid `#0071E3` Apple Action Blue primary `Code` capsule CTA), borderless Studio Grey (`#F5F5F7`, `arc=10pt`) Bento & Abstract cards, monochrome Space Titanium (`#424245`) + Link Blue (`#0066CC`) accents, and **`#000000` Stage Black** contrast blocks for code listings (`#2997FF` Sky Blue keywords & macOS dots) and hardware spec cards.
+Drops the Health-Card chrome in favor of an `apple.com` + `apple-design` Human Interface layout: subtle top local-nav utility hairline above a **centered keynote Hero** (`#1D1D1F` bold Sans headline, `#6E6E73` Pewter subhead, solid `#0071E3` Apple Action Blue primary `Code` capsule CTA), borderless Studio Grey (`#F5F5F7`, `arc=10pt`) Bento & Abstract cards, monochrome Space Titanium (`#424245`) + Link Blue (`#0066CC`) accents, and **`#000000` Stage Black** contrast blocks for code listings (`#4DA6FF` Sky Blue keywords & macOS dots) and hardware spec cards.
 
 <table>
   <tr>
-    <td width="25%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-apple.png" alt="Apple Theme Page 1" width="100%" /><br />
       <sub><b>Apple · Page 1</b> — Local-Nav Hairline, Centered Hero & Blue CTA</sub>
     </td>
-    <td width="25%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-apple-2.png" alt="Apple Theme Page 2" width="100%" /><br />
-      <sub><b>Apple · Page 2</b> — Borderless Studio Grey Bento & Stage Black Code</sub>
+      <sub><b>Apple · Page 2</b> — Mist Rules Card & Hairline Math Inspectors</sub>
     </td>
-    <td width="25%" align="center">
+    <td width="33.3%" align="center">
       <img src="assets/theme-apple-3.png" alt="Apple Theme Page 3" width="100%" /><br />
-      <sub><b>Apple · Page 3</b> — Stage Black Listing & Studio Grey Callouts</sub>
+      <sub><b>Apple · Page 3</b> — Studio Grey Bento, Flowchart & Algorithm</sub>
     </td>
-    <td width="25%" align="center">
+  </tr>
+  <tr>
+    <td width="33.3%" align="center">
       <img src="assets/theme-apple-4.png" alt="Apple Theme Page 4" width="100%" /><br />
-      <sub><b>Apple · Page 4</b> — Hairline Tables & Stage Black Hardware Tile</sub>
+      <sub><b>Apple · Page 4</b> — Stage Black <code>#000000</code> Code, Plots & Callouts</sub>
+    </td>
+    <td width="33.3%" align="center">
+      <img src="assets/theme-apple-5.png" alt="Apple Theme Page 5" width="100%" /><br />
+      <sub><b>Apple · Page 5</b> — Hairline Tables, Titanium Deltas & Caution Tile</sub>
+    </td>
+    <td width="33.3%" align="center">
+      <img src="assets/theme-apple-6.png" alt="Apple Theme Page 6" width="100%" /><br />
+      <sub><b>Apple · Page 6</b> — Grey ORCID, Stage Black Hardware Tile & Refs</sub>
     </td>
   </tr>
 </table>
 
-> Full multi-page renders of every language mode (`lang=en`, `lang=zh`, `lang=bilingual`) and theme live in **[PREVIEW.md](PREVIEW.md)**.
+> Full multi-page spreads across all 3 languages (`en`, `zh`, `bilingual`) and all 7 built-in themes (`akatechreport`, `claude`, `apple`, `ocean`, `sage`, `lavender`, `mono`) live in **[PREVIEW.md](PREVIEW.md)**.
 
 ---
 

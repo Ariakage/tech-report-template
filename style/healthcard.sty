@@ -93,6 +93,10 @@
   %% fancyhdr, microtype, amsmath, amsthm, natbib, libertine, zi4, newtxmath
   %% (or fontspec + unicode-math + OpenType libertine under XeTeX/LuaTeX),
   %% environ, graphicx, balance.
+  %% Prefer acmart's built-in pbalance over balance.sty to prevent orphaned References headings on balanced last pages
+  \IfFileExists{pbalance.sty}{%
+    \@ifundefined{if@ACM@pbalance}{}{\@ACM@pbalancetrue\@ACM@balancefalse}%
+  }{}%
   \ifXeTeX
     \microtypesetup{protrusion=true}
   \else
@@ -3478,9 +3482,16 @@
 \AtBeginDocument{%
   \ifhc@acmart
     \renewcommand{\bibfont}{\footnotesize\color{hcInk}}%
+    \@ifundefined{bibsection}{}{%
+      \renewcommand{\bibsection}{%
+        \needspace{7\baselineskip}%
+        \phantomsection\addcontentsline{toc}{section}{\refname}%
+        \section*{\refname}%
+      }%
+    }%
   \fi
   \@ifundefined{bibliography}{}{%
-    \pretocmd{\bibliography}{\Needspace{5\baselineskip}}{}{}%
+    \pretocmd{\bibliography}{\needspace{7\baselineskip}}{}{}%
   }%
 }
 
